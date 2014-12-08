@@ -1,0 +1,14 @@
+doctype
+html
+  head
+    title #{title}
+    script(src="/socket.io/socket.io.js")
+    link(rel='stylesheet', href='/stylesheets/boilerplate.css')
+    link(rel='stylesheet', href='/stylesheets/normalize.css')
+    link(rel='stylesheet', href='/stylesheets/style.css')
+  body
+    #container.container
+      #matrix.hidden
+        #grid
+      #information.info.grayed.hidden
+    script(src="/javascripts/player.js")

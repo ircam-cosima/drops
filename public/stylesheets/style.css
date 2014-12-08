@@ -1,0 +1,121 @@
+/* ==========================================================================
+ * Fonts
+ * ========================================================================== */
+
+@font-face {
+    font-family: 'Quicksand';
+    font-weight: 100;
+    src: url('../fonts/Quicksand-Light.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Quicksand';
+    font-weight: 400;
+    src: url('../fonts/Quicksand-Regular.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Quicksand';
+    font-weight: 700;
+    src: url('../fonts/Quicksand-Bold.ttf') format('truetype');
+}
+
+
+/* ==========================================================================
+ * Elements
+ * ========================================================================== */
+
+body {
+  background-color: black;
+  color: #fff;
+  font-family: 'Quicksand', 'Lato', 'Helvetica Neue', 'Helvetica', sans-serif;
+  font-size: 20px;
+  letter-spacing: 0.05em;
+}
+
+#grid {
+  /*background-color: black;*/
+  display: block;
+  position: relative;
+}
+
+.info {
+  font-size: 5em;
+  padding: 1em;
+  text-align: center;
+}
+
+.info p {
+  margin-bottom: 1em;
+}
+
+.info.grayed {
+  color: #333;
+}
+
+.info .position {
+  display: block;
+  font-size: 3em;
+  font-weight: 700;
+  height: 2em;
+  line-height: 2em;
+  margin: 0 auto;
+  text-align: center;
+  width: 2em;
+}
+
+.info .position.circle {
+  background-color: #428BCA;
+  border-radius: 50%;
+}
+
+.info .small {
+  font-size: 0.5em;
+  margin: 2em 0;
+}
+
+.topology {
+  position: relative;
+}
+
+.tile {
+  background-color: #333;
+  border-radius: 50%;
+  position: absolute;
+}
+
+.tile.player {
+  background-color: #428BCA;
+}
+
+.tile.player.soloist {
+  background-color: #e74c3c;
+}
+
+.tile.player.me {
+  background-color: #e74c3c;
+}
+
+.container {
+
+}
+
+/*@media only screen and (min-width: 35em) {
+  body {
+    font-size: 2em;
+  }
+
+  .btn {
+    padding: 0.9em 1em 1.1em;
+  }
+}
+
+@media only screen and (min-width: 50em) {
+  body {
+    font-size: 4em;
+  }
+
+  .btn {
+    padding: 0.45em 0.5em 0.55em
+  }
+}*/
