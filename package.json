@@ -11,7 +11,9 @@
     "jade": "~1.5.0",
     "socket.io": "~1.1.0",
     "matrix": "git://github.com/Ircam-RnD/matrix.git#master",
-    "audio-context": "git://github.com/Ircam-RnD/audio-context.git#master"
+    "audio-context": "git://github.com/Ircam-RnD/audio-context.git#master",
+    "time-engine": "git://github.com/Ircam-RnD/time-engine.git#master",
+    "scheduler": "git://github.com/Ircam-RnD/scheduler.git#master"
   },
   "devDependencies": {
     "gulp": "~3.8.7",
