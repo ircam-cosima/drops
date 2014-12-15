@@ -24,7 +24,8 @@ class Echo extends TimeEngine {
   }
 
   advanceTime(time) {
-    this.echoer.synth.trigger(time, this.params, this.gain);
+    var quantizedTime = this.echoer.quantizeFun(time);
+    this.echoer.synth.trigger(quantizedTime, this.params, this.gain);
     this.gain *= this.echoer.gainFactor;
 
     if (this.gain < this.echoer.minGain) {
@@ -37,10 +38,12 @@ class Echo extends TimeEngine {
 }
 
 class Echoer {
-  constructor(synth) {
+  constructor(synth, quantizeFun) {
     this.synth = synth;
+    this.quantizeFun = quantizeFun;
+
     this.duration = 1;
-    this.gainFactor = 0.66;
+    this.gainFactor = 0.5;
     this.minGain = 0.01;
   }
 
@@ -53,24 +56,25 @@ class Echoer {
 }
 
 class PlayerPerformance extends clientSide.Performance {
-  constructor(audioBuffers, sync, placement) {
+  constructor(audioBuffers, sync, placement, params = {}) {
     super();
 
     this.sync = sync;
     this.placement = placement;
-    this.synth = new SampleSynth();
+    this.synth = new SampleSynth(audioBuffers);
 
-    var echoer = new Echoer(this.synth);
-    echoer.duration = 1;
-    echoer.gainFactor = 0.5;
-    echoer.minGain = 0.001;
+    this.quantize = params.duration || 0.15;
+
+    var echoer = new Echoer(this.synth, (time) => {
+      var serverTime = sync.getServerTime(time);
+      var quantizedServerTime = Math.ceil(serverTime / this.quantize) * this.quantize;
+      return sync.getLocalTime(quantizedServerTime);
+    });
+
+    echoer.duration = params.duration || 5;
+    echoer.gainFactor = params.gainFactor || 0.9;
+    echoer.minGain = params.minGain || 0.001;
     this.echoer = echoer;
-
-    this.label = null;
-    this.place = null;
-    this.position = null;
-
-    this.displayDiv.classList.add('fullscreen');
 
     // setup GUI
     var div = document.createElement('div');
@@ -84,21 +88,19 @@ class PlayerPerformance extends clientSide.Performance {
 
     // setup input listeners
     inputModule.on('touchstart', (touchData) => {
-      var now = scheduler.currentTime;
+      var time = scheduler.currentTime;
       var x = (touchData.coordinates[0] - this.displayDiv.offsetLeft + window.scrollX) / this.displayDiv.offsetWidth;
       var y = (touchData.coordinates[1] - this.displayDiv.offsetTop + window.scrollY) / this.displayDiv.offsetHeight;
       var params = {
-        index: this.place, 
+        index: this.placement.place, 
         x: x,
         y: y,
       };
 
-      // echo sound
-      this.echoer.start(now, params, 1);
+      this.echoer.start(time, params, 1);
 
       var socket = ioClient.socket;
-      var serverTime = this.sync.getServerTime(now);
-      socket.emit('perf_sound', serverTime, params, 1);
+      socket.emit('perf_sound', time, params, 1);
     });
 
     inputModule.enableTouch(this.displayDiv);
@@ -114,11 +116,8 @@ class PlayerPerformance extends clientSide.Performance {
   start() {
     super.start();
 
-    var place = this.placement.place;
-    var label = this.placement.label;
-
     // setup GUI
-    this.informationDiv.innerHTML = "<p class='small'>You are at position</p>" + "<div class='position'><span>" + label + "</span></div>";
+    this.informationDiv.innerHTML = "<p class='small'>You are at position</p>" + "<div class='position'><span>" + this.placement.label + "</span></div>";
     this.informationDiv.classList.remove('hidden');
     this.displayDiv.classList.remove('hidden');
   }

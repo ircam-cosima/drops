@@ -34,6 +34,8 @@ var audioFiles = [
   'sounds/12-drops-B-C5.mp3'
 ];
 
+var welcome = "<p>Welcome to <b>Drops</b>.</p> <p>Please make yourself comfortable.</p>";
+
 window.addEventListener('load', () => {
   // load audio files
 
@@ -41,9 +43,10 @@ window.addEventListener('load', () => {
   var fileProgress = [];
   var totalProgress = 0;
 
-  // var progressDiv = document.createElement('div');
-  // progressDiv.setAttribute('class', 'info');
-  // container.appendChild(progressDiv);
+  var progressDiv = document.createElement('div');
+  progressDiv.classList.add('info');
+  progressDiv.classList.add('fullscreen');
+  container.appendChild(progressDiv);
 
   for (let i = 0; i < audioFiles.length; i++)
     fileProgress.push(0);
@@ -54,15 +57,19 @@ window.addEventListener('load', () => {
     totalProgress += (progress - fileProgress[obj.index]);
     fileProgress[obj.index] = progress;
 
-    // progressDiv.innerHTML = "" + Math.floor(100 * totalProgress) + "%";
+    progressDiv.innerHTML = welcome + "<p>Loading ...<br>" + Math.floor(100 * totalProgress / 24) + "%</p>";
   };
 
   loader.load(audioFiles)
     .then(function(audioBuffers) {
+      container.removeChild(progressDiv);
+
       var sync = new clientSide.SetupSync();
       var placement = new clientSide.SetupPlacementAssigned({display: false});
       var performance = new PlayerPerformance(audioBuffers, sync, placement);
       var manager = new clientSide.Manager([sync, placement], performance);
+
+      manager.displayDiv.innerHTML = welcome + "<p>Touch the screen to <b>join the performance!</b></p>";
 
       ioClient.start(() => {
         manager.start();
