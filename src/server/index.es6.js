@@ -25,10 +25,8 @@ app.get('/env', function(req, res) {
 // init socket io server
 serverSide.ioServer.init(app);
 
-// create manangers and start server side
-var placementManager = new serverSide.PlacementManagerAssignedPlaces({maxPlaces: 200, order: 'ascending'});
-var syncManager = new serverSide.SyncManager();
-var setupManager = new serverSide.SetupManagerPlacementAndSync(placementManager, syncManager);
-var performanceManager = new ServerPerformance();
-
-serverSide.start(setupManager, performanceManager);
+// start server side
+var placement = new serverSide.SetupPlacementAssigned({maxPlaces: 200, order: 'ascending'});
+var sync = new serverSide.SetupSync();
+var performance = new ServerPerformance();
+var manager = new serverSide.ManagerPlayers([sync, placement], performance);

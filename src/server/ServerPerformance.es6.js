@@ -3,24 +3,18 @@
 var serverSide = require('matrix/server');
 var ioServer = serverSide.ioServer;
 
-class ServerPerformance extends serverSide.PerformanceManager {
-  constructor(topologyManager) {
-    super(topologyManager);
+class ServerPerformance extends serverSide.Performance {
+  constructor() {
+    super();
   }
 
-  init(playerManager) {
-    super.init(playerManager);
-  }
-
-  addPlayer(player) {
-    var socket = player.socket;
-
-    socket.on('perf_sound', (time, playerId, x, y, gain) => {
-      console.log('sound:', time, playerId, x, y, gain);
+  connect(socket, player) {
+    socket.on('perf_sound', (time, params, gain) => {
+      console.log('sound:', time, params, gain);
     });
   }
 
-  removePlayer(player) {
+  disconnect(socket, player) {
 
   }
 }

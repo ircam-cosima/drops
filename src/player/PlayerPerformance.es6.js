@@ -52,11 +52,12 @@ class Echoer {
   }
 }
 
-class PlayerPerformance extends clientSide.PerformanceManager {
-  constructor(syncManager) {
+class PlayerPerformance extends clientSide.Performance {
+  constructor(audioBuffers, sync, placement) {
     super();
 
-    this.syncManager = syncManager;
+    this.sync = sync;
+    this.placement = placement;
     this.synth = new SampleSynth();
 
     var echoer = new Echoer(this.synth);
@@ -69,23 +70,23 @@ class PlayerPerformance extends clientSide.PerformanceManager {
     this.place = null;
     this.position = null;
 
-    this.parentDiv.classList.add('fullscreen');
+    this.displayDiv.classList.add('fullscreen');
 
     // setup GUI
-    var informationDiv = document.createElement('div');
-    informationDiv.setAttribute('id', 'information');
-    informationDiv.classList.add('info');
-    informationDiv.classList.add('grayed');
-    informationDiv.classList.add('hidden');
-    this.informationDiv = informationDiv;
+    var div = document.createElement('div');
+    div.setAttribute('id', 'information');
+    div.classList.add('info');
+    div.classList.add('grayed');
+    div.classList.add('hidden');
+    this.informationDiv = div;
 
-    this.parentDiv.appendChild(informationDiv);
+    this.displayDiv.appendChild(this.informationDiv);
 
     // setup input listeners
     inputModule.on('touchstart', (touchData) => {
       var now = scheduler.currentTime;
-      var x = (touchData.coordinates[0] - this.parentDiv.offsetLeft + window.scrollX) / this.parentDiv.offsetWidth;
-      var y = (touchData.coordinates[1] - this.parentDiv.offsetTop + window.scrollY) / this.parentDiv.offsetHeight;
+      var x = (touchData.coordinates[0] - this.displayDiv.offsetLeft + window.scrollX) / this.displayDiv.offsetWidth;
+      var y = (touchData.coordinates[1] - this.displayDiv.offsetTop + window.scrollY) / this.displayDiv.offsetHeight;
       var params = {
         index: this.place, 
         x: x,
@@ -96,11 +97,11 @@ class PlayerPerformance extends clientSide.PerformanceManager {
       this.echoer.start(now, params, 1);
 
       var socket = ioClient.socket;
-      var serverTime = this.syncManager.getServerTime(now);
+      var serverTime = this.sync.getServerTime(now);
       socket.emit('perf_sound', serverTime, params, 1);
     });
 
-    inputModule.enableTouch(this.parentDiv);
+    inputModule.enableTouch(this.displayDiv);
 
     // setup performance control listeners
     var socket = ioClient.socket;
@@ -110,13 +111,16 @@ class PlayerPerformance extends clientSide.PerformanceManager {
     });
   }
 
-  start(placeInfo) {
-    super.start(placeInfo);
+  start() {
+    super.start();
+
+    var place = this.placement.place;
+    var label = this.placement.label;
 
     // setup GUI
-    this.informationDiv.innerHTML = "<p class='small'>You are at position</p>" + "<div class='position'><span>" + placeInfo.label + "</span></div>";
+    this.informationDiv.innerHTML = "<p class='small'>You are at position</p>" + "<div class='position'><span>" + label + "</span></div>";
     this.informationDiv.classList.remove('hidden');
-    this.parentDiv.classList.remove('hidden');
+    this.displayDiv.classList.remove('hidden');
   }
 }
 

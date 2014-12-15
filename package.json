@@ -12,6 +12,7 @@
     "socket.io": "~1.1.0",
     "matrix": "git://github.com/Ircam-RnD/matrix.git#master",
     "audio-context": "git://github.com/Ircam-RnD/audio-context.git#master",
+    "loaders": "git://github.com/Ircam-RnD/loaders.git#master",
     "time-engine": "git://github.com/Ircam-RnD/time-engine.git#master",
     "scheduler": "git://github.com/Ircam-RnD/scheduler.git#master"
   },
