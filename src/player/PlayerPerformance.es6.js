@@ -76,23 +76,13 @@ class PlayerPerformance extends clientSide.Performance {
     echoer.minGain = params.minGain || 0.001;
     this.echoer = echoer;
 
-    // setup GUI
-    var div = document.createElement('div');
-    div.setAttribute('id', 'information');
-    div.classList.add('info');
-    div.classList.add('grayed');
-    div.classList.add('hidden');
-    this.informationDiv = div;
-
-    this.displayDiv.appendChild(this.informationDiv);
-
     // setup input listeners
     inputModule.on('touchstart', (touchData) => {
       var time = scheduler.currentTime;
       var x = (touchData.coordinates[0] - this.displayDiv.offsetLeft + window.scrollX) / this.displayDiv.offsetWidth;
       var y = (touchData.coordinates[1] - this.displayDiv.offsetTop + window.scrollY) / this.displayDiv.offsetHeight;
       var params = {
-        index: this.placement.place, 
+        index: this.placement.place,
         x: x,
         y: y,
       };
@@ -114,12 +104,12 @@ class PlayerPerformance extends clientSide.Performance {
   }
 
   start() {
+    if (this.displayDiv) {
+      this.displayDiv.innerHTML = "<p class='small'>You are at position</p>" + "<div class='position'><span>" + this.placement.label + "</span></div>";
+      this.displayDiv.classList.remove('hidden');
+    }
+    
     super.start();
-
-    // setup GUI
-    this.informationDiv.innerHTML = "<p class='small'>You are at position</p>" + "<div class='position'><span>" + this.placement.label + "</span></div>";
-    this.informationDiv.classList.remove('hidden');
-    this.displayDiv.classList.remove('hidden');
   }
 }
 
