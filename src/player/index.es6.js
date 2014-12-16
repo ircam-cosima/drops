@@ -36,12 +36,17 @@ var audioFiles = [
 
 var welcome = "<p>Welcome to <b>Drops</b>.</p> <p>Please make yourself comfortable.</p>";
 
+function createImpulseResponse(callback) {
+  setTimeout(() => {
+    callback(null);
+  }, 100);
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   // load audio files
-
   var loader = new AudioBufferLoader();
   var fileProgress = [];
-  var totalProgress = 0;
+  var loaderProgress = 0;
 
   var progressDiv = document.createElement('div');
   progressDiv.classList.add('info');
@@ -54,25 +59,29 @@ window.addEventListener('DOMContentLoaded', () => {
   loader.progressCallback = function(obj) {
     var progress = obj.value;
 
-    totalProgress += (progress - fileProgress[obj.index]);
+    loaderProgress += (progress - fileProgress[obj.index]);
     fileProgress[obj.index] = progress;
 
-    progressDiv.innerHTML = welcome + "<p>Loading ...<br>" + Math.floor(100 * totalProgress / 24) + "%</p>";
+    progressDiv.innerHTML = welcome + "<p>Loading ...<br>" + Math.floor(100 * loaderProgress / 24) + "%</p>";
   };
 
   loader.load(audioFiles)
     .then(function(audioBuffers) {
       container.removeChild(progressDiv);
 
-      var sync = new clientSide.SetupSync();
-      var placement = new clientSide.SetupPlacementAssigned({display: false});
-      var performance = new PlayerPerformance(audioBuffers, sync, placement);
-      var manager = new clientSide.Manager([sync, placement], performance);
+      createImpulseResponse((impulseResponse) => {
+        var sync = new clientSide.SetupSync();
+        var placement = new clientSide.SetupPlacementAssigned({
+          display: false
+        });
+        var performance = new PlayerPerformance(audioBuffers, impulseResponse, sync, placement);
+        var manager = new clientSide.Manager([sync, placement], performance);
 
-      manager.displayDiv.innerHTML = welcome + "<p>Touch the screen to <b>join the performance!</b></p>";
+        manager.displayDiv.innerHTML = welcome + "<p>Touch the screen to <b>join the performance!</b></p>";
 
-      ioClient.start(() => {
-        manager.start();
+        ioClient.start(() => {
+          manager.start();
+        });
       });
     });
 });

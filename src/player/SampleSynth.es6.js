@@ -7,8 +7,8 @@ function cent2lin(cent) {
 }
 
 class SampleSynth {
-  constructor(buffers) {
-    this.buffers = buffers;
+  constructor(audioBuffers, impulseResponse) {
+    this.audioBuffers = audioBuffers;
 
     this.output = audioContext.createGain();
     this.output.connect(audioContext.destination);
@@ -16,17 +16,18 @@ class SampleSynth {
   }
 
   trigger(time, params, gain) { // distance
-    var buffers = this.buffers;
+    var audioBuffers = this.audioBuffers;
 
-    if (buffers && buffers.length > 0) {
+    if (audioBuffers && audioBuffers.length > 0) {
       var index = params.index || 0;
       var x = params.x || 0.5;
       var y = params.y || 0.5;
       var cx = 2 * (x - 0.5);
       var cy = 2 * (y - 0.5);
       var r = Math.sqrt(cx * cx + cy * cy);
+      var d = params.distance || 0;
 
-      index %= Math.floor(buffers.length / 2);
+      index %= Math.floor(audioBuffers.length / 2);
 
       var durationFactor = Math.pow(10, -y); // 0.1 ... 1
 
@@ -35,7 +36,7 @@ class SampleSynth {
       g1.gain.value = gain;
 
       var s1 = audioContext.createBufferSource();
-      s1.buffer = buffers[2 * index + 1];
+      s1.buffer = audioBuffers[2 * index + 1];
       s1.playbackRate.value = cent2lin(50 * r);
       s1.connect(g1);
       s1.start(time);
@@ -45,7 +46,7 @@ class SampleSynth {
       g2.gain.value = gain;
 
       var s2 = audioContext.createBufferSource();
-      s2.buffer = buffers[2 * index + 1];
+      s2.buffer = audioBuffers[2 * index + 1];
       s1.playbackRate.value = cent2lin(-33 * r);
       s2.connect(g2);
       s2.start(time);

@@ -9,6 +9,8 @@ var scheduler = require('scheduler');
 var SampleSynth = require('./SampleSynth');
 var visual = require('./visual/main');
 
+var period = 0.150;
+
 function changeBackgroundColor(d) {
   var value = Math.floor(Math.max(1 - d, 0) * 255);
   document.body.style.backgroundColor = 'rgb(' + value + ', ' + value + ', ' + value + ')';
@@ -71,12 +73,12 @@ class Echoer {
 }
 
 class PlayerPerformance extends clientSide.Performance {
-  constructor(audioBuffers, sync, placement, params = {}) {
+  constructor(audioBuffers, impulseResponse, sync, placement, params = {}) {
     super();
 
     this.sync = sync;
     this.placement = placement;
-    this.synth = new SampleSynth(audioBuffers);
+    this.synth = new SampleSynth(audioBuffers, impulseResponse);
 
     var canvas = document.createElement('canvas');
     canvas.setAttribute('id', 'scene');
@@ -84,7 +86,7 @@ class PlayerPerformance extends clientSide.Performance {
     // canvas.width = width;
     // canvas.height = height;
 
-    this.quantize = params.duration || 0.15;
+    this.quantize = period;
 
     var echoer = new Echoer(this.synth, audioBuffers, (time) => {
       var serverTime = sync.getServerTime(time);
@@ -120,7 +122,8 @@ class PlayerPerformance extends clientSide.Performance {
     var socket = ioClient.socket;
 
     socket.on('perf_echo', (serverTime, params, gain) => {
-
+      var time = this.sync.getLocalTime(serverTime);
+      //this.echoer.start(time, params, gain);
     });
   }
 
