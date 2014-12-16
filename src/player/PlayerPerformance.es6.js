@@ -7,6 +7,7 @@ var audioContext = require('audio-context');
 var TimeEngine = require('time-engine');
 var scheduler = require('scheduler');
 var SampleSynth = require('./SampleSynth');
+var visual = require('./visual/main');
 
 function changeBackgroundColor(d) {
   var value = Math.floor(Math.max(1 - d, 0) * 255);
@@ -26,6 +27,7 @@ class Echo extends TimeEngine {
   advanceTime(time) {
     var quantizedTime = this.echoer.quantizeFun(time);
     this.echoer.synth.trigger(quantizedTime, this.params, this.gain);
+    this.echoer.makeBlob(this.params, this.gain);
     this.gain *= this.echoer.gainFactor;
 
     if (this.gain < this.echoer.minGain) {
@@ -38,8 +40,9 @@ class Echo extends TimeEngine {
 }
 
 class Echoer {
-  constructor(synth, quantizeFun) {
+  constructor(synth, audioBuffers, quantizeFun) {
     this.synth = synth;
+    this.audioBuffers = audioBuffers;
     this.quantizeFun = quantizeFun;
 
     this.duration = 1;
@@ -49,9 +52,21 @@ class Echoer {
 
   start(time, params, gain) {
     this.synth.trigger(time, params, gain);
+    this.makeBlob(params, gain);
 
     var echo = new Echo(this, params, gain);
     scheduler.add(echo, this.duration);
+  }
+
+  makeBlob(params, gain) {
+    visual.createCircle({
+      index: params.index,
+      x: params.x,
+      y: params.y,
+      duration: this.audioBuffers[2 * params.index + 1].duration,
+      velocity: 100 + gain * 200,
+      opacity: Math.sqrt(gain)
+    });
   }
 }
 
@@ -63,16 +78,22 @@ class PlayerPerformance extends clientSide.Performance {
     this.placement = placement;
     this.synth = new SampleSynth(audioBuffers);
 
+    var canvas = document.createElement('canvas');
+    canvas.setAttribute('id', 'scene');
+    document.body.appendChild(canvas);
+    // canvas.width = width;
+    // canvas.height = height;
+
     this.quantize = params.duration || 0.15;
 
-    var echoer = new Echoer(this.synth, (time) => {
+    var echoer = new Echoer(this.synth, audioBuffers, (time) => {
       var serverTime = sync.getServerTime(time);
       var quantizedServerTime = Math.ceil(serverTime / this.quantize) * this.quantize;
       return sync.getLocalTime(quantizedServerTime);
     });
 
     echoer.duration = params.duration || 5;
-    echoer.gainFactor = params.gainFactor || 0.9;
+    echoer.gainFactor = params.gainFactor || 0.8;
     echoer.minGain = params.minGain || 0.001;
     this.echoer = echoer;
 
@@ -104,11 +125,12 @@ class PlayerPerformance extends clientSide.Performance {
   }
 
   start() {
-    if (this.displayDiv) {
-      this.displayDiv.innerHTML = "<p class='small'>You are at position</p>" + "<div class='position'><span>" + this.placement.label + "</span></div>";
-      this.displayDiv.classList.remove('hidden');
-    }
+    // if (this.displayDiv) {
+    //   this.displayDiv.innerHTML = "<p class='small'>You are at position</p>" + "<div class='position'><span>" + this.placement.label + "</span></div>";
+    //   this.displayDiv.classList.remove('hidden');
+    // }
     
+    visual.start();
     super.start();
   }
 }

@@ -36,7 +36,7 @@ var audioFiles = [
 
 var welcome = "<p>Welcome to <b>Drops</b>.</p> <p>Please make yourself comfortable.</p>";
 
-window.addEventListener('load', () => {
+window.addEventListener('DOMContentLoaded', () => {
   // load audio files
 
   var loader = new AudioBufferLoader();
@@ -45,7 +45,7 @@ window.addEventListener('load', () => {
 
   var progressDiv = document.createElement('div');
   progressDiv.classList.add('info');
-  progressDiv.classList.add('fullscreen');
+  progressDiv.classList.add('welcome');
   container.appendChild(progressDiv);
 
   for (let i = 0; i < audioFiles.length; i++)

@@ -36,7 +36,7 @@ class SampleSynth {
 
       var s1 = audioContext.createBufferSource();
       s1.buffer = buffers[2 * index + 1];
-      s1.playbackRate.value = cent2lin(33 * r);
+      s1.playbackRate.value = cent2lin(50 * r);
       s1.connect(g1);
       s1.start(time);
 

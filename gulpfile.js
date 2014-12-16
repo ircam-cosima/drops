@@ -33,7 +33,7 @@ gulp.task('clean', function() {
 });
 
 gulp.task('transpile-app', function() {
-  return gulp.src('src/*/*.es6.js')
+  return gulp.src('src/**/*.es6.js')
     .pipe(es6({
       disallowUnknownReferences: false
     }))

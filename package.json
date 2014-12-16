@@ -1,7 +1,7 @@
 {
   "name": "drops",
   "author": "Norbert Schnell, Sébastien Robaszkiewicz",
-  "description": "The Matrix's Wandering Sound is a collective performance that enables players to play on other players' devices by moving their finger on the matrix represented on the screen of their phones.",
+  "description": "The Matrix's Drops is a collective performance that enables players to play on other players' devices by moving their finger on the matrix represented on the screen of their phones.",
   "version": "0.0.1",
   "scripts": {
     "start": "nodemon server.js"
@@ -14,7 +14,10 @@
     "audio-context": "git://github.com/Ircam-RnD/audio-context.git#master",
     "loaders": "git://github.com/Ircam-RnD/loaders.git#master",
     "time-engine": "git://github.com/Ircam-RnD/time-engine.git#master",
-    "scheduler": "git://github.com/Ircam-RnD/scheduler.git#master"
+    "scheduler": "git://github.com/Ircam-RnD/scheduler.git#master",
+    "d3-scale-linear": "0.0.0",
+    "dat-gui": "~0.5.0",
+    "vector": "git+https://github.com/b-ma/vector2d.git"
   },
   "devDependencies": {
     "gulp": "~3.8.7",
