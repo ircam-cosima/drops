@@ -10,7 +10,13 @@ class SampleSynth {
   constructor(audioBuffers, impulseResponse) {
     this.audioBuffers = audioBuffers;
 
+    this.impulseResponse = impulseResponse;
+    this.convolver = audioContext.createConvolver();
+    this.convolver.buffer = impulseResponse;
+    
     this.output = audioContext.createGain();
+    this.convolver.connect(this.output);
+    
     this.output.connect(audioContext.destination);
     this.output.gain.value = 1;
   }
@@ -27,12 +33,22 @@ class SampleSynth {
       var r = Math.sqrt(cx * cx + cy * cy);
       var d = params.distance || 0;
 
+      var wet = audioContext.createGain();
+      wet.connect(this.convolver);
+      var dry = audioContext.createGain();
+      dry.connect(this.output);
+      
+      // clip in [0,1]
+      wet.gain.value = Math.min(1, Math.max(0, d));
+      dry.gain.value = Math.sqrt(1 - wet.gain.value);
+      
       index %= Math.floor(audioBuffers.length / 2);
 
       var durationFactor = Math.pow(10, -y); // 0.1 ... 1
 
       var g1 = audioContext.createGain();
-      g1.connect(this.output);
+      g1.connect(wet);
+      g1.connect(dry);
       g1.gain.value = gain;
 
       var s1 = audioContext.createBufferSource();
@@ -42,7 +58,8 @@ class SampleSynth {
       s1.start(time);
 
       var g2 = audioContext.createGain();
-      g2.connect(this.output);
+      g2.connect(wet);
+      g2.connect(dry);
       g2.gain.value = gain;
 
       var s2 = audioContext.createBufferSource();

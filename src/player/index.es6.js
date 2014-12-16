@@ -36,10 +36,84 @@ var audioFiles = [
 
 var welcome = "<p>Welcome to <b>Drops</b>.</p> <p>Please make yourself comfortable.</p>";
 
+var impulseResponseParams = {
+  sampleRate : 44100, // Hz FROM CONTEXT
+  numChannels : 1, // FROM CONTEXT (2 for stereo, 4 for true stereo)
+  fadeIntime : 0.2, // seconds
+  decayThreshold : -20, // dB
+  decayTime : 5, // seconds
+  lowPassFreqStart : 15000, // Hz
+  lowPassFreqEnd : 100, // Hz
+};
+
 function createImpulseResponse(callback) {
-  setTimeout(() => {
+  var fadeInTime = impulseResponseParams.fadeInTime || 0;
+  var decayThreshold = impulseResponseParams.decayThreshold || -30;
+  var decayTime = impulseResponseParams.decayTime || 3;
+  var sampleRate = impulseResponseParams.sampleRate || 44100;
+  var numChannels = impulseResponseParams.numChannels || 1;
+  var lowPassFreqStart = impulseResponseParams.LowPassFreqStart || 15000;
+  var lowPassFreqEnd = impulseResponseParams.LowPassFreqEnd || 1000;
+
+  var fadeInSampleFrames = Math.round(fadeInTime * sampleRate);
+  var decaySampleFrames = Math.round(decayTime * sampleRate);
+  var numSampleFrames = fadeInSampleFrames + decaySampleFrames;
+  var decayBase = Math.pow(dBToPower(decayThreshold), 1 / (numSampleFrames - 1));
+
+  // Wait for the Monkey.
+  var context = null;
+  if(typeof(OfflineAudioContext) === 'function' ||
+     typeof(OfflineAudioContext) === 'object') {
+    context = new OfflineAudioContext(numChannels, numSampleFrames, sampleRate);
+  }
+  else if(typeof(webkitOfflineAudioContext) === 'function' ||
+          typeof(webkitOfflineAudioContext) === 'object')  {
+    context = new webkitOfflineAudioContext(numChannels, numSampleFrames, sampleRate);
+  }
+  if(context === null) {
     callback(null);
-  }, 100);
+    return;
+  }
+  
+  var reverbIR = context.createBuffer(numChannels, numSampleFrames, sampleRate);
+
+  var fadeInFactor = 1 / (fadeInSampleFrames - 1);
+  for (var i = 0; i < numChannels; i++) {
+    var chan = reverbIR.getChannelData(i);
+    var j;
+    for (j = 0; j < numSampleFrames; j++) {
+      chan[j] = randomSample() * Math.pow(decayBase, j);
+    }
+    // Yes, fade in applies to an (already) exponential decay.
+    for (j = 0; j < fadeInSampleFrames; j++) {
+      chan[j] *= j * fadeInFactor;
+    }
+  }
+
+  if (lowPassFreqStart == 0) {
+    callback(reverbIR);
+    return;
+  }
+  
+  var player = context.createBufferSource();
+  player.buffer = reverbIR;
+  var filter = context.createBiquadFilter();
+
+  lowPassFreqStart = Math.min(lowPassFreqStart, reverbIR.sampleRate / 2);
+  lowPassFreqEnd = Math.min(lowPassFreqEnd, reverbIR.sampleRate / 2);
+
+  filter.type = "lowpass";
+  filter.Q.value = 0.0001;
+  filter.frequency.setValueAtTime(lowPassFreqStart, 0);
+  filter.frequency.exponentialRampToValueAtTime(lowPassFreqEnd, decayTime);
+
+  player.connect(filter);
+  filter.connect(context.destination);
+  player.start(0);
+  context.oncomplete = function(event) {
+    callback(event.renderedBuffer);
+  };
+  context.startRendering();
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -85,3 +159,16 @@ window.addEventListener('DOMContentLoaded', () => {
       });
     });
 });
+
+/** @private
+    @return {number} A random number from -1 to 1. */
+var randomSample = function() {
+  return Math.random() * 2 - 1;
+};
+
+
+/** @private
+    @return {number} An exponential gain value (1e-6 for -60dB) */
+var dBToPower = function(dBValue) {
+  return Math.pow(10, dBValue / 10);
+};
