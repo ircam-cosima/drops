@@ -1,5 +1,6 @@
 var loop = require('./loop');
 var Circle = require('./circle');
+var colorMap = require('./color-map');
 
 // globals
 var w, h;
@@ -81,5 +82,38 @@ module.exports = {
     window.addEventListener('resize', setSize);
 
     loop.run(options);
+  },
+
+  remove(index) {
+    for (let circle of circles) {
+      if (circle.index === index)
+        circle.isDead = true;
+    }
+  },
+
+  clear() {
+    circles = [];
+  },
+
+  makeButton(container, index, x, y, func) {
+    var posX = x * w;
+    var posY = y * h;
+
+    var el = document.createElement('div');
+    el.classList.add('button');
+    el.style.left = posX + 'px';
+    el.style.top = posY + 'px';
+    el.style.backgroundColor = colorMap[index % colorMap.length];
+
+    el.addEventListener('touchstart', function onTouchStart(e) {
+      e.preventDefault();
+      el.removeEventListener(onTouchStart);
+      func(index, x, y);
+      container.removeChild(el);
+    });
+
+    container.appendChild(el);
+
   }
+
 };

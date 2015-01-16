@@ -35,6 +35,10 @@ body {
   padding: 0;
 }
 
+h1 {
+  font-size: 4em;  
+}
+
 #grid {
   display: block;
   position: relative;
@@ -47,18 +51,14 @@ body {
   margin: 0 auto;
   font-size: 5em;
   text-align: center;
-}
-
-p {
-  margin-bottom: 1em;
+  line-height: 1.2em;
 }
 
 .setup {
   background: #000;
-  position: fixed;
-  min-height: 100%;
-  min-width: 100%;
-  font-size: 5em;
+  height: 100%;
+  width: 100%;
+  font-size: 4em;
   text-align: center;
 }
 
@@ -67,7 +67,16 @@ p {
   margin: 2em 0;
 }
 
+.sync {
+  background: #000;
+  height: 100%;
+  width: 80%;
+  padding-top: 30%;
+  margin: 0 auto;
+}
+
 .placement .position.circle {
+  position: fixed;
   background-color: #428BCA;
   border-radius: 50%;
   display: block;
@@ -82,66 +91,40 @@ p {
 
 .performance {
   position: fixed;
-  min-height: 100%;
-  min-width: 100%;
-  font-size: 5em;
+  height: 100%;
+  width: 100%;
   text-align: center;
-  color: #333;
+  color: #444;
+  padding-top: 10%;
 }
 
 .performance p {
-  margin-bottom: 1em;
+  font-size: 5em;
+  font-weight: bold;
+  margin: 0em;
 }
 
-.performance .position {
-  display: block;
-  font-size: 3em;
-  font-weight: 700;
-  height: 2em;
-  line-height: 2em;
-  margin: 0 auto;
-  text-align: center;
-  width: 2em;
+.performance .big {
+  font-size: 10em;
+  font-weight: bold;
 }
 
-.topology {
-  position: relative;
-}
-
-.tile {
-  background-color: #333;
+.button {
+  width: 200px;
+  height: 200px;
+  margin-left: -100px;
+  margin-top: -100px;
+  opacity: 0.8;
   border-radius: 50%;
   position: absolute;
 }
 
-.tile.player {
-  background-color: #428BCA;
+.admin {
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  color: #fff;
+  margin-bottom: 1em;
+  font-size: 2em;
+  font-weight: bold;
 }
-
-.tile.player.soloist {
-  background-color: #e74c3c;
-}
-
-.tile.player.me {
-  background-color: #e74c3c;
-}
-
-/*@media only screen and (min-width: 35em) {
-  body {
-    font-size: 2em;
-  }
-
-  .btn {
-    padding: 0.9em 1em 1.1em;
-  }
-}
-
-@media only screen and (min-width: 50em) {
-  body {
-    font-size: 4em;
-  }
-
-  .btn {
-    padding: 0.45em 0.5em 0.55em
-  }
-}*/

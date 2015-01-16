@@ -1,21 +1,6 @@
 var d3 = require('d3-scale-linear');
+var colorMap = require('./color-map');
 
-function getRandomColor() {
-  var letters = '56789ABCDEF'.split('');
-  var color = '#';
-  for (var i = 0; i < 6; i++ ) {
-      color += letters[Math.floor(Math.random() * letters.length)];
-  }
-  return color;
-}
-
-var colorMap = [
-  "#1abc9c", "#2ecc71", "#3498db", "#9b59b6",
-  "#f1c40f", "#e67e22", "#e74c3c", "#ffffff",
-  "#D6FBAE", "#A7FEC6", "#8CD9DB", "#7B5979", 
-  "#ED5FF9", "#B9CEB7", "#C69575", "#79C967", 
-  "#C8995B", "#D6DD65", "#7B78FD"
-]
 
 var idCounter = 0;
 var colors = '';
@@ -31,7 +16,7 @@ class Circle {
     this.y = options.y || 0.5; // 0.1
     this.opacity = options.opacity || 1;
     this.index = options.index || 0;
-    
+
     this.growthVelocity = options.velocity || 200; // pixels / sec
     this.minVelocity = 50; // if gain is < 0.25 => constant growth
     this.friction = -50; // pixels / sec
@@ -46,7 +31,7 @@ class Circle {
     //   console.log(colors);
     // }
 
-    this.color = colorMap[this.index];
+    this.color = colorMap[this.index % colorMap.length];
     this.radius = 0;
     this.position = {};
     // console.log(this.index, this.color);
@@ -72,14 +57,18 @@ class Circle {
     if (this.growthVelocity > this.minVelocity) {
       this.growthVelocity += (this.friction * dt);
     }
-    
+
     this.radius += this.growthVelocity * dt;
 
-    if (this.lifeTime < 0) { this.isDead = true; }
+    if (this.lifeTime < 0) {
+      this.isDead = true;
+    }
   }
 
   draw(ctx, dt) {
-    if (this.isDead) { return; }
+    if (this.isDead) {
+      return;
+    }
 
     ctx.save();
     ctx.beginPath();

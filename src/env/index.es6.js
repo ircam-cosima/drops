@@ -1,6 +1,6 @@
 'use strict';
 
-var clientSide = require('matrix/client');
+var clientSide = require('soundworks/client');
 var ioClient = clientSide.ioClient;
 
 class EnvPerformance extends clientSide.Performance {

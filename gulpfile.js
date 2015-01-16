@@ -7,7 +7,7 @@ var rename = require('gulp-rename');
 var transform = require('vinyl-transform');
 var watch = require('gulp-watch');
 
-var watchOthers = ['node_modules/matrix/'];
+var watchOthers = ['node_modules/soundworks/'];
 
 var tasks = ['transpile-app', 'clean'];
 if (watchOthers && watchOthers.length) {

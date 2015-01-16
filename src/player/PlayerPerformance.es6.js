@@ -1,6 +1,6 @@
 'use strict';
 
-var clientSide = require('matrix/client');
+var clientSide = require('soundworks/client');
 var ioClient = clientSide.ioClient;
 var inputModule = clientSide.inputModule;
 var audioContext = require('audio-context');
@@ -9,66 +9,112 @@ var scheduler = require('scheduler');
 var SampleSynth = require('./SampleSynth');
 var visual = require('./visual/main');
 
-var period = 0.150;
+var quantize = 0.250;
+
+var loopParams = {
+  echos: 2,
+  period: 7.5,
+  attenuation: 0.70710678118655,
+  threshold: 0.1
+};
+
+scheduler.lookahead = 0.050;
+
+function arrayRemove(array, value) {
+  var index = array.indexOf(value);
+
+  if (index >= 0) {
+    array.splice(index, 1);
+    return true;
+  }
+
+  return false;
+}
 
 function changeBackgroundColor(d) {
   var value = Math.floor(Math.max(1 - d, 0) * 255);
   document.body.style.backgroundColor = 'rgb(' + value + ', ' + value + ', ' + value + ')';
 }
 
-class Echo extends TimeEngine {
-  constructor(echoer, params, gain) {
+class Loop extends TimeEngine {
+  constructor(looper, params, local = false) {
     super();
-
-    this.echoer = echoer;
-
+    this.looper = looper;
     this.params = params;
-    this.gain = gain;
+    this.local = local;
   }
 
   advanceTime(time) {
-    var quantizedTime = this.echoer.quantizeFun(time);
-    this.echoer.synth.trigger(quantizedTime, this.params, this.gain);
-    this.echoer.makeBlob(this.params, this.gain);
-    this.gain *= this.echoer.gainFactor;
-
-    if (this.gain < this.echoer.minGain) {
-      scheduler.remove(this);
-      return null;
-    }
-
-    return time + this.echoer.duration;
+    return this.looper.advance(time, this);
   }
 }
 
-class Echoer {
-  constructor(synth, audioBuffers, quantizeFun) {
+class Looper {
+  constructor(synth, audioBuffers, updatePlaying) {
     this.synth = synth;
     this.audioBuffers = audioBuffers;
-    this.quantizeFun = quantizeFun;
-
-    this.duration = 1;
-    this.gainFactor = 0.5;
-    this.minGain = 0.01;
+    this.updatePlaying = updatePlaying;
+    this.loops = [];
   }
 
-  start(time, params, gain) {
-    this.synth.trigger(time, params, gain);
-    this.makeBlob(params, gain);
+  start(time, params, local = false) {
+    var loop = new Loop(this, params, local);
 
-    var echo = new Echo(this, params, gain);
-    scheduler.add(echo, this.duration);
+    scheduler.add(loop, time);
+    this.loops.push(loop);
+
+    if (local)
+      this.updatePlaying(1);
   }
 
-  makeBlob(params, gain) {
+  advance(time, loop) {
+    var params = loop.params;
+
+    this.synth.trigger(time, params);
+
     visual.createCircle({
       index: params.index,
       x: params.x,
       y: params.y,
-      duration: this.audioBuffers[2 * params.index + 1].duration,
-      velocity: 100 + gain * 200,
-      opacity: Math.sqrt(gain)
+      duration: this.audioBuffers[params.index].duration,
+      velocity: 100 + params.gain * 200,
+      opacity: Math.sqrt(params.gain)
     });
+
+    params.gain *= params.attenuation;
+
+    if (params.gain < params.threshold) {
+      arrayRemove(this.loops, loop);
+
+      if (loop.local)
+        this.updatePlaying(-1);
+
+      return null;
+    }
+
+    return time + params.period;
+  }
+
+  remove(index) {
+    var loops = this.loops;
+    var i = 0;
+
+    while (i < loops.length) {
+      var loop = loops[i];
+
+      if (loop.params.index === index) {
+        loops.splice(i, 1);
+
+        scheduler.remove(loop);
+
+        if (loop.local) {
+          this.updatePlaying(-1);
+          visual.remove(index);
+        }
+      } else {
+        i++;
+      }
+    }
   }
 }
 
@@ -80,61 +126,157 @@ class PlayerPerformance extends clientSide.Performance {
     this.placement = placement;
     this.synth = new SampleSynth(audioBuffers, impulseResponse);
 
+    this.numTriggers = 6;
+
     var canvas = document.createElement('canvas');
     canvas.setAttribute('id', 'scene');
     document.body.appendChild(canvas);
     // canvas.width = width;
     // canvas.height = height;
 
-    this.quantize = period;
+    this.quantize = quantize;
+    this.numDrops = 0;
+    this.numPlaying = 0;
+    this.numButtons = 0;
 
-    var echoer = new Echoer(this.synth, audioBuffers, (time) => {
-      var serverTime = sync.getServerTime(time);
-      var quantizedServerTime = Math.ceil(serverTime / this.quantize) * this.quantize;
-      return sync.getLocalTime(quantizedServerTime);
+    this.looper = new Looper(this.synth, audioBuffers, (incrNumPlaying) => {
+      if (incrNumPlaying === 0)
+        this.numPlaying = 0;
+      else
+        this.numPlaying += incrNumPlaying;
+
+      this.updateCount();
+      //this.updateButtons();
     });
 
-    echoer.duration = params.duration || 5;
-    echoer.gainFactor = params.gainFactor || 0.8;
-    echoer.minGain = params.minGain || 0.001;
-    this.echoer = echoer;
+    inputModule.on('devicemotion', (data) => {
+      var accX = data.acceleration.x;
+      var accY = data.acceleration.y;
+      var accZ = data.acceleration.z;
+      var mag = Math.sqrt(accX * accX + accY * accY + accZ * accZ);
+
+      if (mag > 30) {
+        var index = this.placement.place;
+        this.looper.remove(index, true);
+        ioClient.socket.emit('perf_clear', index);
+      }
+    });
 
     // setup input listeners
-    inputModule.on('touchstart', (touchData) => {
+    inputModule.on('touchstart', (data) => {
       var time = scheduler.currentTime;
-      var x = (touchData.coordinates[0] - this.displayDiv.offsetLeft + window.scrollX) / this.displayDiv.offsetWidth;
-      var y = (touchData.coordinates[1] - this.displayDiv.offsetTop + window.scrollY) / this.displayDiv.offsetHeight;
-      var params = {
-        index: this.placement.place,
-        x: x,
-        y: y,
-      };
 
-      this.echoer.start(time, params, 1);
+      if (this.numPlaying < this.numDrops) {
+        var x = (data.coordinates[0] - this.displayDiv.offsetLeft + window.scrollX) / this.displayDiv.offsetWidth;
+        var y = (data.coordinates[1] - this.displayDiv.offsetTop + window.scrollY) / this.displayDiv.offsetHeight;
+        var soundParams = {
+          index: this.placement.place,
+          gain: 1,
+          x: x,
+          y: y,
+          echos: loopParams.echos,
+          period: Math.pow(2, 0.1 * (x - 0.5)) * loopParams.period,
+          attenuation: loopParams.attenuation,
+          threshold: loopParams.threshold
+        };
 
-      var socket = ioClient.socket;
-      socket.emit('perf_sound', time, params, 1);
+        var serverTime = this.sync.getServerTime(time);
+
+        // quantize
+        // serverTime = Math.ceil(serverTime / this.quantize) * this.quantize;
+        // time = this.sync.getLocalTime(serverTime);
+
+        this.looper.start(time, soundParams, true);
+        ioClient.socket.emit('perf_sound', serverTime, soundParams);
+      }
     });
 
-    inputModule.enableTouch(this.displayDiv);
-
     // setup performance control listeners
-    var socket = ioClient.socket;
-
-    socket.on('perf_echo', (serverTime, params, gain) => {
+    ioClient.socket.on('perf_echo', (serverTime, soundParams) => {
       var time = this.sync.getLocalTime(serverTime);
-      //this.echoer.start(time, params, gain);
+      this.looper.start(time, soundParams);
+    });
+
+    ioClient.socket.on('perf_clear', (index) => {
+      this.looper.remove(index);
+    });
+
+    ioClient.socket.on('admin_params', (params) => {
+      this.numDrops = params.numDrops;
+      this.updateCount();
+      //this.updateButtons();
+    });
+
+    ioClient.socket.on('admin_param_drops', (numDrops) => {
+      this.numDrops = numDrops;
+      this.updateCount();
+      //this.updateButtons();
     });
   }
 
+  updateCount() {
+    var numAvailable = Math.max(0, this.numDrops - this.numPlaying);
+
+    this.displayDiv.innerHTML = "<p> </p>";
+
+    if (numAvailable > 0) {
+      this.displayDiv.innerHTML += "<p>You have</p>";
+
+      if (numAvailable === this.numDrops) {
+        if (numAvailable === 1)
+          this.displayDiv.innerHTML += "<p class='big'>1</p> <p>drop to play</p>";
+        else
+          this.displayDiv.innerHTML += "<p class='big'>" + numAvailable + "</p> <p>drops to play</p>";
+      } else
+        this.displayDiv.innerHTML += "<p class='big'>" + numAvailable + " of " + this.numDrops + "</p> <p>drops to play</p>";
+    } else
+      this.displayDiv.innerHTML += "<p> </p> <p class='big'>Listen!</p> <p>(shake to clear)</p>";
+  }
+
+  updateButtons() {
+    var needButtons = this.numDrops - this.numPlaying;
+
+    while (needButtons > this.numButtons) {
+      var index = this.placement.place;
+      var x = Math.random();
+      var y = Math.random();
+
+      this.numButtons++;
+      visual.makeButton(this.displayDiv, index, x, y, (index, x, y) => {
+        var time = scheduler.currentTime;
+        var soundParams = {
+          index: this.placement.place,
+          gain: 1,
+          x: x,
+          y: y,
+          echos: loopParams.echos,
+          period: loopParams.period,
+          attenuation: loopParams.attenuation,
+          threshold: loopParams.threshold
+        };
+
+        var serverTime = this.sync.getServerTime(time);
+        // quantize
+        // serverTime = Math.ceil(serverTime / this.quantize) * this.quantize;
+        // time = this.sync.getLocalTime(serverTime);
+
+        this.looper.start(time, soundParams, true);
+        ioClient.socket.emit('perf_sound', serverTime, soundParams);
+
+        this.numButtons--;
+      });
+    }
+  }
+
   start() {
-    // if (this.displayDiv) {
-    //   this.displayDiv.innerHTML = "<p class='small'>You are at position</p>" + "<div class='position'><span>" + this.placement.label + "</span></div>";
-    //   this.displayDiv.classList.remove('hidden');
-    // }
-    
     visual.start();
     super.start();
+
+    this.updateCount();
+    //this.updateButtons();
+
+    inputModule.enableTouch(this.displayDiv);
+    inputModule.enableDeviceMotion();
   }
 }
 
