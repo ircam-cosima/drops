@@ -119,12 +119,12 @@ class Looper {
 }
 
 class PlayerPerformance extends clientSide.Performance {
-  constructor(audioBuffers, impulseResponse, sync, placement, params = {}) {
+  constructor(audioBuffers, sync, placement, params = {}) {
     super();
 
     this.sync = sync;
     this.placement = placement;
-    this.synth = new SampleSynth(audioBuffers, impulseResponse);
+    this.synth = new SampleSynth(audioBuffers);
 
     this.numTriggers = 6;
 

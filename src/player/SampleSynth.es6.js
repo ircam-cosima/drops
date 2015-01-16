@@ -7,9 +7,8 @@ function cent2lin(cent) {
 }
 
 class SampleSynth {
-  constructor(audioBuffers, impulseResponse) {
+  constructor(audioBuffers) {
     this.audioBuffers = audioBuffers;
-
     this.output = audioContext.createGain();
     this.output.connect(audioContext.destination);
     this.output.gain.value = 1;

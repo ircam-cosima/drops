@@ -119,11 +119,15 @@ var audioFiles = dropsFiles;
 
 var welcome = "<p>Welcome to <b>Drops</b>.</p> <p>Please make yourself comfortable.</p>";
 
-function createImpulseResponse(callback) {
-  setTimeout(() => {
-    callback(null);
-  }, 100);
-}
+var impulseResponseParams = {
+  sampleRate: 44100, // Hz FROM CONTEXT
+  numChannels: 1, // FROM CONTEXT (2 for stereo, 4 for true stereo)
+  fadeIntime: 0.2, // seconds
+  decayThreshold: -20, // dB
+  decayTime: 5, // seconds
+  lowPassFreqStart: 15000, // Hz
+  lowPassFreqEnd: 100, // Hz
+};
 
 window.addEventListener('DOMContentLoaded', () => {
   // load audio files
@@ -151,19 +155,30 @@ window.addEventListener('DOMContentLoaded', () => {
     .then(function(audioBuffers) {
       container.removeChild(progressDiv);
 
-      createImpulseResponse((impulseResponse) => {
-        var sync = new clientSide.SetupSync();
-        var placement = new clientSide.SetupPlacementAssigned({
-          display: false
-        });
-        var performance = new PlayerPerformance(audioBuffers, impulseResponse, sync, placement);
-        var manager = new clientSide.Manager([sync, placement], performance);
+      var sync = new clientSide.SetupSync();
+      var placement = new clientSide.SetupPlacementAssigned({
+        display: false
+      });
+      var performance = new PlayerPerformance(audioBuffers, sync, placement);
+      var manager = new clientSide.Manager([sync, placement], performance);
 
-        manager.displayDiv.innerHTML = welcome + "<p>Touch the screen to <b>join the performance!</b></p>";
+      manager.displayDiv.innerHTML = welcome + "<p>Touch the screen to <b>join the performance!</b></p>";
 
-        ioClient.start(() => {
-          manager.start();
-        });
+      ioClient.start(() => {
+        manager.start();
       });
     });
 });
+
+/** @private
+    @return {number} A random number from -1 to 1. */
+var randomSample = function() {
+  return Math.random() * 2 - 1;
+};
+
+
+/** @private
+    @return {number} An exponential gain value (1e-6 for -60dB) */
+var dBToPower = function(dBValue) {
+  return Math.pow(10, dBValue / 10);
+};
