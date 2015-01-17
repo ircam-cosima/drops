@@ -7,11 +7,15 @@ class ServerPerformance extends serverSide.Performance {
   constructor(globalParams) {
     super();
 
+    this.players = [];
     this.globalParams = globalParams;
   }
 
   connect(socket, player) {
     var players = this.managers['/play'].playing;
+
+    // register player at its place
+    this.players[player.place] = player;
 
     // initialize echo sockets
     player.privateState.echoSockets = [];
@@ -24,6 +28,7 @@ class ServerPerformance extends serverSide.Performance {
       var division = soundParams.echoes + 1;
       var period = soundParams.period / division;
       var attenuation = Math.pow(soundParams.attenuation, 1 / division);
+      var echoSockets = player.privateState.echoSockets;
 
       if (division > numPlayers)
         division = numPlayers;
@@ -31,16 +36,17 @@ class ServerPerformance extends serverSide.Performance {
       if (division > 1) {
         var index = player.place;
 
-        player.privateState.echoSockets = [];
-
         for (let i = 1; i <= soundParams.echoes; i++) {
           var echoPlayerIndex = (index + i) % numPlayers;
           var echoPlayer = players[echoPlayerIndex];
+          var echoSocket = echoPlayer.socket;
 
-          player.privateState.echoSockets.push(echoPlayer.socket);
+          // memorize (new) echo player's socket
+          if(echoSockets.indexOf(echoSocket) < 0)
+            echoSockets.push(echoSocket);
 
           soundParams.gain *= attenuation;
-          echoPlayer.socket.emit('perf_echo', time + i * period, soundParams);
+          echoSocket.emit('perf_echo', time + i * period, soundParams);
         }
       }
     });
@@ -50,6 +56,9 @@ class ServerPerformance extends serverSide.Performance {
 
       for (let i = 0; i < echoSockets.length; i++)
         echoSockets[i].emit('perf_clear', player.place);
+
+      // clear echo sockets
+      player.privateState.echoSockets = [];
     });
 
     socket.on('print', (str) => {
@@ -63,7 +72,12 @@ class ServerPerformance extends serverSide.Performance {
     if (echoSockets) {
       for (let i = 0; i < echoSockets.length; i++)
         echoSockets[i].emit('perf_clear', player.place);
+
+      player.privateState.echoSockets = null;
     }
+
+    // unregister player from its place
+    this.players[player.place] = null;
   }
 }
 
