@@ -33,13 +33,17 @@ class Param {
     decr.onclick = decr.ontouchstart = function() {
       param.incr(-1, true);
     };
+
+    ioClient.socket.on('admin_param_' + name, (val) => {
+      param.set(val);
+    });
   }
 
   set(val, send = false) {
     this.value = Math.min(this.max, Math.max(this.min, val));
     this.box.value = this.value.toString();
 
-    if(send)
+    if (send)
       ioClient.socket.emit('admin_param_' + this.name, this.value);
   }
 

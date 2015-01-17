@@ -48,6 +48,7 @@ io.of("/admin").on('connection', (socket) => {
     globalParams.drops = drops;
 
     // propagate drops parameter to players
+    socket.broadcast.emit('admin_param_drops', drops);
     io.of('/play').emit('admin_param_drops', drops);
   });
 });
