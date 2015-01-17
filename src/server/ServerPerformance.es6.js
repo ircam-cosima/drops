@@ -21,25 +21,26 @@ class ServerPerformance extends serverSide.Performance {
 
     socket.on('perf_sound', (time, soundParams) => {
       var numPlayers = players.length;
-      var numEchos = soundParams.echos;
-      var period = soundParams.period / (numEchos + 1);
-      var attenuation = Math.pow(soundParams.attenuation, 1 / (numEchos + 1));
+      var division = soundParams.echoes + 1;
+      var period = soundParams.period / division;
+      var attenuation = Math.pow(soundParams.attenuation, 1 / division);
 
-      if (numEchos > numPlayers - 1)
-        numEchos = numPlayers - 1;
+      if (division > numPlayers)
+        division = numPlayers;
 
-      if (numEchos > 0) {
+      if (division > 1) {
         var index = player.place;
-        var step = (numPlayers - 1) / numEchos;
 
-        for (let i = 0; i < numEchos; i++) {
-          var echoPlayerIndex = (index + i + 1) % numPlayers;
+        player.privateState.echoSockets = [];
+
+        for (let i = 1; i <= soundParams.echoes; i++) {
+          var echoPlayerIndex = (index + i) % numPlayers;
           var echoPlayer = players[echoPlayerIndex];
 
-          player.privateState.echoSockets[i] = echoPlayer.socket;
+          player.privateState.echoSockets.push(echoPlayer.socket);
 
           soundParams.gain *= attenuation;
-          echoPlayer.socket.emit('perf_echo', time + (i + 1) * period, soundParams);
+          echoPlayer.socket.emit('perf_echo', time + i * period, soundParams);
         }
       }
     });
@@ -49,6 +50,10 @@ class ServerPerformance extends serverSide.Performance {
 
       for (let i = 0; i < echoSockets.length; i++)
         echoSockets[i].emit('perf_clear', player.place);
+    });
+
+    socket.on('print', (str) => {
+      console.log('print:', str);
     });
   }
 

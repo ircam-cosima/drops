@@ -37,6 +37,22 @@ body {
 
 h1 {
   font-size: 4em;  
+  text-align: center;
+}
+
+input  {
+  text-align: center;
+  background-color: #000;
+  border: 0;
+  padding: 0
+}
+
+button  {
+  text-align: center;
+  background-color: #000;
+  border: 0;
+  width: 0.5em;
+  padding: 0 0 0 0;
 }
 
 #grid {
@@ -120,11 +136,10 @@ h1 {
 }
 
 .admin {
-  position: fixed;
   height: 100%;
-  width: 100%;
+  width: 90%;
   color: #fff;
-  margin-bottom: 1em;
-  font-size: 2em;
-  font-weight: bold;
+  text-align: center;
+  font-size: 4em;
+  margin: 0 auto;
 }

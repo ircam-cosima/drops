@@ -29,7 +29,8 @@ app.get('/admin', function(req, res) {
 });
 
 var globalParams = {
-  numDrops: 1
+  drops: 1,
+  echoes: 3
 };
 
 // init socket io server
@@ -43,11 +44,11 @@ io.of("/admin").on('connection', (socket) => {
   socket.emit("admin_params", globalParams);
 
   // send global params to admin client
-  socket.on('admin_param_drops', (numDrops) => {
-    globalParams.numDrops = numDrops;
+  socket.on('admin_param_drops', (drops) => {
+    globalParams.drops = drops;
 
     // propagate drops parameter to players
-    io.of('/play').emit('admin_param_drops', numDrops);
+    io.of('/play').emit('admin_param_drops', drops);
   });
 });
 

@@ -7,7 +7,12 @@ html
     link(rel='stylesheet', href='/stylesheets/normalize.css')
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
-    header
-      h1 #{title}
-    #container.container
+    h1 #{title}
     script(src="/javascripts/admin.js")
+    #admin.admin
+      | drops: 
+      button(id='drops-decr') <
+      | 
+      input(id='drops-box', type='number', value='0', min='0', max='100', step='1', size='2')
+      | 
+      button(id='drops-incr') >

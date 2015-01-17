@@ -12,7 +12,7 @@ var visual = require('./visual/main');
 var quantize = 0.250;
 
 var loopParams = {
-  echos: 2,
+  echoes: 2,
   period: 7.5,
   attenuation: 0.70710678118655,
   threshold: 0.1
@@ -70,6 +70,15 @@ class Looper {
   advance(time, loop) {
     var params = loop.params;
 
+    if (params.gain < params.threshold) {
+      arrayRemove(this.loops, loop);
+
+      if (loop.local)
+        this.updatePlaying(-1);
+
+      return null;
+    }
+
     this.synth.trigger(time, params);
 
     visual.createCircle({
@@ -82,15 +91,6 @@ class Looper {
     });
 
     params.gain *= params.attenuation;
-
-    if (params.gain < params.threshold) {
-      arrayRemove(this.loops, loop);
-
-      if (loop.local)
-        this.updatePlaying(-1);
-
-      return null;
-    }
 
     return time + params.period;
   }
@@ -150,12 +150,12 @@ class PlayerPerformance extends clientSide.Performance {
     });
 
     inputModule.on('devicemotion', (data) => {
-      var accX = data.acceleration.x;
-      var accY = data.acceleration.y;
-      var accZ = data.acceleration.z;
+      var accX = data.accelerationIncludingGravity.x;
+      var accY = data.accelerationIncludingGravity.y;
+      var accZ = data.accelerationIncludingGravity.z;
       var mag = Math.sqrt(accX * accX + accY * accY + accZ * accZ);
 
-      if (mag > 30) {
+      if (mag > 20) {
         var index = this.placement.place;
         this.looper.remove(index, true);
         ioClient.socket.emit('perf_clear', index);
@@ -174,7 +174,7 @@ class PlayerPerformance extends clientSide.Performance {
           gain: 1,
           x: x,
           y: y,
-          echos: loopParams.echos,
+          echoes: loopParams.echoes,
           period: Math.pow(2, 0.1 * (x - 0.5)) * loopParams.period,
           attenuation: loopParams.attenuation,
           threshold: loopParams.threshold
@@ -202,13 +202,13 @@ class PlayerPerformance extends clientSide.Performance {
     });
 
     ioClient.socket.on('admin_params', (params) => {
-      this.numDrops = params.numDrops;
+      this.numDrops = params.drops;
       this.updateCount();
       //this.updateButtons();
     });
 
-    ioClient.socket.on('admin_param_drops', (numDrops) => {
-      this.numDrops = numDrops;
+    ioClient.socket.on('admin_param_drops', (drops) => {
+      this.numDrops = drops;
       this.updateCount();
       //this.updateButtons();
     });
@@ -230,7 +230,7 @@ class PlayerPerformance extends clientSide.Performance {
       } else
         this.displayDiv.innerHTML += "<p class='big'>" + numAvailable + " of " + this.numDrops + "</p> <p>drops to play</p>";
     } else
-      this.displayDiv.innerHTML += "<p> </p> <p class='big'>Listen!</p> <p>(shake to clear)</p>";
+      this.displayDiv.innerHTML += "<p> </p> <p class='big'>Listen!</p>";
   }
 
   updateButtons() {
@@ -249,7 +249,7 @@ class PlayerPerformance extends clientSide.Performance {
           gain: 1,
           x: x,
           y: y,
-          echos: loopParams.echos,
+          echoes: loopParams.echoes,
           period: loopParams.period,
           attenuation: loopParams.attenuation,
           threshold: loopParams.threshold
