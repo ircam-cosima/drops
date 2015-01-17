@@ -146,7 +146,6 @@ class PlayerPerformance extends clientSide.Performance {
         this.numPlaying += incrNumPlaying;
 
       this.updateCount();
-      //this.updateButtons();
     });
 
     inputModule.on('devicemotion', (data) => {
@@ -155,39 +154,17 @@ class PlayerPerformance extends clientSide.Performance {
       var accZ = data.accelerationIncludingGravity.z;
       var mag = Math.sqrt(accX * accX + accY * accY + accZ * accZ);
 
-      if (mag > 20) {
-        var index = this.placement.place;
-        this.looper.remove(index, true);
-        ioClient.socket.emit('perf_clear', index);
-      }
+      if (mag > 20)
+        this.clear();
     });
 
     // setup input listeners
     inputModule.on('touchstart', (data) => {
-      var time = scheduler.currentTime;
-
       if (this.numPlaying < this.numDrops) {
         var x = (data.coordinates[0] - this.displayDiv.offsetLeft + window.scrollX) / this.displayDiv.offsetWidth;
         var y = (data.coordinates[1] - this.displayDiv.offsetTop + window.scrollY) / this.displayDiv.offsetHeight;
-        var soundParams = {
-          index: this.placement.place,
-          gain: 1,
-          x: x,
-          y: y,
-          echoes: loopParams.echoes,
-          period: Math.pow(2, 0.1 * (x - 0.5)) * loopParams.period,
-          attenuation: loopParams.attenuation,
-          threshold: loopParams.threshold
-        };
 
-        var serverTime = this.sync.getServerTime(time);
-
-        // quantize
-        // serverTime = Math.ceil(serverTime / this.quantize) * this.quantize;
-        // time = this.sync.getLocalTime(serverTime);
-
-        this.looper.start(time, soundParams, true);
-        ioClient.socket.emit('perf_sound', serverTime, soundParams);
+        this.trigger(x, y);
       }
     });
 
@@ -204,14 +181,45 @@ class PlayerPerformance extends clientSide.Performance {
     ioClient.socket.on('admin_params', (params) => {
       this.numDrops = params.drops;
       this.updateCount();
-      //this.updateButtons();
     });
 
     ioClient.socket.on('admin_param_drops', (drops) => {
       this.numDrops = drops;
       this.updateCount();
-      //this.updateButtons();
     });
+  }
+
+  trigger(x, y) {
+    var soundParams = {
+      index: this.placement.place,
+      gain: 1,
+      x: x,
+      y: y,
+      echoes: loopParams.echoes,
+      period: Math.pow(2, 0.1 * (x - 0.5)) * loopParams.period,
+      attenuation: loopParams.attenuation,
+      threshold: loopParams.threshold
+    };
+
+    var time = scheduler.currentTime;
+    var serverTime = this.sync.getServerTime(time);
+
+    // quantize
+    // serverTime = Math.ceil(serverTime / this.quantize) * this.quantize;
+    // time = this.sync.getLocalTime(serverTime);
+
+    this.looper.start(time, soundParams, true);
+    ioClient.socket.emit('perf_sound', serverTime, soundParams);
+  }
+
+  clear() {
+    var index = this.placement.place;
+
+    // remove at own looper
+    this.looper.remove(index, true);
+
+    // remove at other players
+    ioClient.socket.emit('perf_clear', index);
   }
 
   updateCount() {
@@ -233,39 +241,22 @@ class PlayerPerformance extends clientSide.Performance {
       this.displayDiv.innerHTML += "<p> </p> <p class='big'>Listen!</p>";
   }
 
-  updateButtons() {
-    var needButtons = this.numDrops - this.numPlaying;
+ autoTrigger() {
+    if (this.numPlaying < this.numDrops)
+      this.trigger(Math.random(), Math.random());
 
-    while (needButtons > this.numButtons) {
-      var index = this.placement.place;
-      var x = Math.random();
-      var y = Math.random();
+    setTimeout(() => {
+      this.autoTrigger();
+    }, Math.random() * 2000 + 50);
+  }
 
-      this.numButtons++;
-      visual.makeButton(this.displayDiv, index, x, y, (index, x, y) => {
-        var time = scheduler.currentTime;
-        var soundParams = {
-          index: this.placement.place,
-          gain: 1,
-          x: x,
-          y: y,
-          echoes: loopParams.echoes,
-          period: loopParams.period,
-          attenuation: loopParams.attenuation,
-          threshold: loopParams.threshold
-        };
+  autoClear() {
+    if (this.numPlaying > 0)
+      this.clear(Math.random(), Math.random());
 
-        var serverTime = this.sync.getServerTime(time);
-        // quantize
-        // serverTime = Math.ceil(serverTime / this.quantize) * this.quantize;
-        // time = this.sync.getLocalTime(serverTime);
-
-        this.looper.start(time, soundParams, true);
-        ioClient.socket.emit('perf_sound', serverTime, soundParams);
-
-        this.numButtons--;
-      });
-    }
+    setTimeout(() => {
+      this.autoClear();
+    }, Math.random() * 60000 + 60000);
   }
 
   start() {
@@ -273,10 +264,13 @@ class PlayerPerformance extends clientSide.Performance {
     super.start();
 
     this.updateCount();
-    //this.updateButtons();
 
     inputModule.enableTouch(this.displayDiv);
     inputModule.enableDeviceMotion();
+
+    // for testing
+    //this.autoTrigger();
+    //this.autoClear();
   }
 }
 
