@@ -8,16 +8,12 @@ class ServerPerformance extends serverSide.Performance {
     super();
 
     this.numPlayers = 0;
-    this.players = [];
     this.adminParams = adminParams;
     this.adminDisplay = adminDisplay;
   }
 
   connect(socket, player) {
     var players = this.managers['/play'].playing;
-
-    // register player at its place
-    this.players[player.place] = player;
 
     // initialize echo sockets
     player.privateState.echoSockets = [];
@@ -39,7 +35,7 @@ class ServerPerformance extends serverSide.Performance {
         numEchoPlayers = numPlayers - 1;
 
       if (numEchoPlayers > 0) {
-        var index = player.place;
+        var index = players.indexOf(player);
 
         for (let i = 1; i <= numEchoPlayers; i++) {
           var echoPlayerIndex = (index + i) % numPlayers;
@@ -84,9 +80,6 @@ class ServerPerformance extends serverSide.Performance {
     }
 
     if (player.place !== null) {
-      // unregister player from its place
-      this.players[player.place] = null;
-
       // decrement number of players
       this.adminDisplay.numPlayers--;
       ioServer.io.of('/admin').emit('admin_display_numPlayers', this.adminDisplay.numPlayers);
