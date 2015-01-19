@@ -217,7 +217,7 @@ class PlayerPerformance extends clientSide.Performance {
       x: x,
       y: y,
       echoDiv: this.echoDiv,
-      echoPeriod: Math.pow(2, 0.1 * (x - 0.5)) * this.echoPeriod,
+      echoPeriod: this.echoPeriod,
       echoAttenuation: this.echoAttenuation,
       minEchoGain: this.minEchoGain
     };
@@ -297,7 +297,7 @@ class PlayerPerformance extends clientSide.Performance {
 
     // for testing
     // this.autoTrigger();
-    // this.autoClear();
+    //this.autoClear();
   }
 }
 
