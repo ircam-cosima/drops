@@ -148,7 +148,7 @@ window.addEventListener('DOMContentLoaded', () => {
     loaderProgress += (progress - fileProgress[obj.index]);
     fileProgress[obj.index] = progress;
 
-    progressDiv.innerHTML = "<p>Loading ...<br>" + Math.floor(100 * loaderProgress / 24) + "%</p>";
+    progressDiv.innerHTML = "<p>Loading ...</p>";
   };
 
   loader.load(audioFiles)

@@ -4,11 +4,13 @@ var serverSide = require('soundworks/server');
 var ioServer = serverSide.ioServer;
 
 class ServerPerformance extends serverSide.Performance {
-  constructor(globalParams) {
+  constructor(adminParams, adminDisplay) {
     super();
 
+    this.numPlayers = 0;
     this.players = [];
-    this.globalParams = globalParams;
+    this.adminParams = adminParams;
+    this.adminDisplay = adminDisplay;
   }
 
   connect(socket, player) {
@@ -21,32 +23,37 @@ class ServerPerformance extends serverSide.Performance {
     player.privateState.echoSockets = [];
 
     // send global parameters
-    socket.emit("admin_params", this.globalParams);
+    socket.emit("admin_params", this.adminParams);
+
+    // increment number of players
+    this.adminDisplay.numPlayers++;
+    ioServer.io.of('/admin').emit('admin_display_numPlayers', this.adminDisplay.numPlayers);
 
     socket.on('perf_sound', (time, soundParams) => {
       var numPlayers = players.length;
-      var division = soundParams.echoes + 1;
-      var period = soundParams.period / division;
-      var attenuation = Math.pow(soundParams.attenuation, 1 / division);
+      var numEchoPlayers = soundParams.echoDiv - 1;
+      var echoDelay = 0;
       var echoSockets = player.privateState.echoSockets;
 
-      if (division > numPlayers)
-        division = numPlayers;
+      if (numEchoPlayers > numPlayers - 1)
+        numEchoPlayers = numPlayers - 1;
 
-      if (division > 1) {
+      if (numEchoPlayers > 0) {
         var index = player.place;
 
-        for (let i = 1; i <= soundParams.echoes; i++) {
+        for (let i = 1; i <= numEchoPlayers; i++) {
           var echoPlayerIndex = (index + i) % numPlayers;
           var echoPlayer = players[echoPlayerIndex];
           var echoSocket = echoPlayer.socket;
 
           // memorize (new) echo player's socket
-          if(echoSockets.indexOf(echoSocket) < 0)
+          if (echoSockets.indexOf(echoSocket) < 0)
             echoSockets.push(echoSocket);
 
-          soundParams.gain *= attenuation;
-          echoSocket.emit('perf_echo', time + i * period, soundParams);
+          echoDelay += soundParams.echoPeriod;
+          soundParams.gain *= soundParams.echoAttenuation;
+
+          echoSocket.emit('perf_echo', time + echoDelay, soundParams);
         }
       }
     });
@@ -76,8 +83,14 @@ class ServerPerformance extends serverSide.Performance {
       player.privateState.echoSockets = null;
     }
 
-    // unregister player from its place
-    this.players[player.place] = null;
+    if (player.place !== null) {
+      // unregister player from its place
+      this.players[player.place] = null;
+
+      // decrement number of players
+      this.adminDisplay.numPlayers--;
+      ioServer.io.of('/admin').emit('admin_display_numPlayers', this.adminDisplay.numPlayers);
+    }
   }
 }
 

@@ -9,15 +9,6 @@ var scheduler = require('scheduler');
 var SampleSynth = require('./SampleSynth');
 var visual = require('./visual/main');
 
-var quantize = 0.250;
-
-var loopParams = {
-  echoes: 2,
-  period: 7.5,
-  attenuation: 0.70710678118655,
-  threshold: 0.1
-};
-
 scheduler.lookahead = 0.050;
 
 function arrayRemove(array, value) {
@@ -37,11 +28,15 @@ function changeBackgroundColor(d) {
 }
 
 class Loop extends TimeEngine {
-  constructor(looper, params, local = false) {
+  constructor(looper, soundParams, local = false) {
     super();
     this.looper = looper;
-    this.params = params;
+
+    this.soundParams = soundParams;
     this.local = local;
+
+    this.period = 3 * soundParams.echoPeriod;
+    this.attenuation = Math.pow(soundParams.echoAttenuation, soundParams.echoDiv);
   }
 
   advanceTime(time) {
@@ -50,49 +45,54 @@ class Loop extends TimeEngine {
 }
 
 class Looper {
-  constructor(synth, audioBuffers, updatePlaying) {
+  constructor(synth, audioBuffers, updateCount) {
     this.synth = synth;
     this.audioBuffers = audioBuffers;
-    this.updatePlaying = updatePlaying;
+    this.updateCount = updateCount;
+
     this.loops = [];
+    this.numLocalLoops = 0;
   }
 
-  start(time, params, local = false) {
-    var loop = new Loop(this, params, local);
-
+  start(time, soundParams, local = false) {
+    var loop = new Loop(this, soundParams, local);
     scheduler.add(loop, time);
     this.loops.push(loop);
 
     if (local)
-      this.updatePlaying(1);
+      this.numLocalLoops++;
+
+    this.updateCount();
   }
 
   advance(time, loop) {
-    var params = loop.params;
+    var soundParams = loop.soundParams;
 
-    if (params.gain < params.threshold) {
+    if (soundParams.gain < soundParams.minEchoGain) {
       arrayRemove(this.loops, loop);
 
       if (loop.local)
-        this.updatePlaying(-1);
+        this.numLocalLoops--;
+
+      this.updateCount();
 
       return null;
     }
 
-    this.synth.trigger(time, params);
+    this.synth.trigger(time, soundParams);
 
     visual.createCircle({
-      index: params.index,
-      x: params.x,
-      y: params.y,
-      duration: this.audioBuffers[params.index].duration,
-      velocity: 100 + params.gain * 200,
-      opacity: Math.sqrt(params.gain)
+      index: soundParams.index,
+      x: soundParams.x,
+      y: soundParams.y,
+      duration: this.audioBuffers[soundParams.index].duration,
+      velocity: 100 + soundParams.gain * 200,
+      opacity: Math.sqrt(soundParams.gain)
     });
 
-    params.gain *= params.attenuation;
+    soundParams.gain *= loop.attenuation;
 
-    return time + params.period;
+    return time + loop.period;
   }
 
   remove(index) {
@@ -102,19 +102,31 @@ class Looper {
     while (i < loops.length) {
       var loop = loops[i];
 
-      if (loop.params.index === index) {
+      if (loop.soundParams.index === index) {
         loops.splice(i, 1);
 
         scheduler.remove(loop);
 
         if (loop.local) {
-          this.updatePlaying(-1);
+          this.numLocalLoops--;
           visual.remove(index);
         }
       } else {
         i++;
       }
     }
+
+    this.updateCount();
+  }
+
+  removeAll() {
+    for (let loop of this.loops)
+      scheduler.remove(loop);
+
+    this.loops = [];
+    this.numLocalLoops = 0;
+
+    this.updateCount();
   }
 }
 
@@ -131,20 +143,20 @@ class PlayerPerformance extends clientSide.Performance {
     var canvas = document.createElement('canvas');
     canvas.setAttribute('id', 'scene');
     document.body.appendChild(canvas);
-    // canvas.width = width;
-    // canvas.height = height;
 
-    this.quantize = quantize;
-    this.numDrops = 0;
-    this.numPlaying = 0;
-    this.numButtons = 0;
+    this.state = 'reset';
+    this.maxDrops = 0;
 
-    this.looper = new Looper(this.synth, audioBuffers, (incrNumPlaying) => {
-      if (incrNumPlaying === 0)
-        this.numPlaying = 0;
-      else
-        this.numPlaying += incrNumPlaying;
+    this.echoDiv = 3;
+    this.echoPeriod = 2.5;
+    this.echoAttenuation = Math.pow(0.70710678118655, 1 / 3);
+    this.minEchoGain = 0.1;
+    this.quantize = 0.250;
 
+    this.numLocalLoops = 0;
+    this.numTotalLoops = 0;
+
+    this.looper = new Looper(this.synth, audioBuffers, () => {
       this.updateCount();
     });
 
@@ -160,7 +172,7 @@ class PlayerPerformance extends clientSide.Performance {
 
     // setup input listeners
     inputModule.on('touchstart', (data) => {
-      if (this.numPlaying < this.numDrops) {
+      if (this.state == 'running' && this.looper.numLocalLoops < this.maxDrops) {
         var x = (data.coordinates[0] - this.displayDiv.offsetLeft + window.scrollX) / this.displayDiv.offsetWidth;
         var y = (data.coordinates[1] - this.displayDiv.offsetTop + window.scrollY) / this.displayDiv.offsetHeight;
 
@@ -175,16 +187,25 @@ class PlayerPerformance extends clientSide.Performance {
     });
 
     ioClient.socket.on('perf_clear', (index) => {
-      this.looper.remove(index);
+      if (index == 'all')
+        this.looper.removeAll();
+      else
+        this.looper.remove(index);
     });
 
     ioClient.socket.on('admin_params', (params) => {
-      this.numDrops = params.drops;
+      this.state = params.state;
+      this.maxDrops = params.maxDrops;
       this.updateCount();
     });
 
-    ioClient.socket.on('admin_param_drops', (drops) => {
-      this.numDrops = drops;
+    ioClient.socket.on('admin_param_state', (state) => {
+      this.state = state;
+      this.updateCount();
+    });
+
+    ioClient.socket.on('admin_param_maxDrops', (maxDrops) => {
+      this.maxDrops = maxDrops;
       this.updateCount();
     });
   }
@@ -195,10 +216,10 @@ class PlayerPerformance extends clientSide.Performance {
       gain: 1,
       x: x,
       y: y,
-      echoes: loopParams.echoes,
-      period: Math.pow(2, 0.1 * (x - 0.5)) * loopParams.period,
-      attenuation: loopParams.attenuation,
-      threshold: loopParams.threshold
+      echoDiv: this.echoDiv,
+      echoPeriod: Math.pow(2, 0.1 * (x - 0.5)) * this.echoPeriod,
+      echoAttenuation: this.echoAttenuation,
+      minEchoGain: this.minEchoGain
     };
 
     var time = scheduler.currentTime;
@@ -223,26 +244,32 @@ class PlayerPerformance extends clientSide.Performance {
   }
 
   updateCount() {
-    var numAvailable = Math.max(0, this.numDrops - this.numPlaying);
+    if (this.state == 'reset') {
+      this.displayDiv.innerHTML = "<p> </p> <p>Waiting for<br>everybody<br>getting ready...</p>";
+    } else if (this.state == 'end' && this.looper.loops.length === 0) {
+      this.displayDiv.innerHTML = "<p> </p> <p>That's all.<br>Thanks!</p>";
+    } else {
+      var numAvailable = Math.max(0, this.maxDrops - this.looper.numLocalLoops);
 
-    this.displayDiv.innerHTML = "<p> </p>";
+      this.displayDiv.innerHTML = "<p> </p>";
 
-    if (numAvailable > 0) {
-      this.displayDiv.innerHTML += "<p>You have</p>";
+      if (numAvailable > 0) {
+        this.displayDiv.innerHTML += "<p>You have</p>";
 
-      if (numAvailable === this.numDrops) {
-        if (numAvailable === 1)
-          this.displayDiv.innerHTML += "<p class='big'>1</p> <p>drop to play</p>";
-        else
-          this.displayDiv.innerHTML += "<p class='big'>" + numAvailable + "</p> <p>drops to play</p>";
+        if (numAvailable === this.maxDrops) {
+          if (numAvailable === 1)
+            this.displayDiv.innerHTML += "<p class='big'>1</p> <p>drop to play</p>";
+          else
+            this.displayDiv.innerHTML += "<p class='big'>" + numAvailable + "</p> <p>drops to play</p>";
+        } else
+          this.displayDiv.innerHTML += "<p class='big'>" + numAvailable + " of " + this.maxDrops + "</p> <p>drops to play</p>";
       } else
-        this.displayDiv.innerHTML += "<p class='big'>" + numAvailable + " of " + this.numDrops + "</p> <p>drops to play</p>";
-    } else
-      this.displayDiv.innerHTML += "<p> </p> <p class='big'>Listen!</p>";
+        this.displayDiv.innerHTML += "<p> </p> <p class='medium'>Listen!</p>";
+    }
   }
 
- autoTrigger() {
-    if (this.numPlaying < this.numDrops)
+  autoTrigger() {
+    if (this.state == 'running' && this.looper.numLocalLoops < this.maxDrops)
       this.trigger(Math.random(), Math.random());
 
     setTimeout(() => {
@@ -251,7 +278,7 @@ class PlayerPerformance extends clientSide.Performance {
   }
 
   autoClear() {
-    if (this.numPlaying > 0)
+    if (this.looper.numLocalLoops > 0)
       this.clear(Math.random(), Math.random());
 
     setTimeout(() => {
@@ -269,8 +296,8 @@ class PlayerPerformance extends clientSide.Performance {
     inputModule.enableDeviceMotion();
 
     // for testing
-    //this.autoTrigger();
-    //this.autoClear();
+    // this.autoTrigger();
+    // this.autoClear();
   }
 }
 

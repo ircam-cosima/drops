@@ -28,33 +28,47 @@ app.get('/admin', function(req, res) {
   });
 });
 
-var globalParams = {
-  drops: 1,
-  echoes: 3
+var adminParams = {
+  maxDrops: 1,
+  state: "reset", // "running", "end"
+};
+
+var adminDisplay = {
+  numPlayers: 0
 };
 
 // init socket io server
 serverSide.ioServer.init(app);
 
-var io = serverSide.ioServer.io;
-io.of("/admin").on('connection', (socket) => {
-  console.log("admin connected");
+function serveGlobalParam(socket, name) {
+  socket.on('admin_param_' + name, (val) => {
+    adminParams[name] = val;
 
-  // send global params to admin client
-  socket.emit("admin_params", globalParams);
-
-  // send global params to admin client
-  socket.on('admin_param_drops', (drops) => {
-    globalParams.drops = drops;
+    // send global params to admin client
+    socket.broadcast.emit('admin_param_' + name, val);
 
     // propagate drops parameter to players
-    socket.broadcast.emit('admin_param_drops', drops);
-    io.of('/play').emit('admin_param_drops', drops);
+    io.of('/play').emit('admin_param_' + name, val);
+  });
+}
+
+var io = serverSide.ioServer.io;
+io.of("/admin").on('connection', (socket) => {
+  // listen to global parameters
+  for (let key of Object.keys(adminParams))
+    serveGlobalParam(socket, key);
+
+  // send global params and display to admin client
+  socket.emit("admin_params", adminParams, true);
+  socket.emit("admin_display", adminDisplay, false);  
+
+  socket.on('admin_clear', () => {
+    io.of('/play').emit('perf_clear', "all");
   });
 });
 
 // start server side
 var placement = new serverSide.SetupPlacementAssigned({maxPlaces: 200, order: 'ascending'});
 var sync = new serverSide.SetupSync();
-var performance = new ServerPerformance(globalParams);
+var performance = new ServerPerformance(adminParams, adminDisplay);
 var manager = new serverSide.ManagerPlayers([sync, placement], performance);

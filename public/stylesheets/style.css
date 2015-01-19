@@ -30,7 +30,7 @@ body {
   color: #fff;
   font-family: 'Quicksand', 'Lato', 'Helvetica Neue', 'Helvetica', sans-serif;
   font-size: 20px;
-  letter-spacing: -0.1em;
+  letter-spacing: -0.2em;
   margin: 0;
   padding: 0;
 }
@@ -38,21 +38,6 @@ body {
 h1 {
   font-size: 4em;  
   text-align: center;
-}
-
-input  {
-  text-align: center;
-  background-color: #000;
-  border: 0;
-  padding: 0
-}
-
-button  {
-  text-align: center;
-  background-color: #000;
-  border: 0;
-  width: 0.5em;
-  padding: 0 0 0 0;
 }
 
 #grid {
@@ -86,7 +71,7 @@ button  {
 .sync {
   background: #000;
   height: 100%;
-  width: 80%;
+  width: 75%;
   padding-top: 30%;
   margin: 0 auto;
 }
@@ -125,6 +110,11 @@ button  {
   font-weight: bold;
 }
 
+.performance .medium {
+  font-size: 6em;
+  font-weight: bold;
+}
+
 .button {
   width: 200px;
   height: 200px;
@@ -142,4 +132,31 @@ button  {
   text-align: center;
   font-size: 4em;
   margin: 0 auto;
+}
+
+.admin input {
+  text-align: center;
+  background-color: #000;
+  border: 0;
+  padding: 0
+}
+
+.admin button {
+  text-align: center;
+  background-color: #000;
+  border: 0;
+  padding: 0 0 0 0;
+}
+
+.admin select {
+  text-align: center;
+  color: #fff;
+  background-color: #000;
+  border: 0;
+  padding: 0
+}
+
+.admin option {
+  color: #fff;
+  background-color: #000;
 }

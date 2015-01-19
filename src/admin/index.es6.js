@@ -7,9 +7,11 @@ var inputModule = clientSide.inputModule;
 ioClient.init('/admin');
 
 var paramList = [];
+var displayList = [];
 
 class Param {
-  constructor(name, label, init, min, max) {
+  constructor(type, name, label, init, min, max) {
+    this.type = type;
     this.name = name;
     this.label = label;
     this.value = init;
@@ -19,20 +21,33 @@ class Param {
 
     var param = this;
 
-    this.box.onchange = function() {
-      var val = Number(param.box.value);
-      param.set(val, true);
-    };
+    switch (type) {
+      case 'number':
+        this.box.onchange = function() {
+          var val = Number(param.box.value);
+          param.set(val, true);
+        };
 
-    var incr = document.getElementById(name + '-incr');
-    incr.onclick = incr.ontouchstart = function() {
-      param.incr(1, true);
-    };
+        var incrButton = document.getElementById(name + '-incr');
+        incrButton.onclick = incrButton.ontouchstart = function() {
+          param.incr(1, true);
+        };
 
-    var decr = document.getElementById(name + '-decr');
-    decr.onclick = decr.ontouchstart = function() {
-      param.incr(-1, true);
-    };
+        var decrButton = document.getElementById(name + '-decr');
+        decrButton.onclick = decrButton.ontouchstart = function() {
+          param.incr(-1, true);
+        };
+
+        break;
+
+      case 'select':
+        this.box.onchange = function() {
+          var val = param.box.value;
+          param.set(val, true);
+        };
+
+        break;
+    }
 
     ioClient.socket.on('admin_param_' + name, (val) => {
       param.set(val);
@@ -40,11 +55,25 @@ class Param {
   }
 
   set(val, send = false) {
-    this.value = Math.min(this.max, Math.max(this.min, val));
-    this.box.value = this.value.toString();
+    switch (this.type) {
+      case 'number':
+        this.value = Math.min(this.max, Math.max(this.min, val));
+        this.box.value = this.value.toString();
 
-    if (send)
-      ioClient.socket.emit('admin_param_' + this.name, this.value);
+        if (send)
+          ioClient.socket.emit('admin_param_' + this.name, this.value);
+
+        break;
+
+      case 'select':
+        this.value = val;
+        this.box.value = val;
+
+        if (send)
+          ioClient.socket.emit('admin_param_' + this.name, val);
+
+        break;
+    }
   }
 
   incr(val, send = false) {
@@ -52,18 +81,51 @@ class Param {
   }
 }
 
+class Display {
+  constructor(type, name, label, init) {
+    this.type = type;
+    this.name = name;
+    this.label = label;
+    this.value = init;
+    this.div = document.getElementById(name + '-div');
+
+    var display = this;
+
+    ioClient.socket.on('admin_display_' + name, (val) => {
+      display.set(val);
+    });
+  }
+
+  set(val) {
+    this.value = val;
+    this.div.innerHTML = this.label + ': ' + this.value.toString();
+  }
+}
+
 window.addEventListener('load', () => {
   var div = document.getElementById('admin');
 
-  var param = new Param('drops', 'drops', 0, 0, 100);
-  paramList.push(param);
+  paramList.push(new Param('number', 'maxDrops', 'max drops', 0, 0, 100));
+  paramList.push(new Param('select', 'state', 'state'));
+
+  displayList.push(new Display('number', 'numPlayers', 'num players', ''));
+
+  var clearButton = document.getElementById('clear-btn');
+  clearButton.onclick = clearButton.ontouchstart = function() {
+    ioClient.socket.emit('admin_clear');
+  };
 
   ioClient.socket.on('admin_params', (params) => {
     for (let param of paramList) {
       let val = params[param.name];
+      param.set(val, false);
+    }
+  });
 
-      if (val)
-        param.set(val, false);
+  ioClient.socket.on('admin_display', (displays) => {
+    for (let display of displayList) {
+      let val = displays[display.name];
+      display.set(val, false);
     }
   });
 
