@@ -27,7 +27,9 @@ class ServerPerformance extends serverSide.Performance {
 
     socket.on('perf_sound', (time, soundParams) => {
       var numPlayers = players.length;
-      var numEchoPlayers = soundParams.echoDiv - 1;
+      var numEchoPlayers = soundParams.loopDiv - 1;
+      var echoPeriod = soundParams.loopPeriod / soundParams.loopDiv;
+      var echoAttenuation = Math.pow(soundParams.loopAttenuation, 1 / soundParams.loopDiv);
       var echoDelay = 0;
       var echoSockets = player.privateState.echoSockets;
 
@@ -46,8 +48,8 @@ class ServerPerformance extends serverSide.Performance {
           if (echoSockets.indexOf(echoSocket) < 0)
             echoSockets.push(echoSocket);
 
-          echoDelay += soundParams.echoPeriod;
-          soundParams.gain *= soundParams.echoAttenuation;
+          echoDelay += echoPeriod;
+          soundParams.gain *= echoAttenuation;
 
           echoSocket.emit('perf_echo', time + echoDelay, soundParams);
         }

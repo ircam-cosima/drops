@@ -10,13 +10,14 @@ var paramList = [];
 var displayList = [];
 
 class Param {
-  constructor(type, name, label, init, min, max) {
+  constructor(type, name, label, init, min, max, step) {
     this.type = type;
     this.name = name;
     this.label = label;
     this.value = init;
     this.min = min;
     this.max = max;
+    this.step = step;
     this.box = document.getElementById(name + '-box');
 
     var param = this;
@@ -30,12 +31,12 @@ class Param {
 
         var incrButton = document.getElementById(name + '-incr');
         incrButton.onclick = incrButton.ontouchstart = function() {
-          param.incr(1, true);
+          param.incr(param.step, true);
         };
 
         var decrButton = document.getElementById(name + '-decr');
         decrButton.onclick = decrButton.ontouchstart = function() {
-          param.incr(-1, true);
+          param.incr(-param.step, true);
         };
 
         break;
@@ -105,8 +106,12 @@ class Display {
 window.addEventListener('load', () => {
   var div = document.getElementById('admin');
 
-  paramList.push(new Param('number', 'maxDrops', 'max drops', 0, 0, 100));
   paramList.push(new Param('select', 'state', 'state'));
+  paramList.push(new Param('number', 'maxDrops', 'max drops', 0, 0, 100, 1));
+  paramList.push(new Param('number', 'loopDiv', 'loop div', 1, 1, 100, 1));
+  paramList.push(new Param('number', 'loopPeriod', 'loop div', 7.5, 1, 30, 0.1));
+  paramList.push(new Param('number', 'loopAttenuation', 'loop atten', 0.71, 0, 1, 0.01));
+  paramList.push(new Param('number', 'minGain', 'min gain', 0.1, 0, 1, 0.01));
 
   displayList.push(new Display('number', 'numPlayers', 'num players', ''));
 

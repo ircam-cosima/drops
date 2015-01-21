@@ -12,15 +12,35 @@ html
     script(src="/javascripts/admin.js")
     #admin.admin
       #numPlayers-div
-      | max drops: 
-      button(id='maxDrops-decr', width='0.5em') <
-      input(id='maxDrops-box', type='number', value='', min='0', max='100', step='1', size='2')
-      button(id='maxDrops-incr', width='0.5em') >
-      <br>
       | state: 
       select(id="state-box")
         option reset
         option running
         option end
+      <br>
+      | max drops: 
+      button(id='maxDrops-decr', width='0.5em') <
+      input(id='maxDrops-box', type='number', value='', min='0', max='100', step='1', size='2')
+      button(id='maxDrops-incr', width='0.5em') >
+      <br>
+      | loop div: 
+      button(id='loopDiv-decr', width='0.5em') <
+      input(id='loopDiv-box', type='number', value='', min='1', max='100', step='1', size='2')
+      button(id='loopDiv-incr', width='0.5em') >
+      <br>
+      | loop period: 
+      button(id='loopPeriod-decr', width='0.5em') <
+      input(id='loopPeriod-box', type='number', value='', min='1', max='30', step='0.1', size='2')
+      button(id='loopPeriod-incr', width='0.5em') >
+      <br>
+      | loop atten: 
+      button(id='loopAttenuation-decr', width='0.5em') <
+      input(id='loopAttenuation-box', type='number', value='', min='0', max='1', step='0.01', size='2')
+      button(id='loopAttenuation-incr', width='0.5em') >
+      <br>
+      | min gain: 
+      button(id='minGain-decr', width='0.5em') <
+      input(id='minGain-box', type='number', value='', min='0', max='1', step='0.01', size='2')
+      button(id='minGain-incr', width='0.5em') >
       <br>
       button(id='clear-btn') clear

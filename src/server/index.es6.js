@@ -29,8 +29,12 @@ app.get('/admin', function(req, res) {
 });
 
 var adminParams = {
-  maxDrops: 1,
   state: "reset", // "running", "end"
+  maxDrops: 1,
+  loopDiv: 3,
+  loopPeriod: 7.5,
+  loopAttenuation: 0.71,
+  minGain: 0.1,
 };
 
 var adminDisplay = {

@@ -34,9 +34,6 @@ class Loop extends TimeEngine {
 
     this.soundParams = soundParams;
     this.local = local;
-
-    this.period = 3 * soundParams.echoPeriod;
-    this.attenuation = Math.pow(soundParams.echoAttenuation, soundParams.echoDiv);
   }
 
   advanceTime(time) {
@@ -68,7 +65,7 @@ class Looper {
   advance(time, loop) {
     var soundParams = loop.soundParams;
 
-    if (soundParams.gain < soundParams.minEchoGain) {
+    if (soundParams.gain < soundParams.minGain) {
       arrayRemove(this.loops, loop);
 
       if (loop.local)
@@ -90,9 +87,9 @@ class Looper {
       opacity: Math.sqrt(soundParams.gain)
     });
 
-    soundParams.gain *= loop.attenuation;
+    soundParams.gain *= soundParams.loopAttenuation;
 
-    return time + loop.period;
+    return time + soundParams.loopPeriod;
   }
 
   remove(index) {
@@ -147,14 +144,13 @@ class PlayerPerformance extends clientSide.Performance {
     this.state = 'reset';
     this.maxDrops = 0;
 
-    this.echoDiv = 3;
-    this.echoPeriod = 2.5;
-    this.echoAttenuation = Math.pow(0.70710678118655, 1 / 3);
-    this.minEchoGain = 0.1;
+    this.loopDiv = 3;
+    this.loopPeriod = 7.5;
+    this.loopAttenuation = 0.70710678118655;
+    this.minGain = 0.1;
     this.quantize = 0.250;
 
     this.numLocalLoops = 0;
-    this.numTotalLoops = 0;
 
     this.looper = new Looper(this.synth, audioBuffers, () => {
       this.updateCount();
@@ -196,6 +192,10 @@ class PlayerPerformance extends clientSide.Performance {
     ioClient.socket.on('admin_params', (params) => {
       this.state = params.state;
       this.maxDrops = params.maxDrops;
+      this.loopDiv = params.loopDiv;
+      this.loopPeriod = params.loopPeriod;
+      this.loopAttenuation = params.loopAttenuation;
+      this.minGain = params.minGain;
       this.updateCount();
     });
 
@@ -208,6 +208,26 @@ class PlayerPerformance extends clientSide.Performance {
       this.maxDrops = maxDrops;
       this.updateCount();
     });
+
+    ioClient.socket.on('admin_param_loopDiv', (loopDiv) => {
+      this.loopDiv = loopDiv;
+      this.updateCount();
+    });
+
+    ioClient.socket.on('admin_param_loopPeriod', (loopPeriod) => {
+      this.loopPeriod = loopPeriod;
+      this.updateCount();
+    });
+
+    ioClient.socket.on('admin_param_loopAttenuation', (loopAttenuation) => {
+      this.loopAttenuation = loopAttenuation;
+      this.updateCount();
+    });
+
+    ioClient.socket.on('admin_param_minGain', (minGain) => {
+      this.minGain = minGain;
+      this.updateCount();
+    });
   }
 
   trigger(x, y) {
@@ -216,10 +236,10 @@ class PlayerPerformance extends clientSide.Performance {
       gain: 1,
       x: x,
       y: y,
-      echoDiv: this.echoDiv,
-      echoPeriod: this.echoPeriod,
-      echoAttenuation: this.echoAttenuation,
-      minEchoGain: this.minEchoGain
+      loopDiv: this.loopDiv,
+      loopPeriod: this.loopPeriod,
+      loopAttenuation: this.loopAttenuation,
+      minGain: this.minGain
     };
 
     var time = scheduler.currentTime;
