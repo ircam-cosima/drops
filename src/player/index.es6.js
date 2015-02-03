@@ -4,6 +4,7 @@ var clientSide = require('soundworks/client');
 var PlayerPerformance = require('./PlayerPerformance');
 var ioClient = clientSide.ioClient;
 var AudioBufferLoader = require('loaders').AudioBufferLoader;
+var platform = require('platform.js');
 
 ioClient.init('/play');
 
@@ -117,7 +118,7 @@ var voxFiles = [
 
 var audioFiles = dropsFiles;
 
-var welcome = "<p>Welcome to <b>Drops</b>.</p> <p>Please make yourself comfortable.</p>";
+var welcome = "<p>Welcome to <b>Drops</b>.</p>";
 
 var impulseResponseParams = {
   sampleRate: 44100, // Hz FROM CONTEXT
@@ -129,27 +130,70 @@ var impulseResponseParams = {
   lowPassFreqEnd: 100, // Hz
 };
 
+function parseVersionString(string) {
+  if (string) {
+    var a = string.split('.');
+
+    if (a[1] >= 0)
+      return parseFloat(a[0] + "." + a[1]);
+
+    return parseFloat(a[0]);
+  }
+
+  return null;
+}
+
 window.addEventListener('DOMContentLoaded', () => {
+  window.top.scrollTo(0, 1);
+
+  var osVersion = parseVersionString(platform.os.version);
+  var browserVersion = parseVersionString(platform.version);
+  var msg = null;
+
+  if (platform.os.family == "iOS") {
+    if (osVersion < 7)
+      msg = "This application requires at least iOS 7.<br/>You have iOS " + platform.os.version + ".";
+  } else if (platform.os.family == "Android") {
+    if (osVersion < 4.2)
+      msg = "This application requires at least Android 4.2.";
+    else if (platform.name != 'Chrome Mobile')
+      msg = "You have to use Chrome to run this application on an Android device.";
+    else if (browserVersion < 35)
+      msg = "Consider using a recent version of Chrome to run this application.";
+  } else {
+    msg = "This application is designed for mobile devices and currently runs only on iOS or Android.";
+  }
+
+  if (msg !== null) {
+    var sorryDiv = document.createElement('div');
+    sorryDiv.classList.add('welcome');
+    container.appendChild(sorryDiv);
+    sorryDiv.innerHTML = "<p>Sorry, this doesn't work as it should.</p> <p>" + msg + "</p>";
+    return;
+  }
+
   // load audio files
   var loader = new AudioBufferLoader();
-  var fileProgress = [];
+  // var fileProgress = [];
   var loaderProgress = 0;
 
   var progressDiv = document.createElement('div');
   progressDiv.classList.add('welcome');
   container.appendChild(progressDiv);
 
-  for (let i = 0; i < audioFiles.length; i++)
-    fileProgress.push(0);
+  // for (let i = 0; i < audioFiles.length; i++)
+  //   fileProgress.push(0);
 
-  loader.progressCallback = function(obj) {
-    var progress = obj.value;
+  // loader.progressCallback = function(obj) {
+  //   var progress = obj.value;
 
-    loaderProgress += (progress - fileProgress[obj.index]);
-    fileProgress[obj.index] = progress;
+  //   loaderProgress += (progress - fileProgress[obj.index]);
+  //   fileProgress[obj.index] = progress;
 
-    progressDiv.innerHTML = "<p>Loading ...</p>";
-  };
+  //   progressDiv.innerHTML = "<p>Loading ...</p>";
+  // };
+
+  progressDiv.innerHTML = "<p>Loading ...</p>";
 
   loader.load(audioFiles)
     .then(function(audioBuffers) {
@@ -162,7 +206,7 @@ window.addEventListener('DOMContentLoaded', () => {
       var performance = new PlayerPerformance(audioBuffers, sync, placement);
       var manager = new clientSide.Manager([sync, placement], performance);
 
-      manager.displayDiv.innerHTML = welcome + "<p>Touch the screen to <b>join the performance!</b></p>";
+      manager.displayDiv.innerHTML = welcome + "<p>Touch the screen to join!</p>";
 
       ioClient.start(() => {
         manager.start();

@@ -17,7 +17,8 @@
     "scheduler": "git://github.com/Ircam-RnD/scheduler.git#master",
     "d3-scale-linear": "0.0.0",
     "dat-gui": "~0.5.0",
-    "vector": "git+https://github.com/b-ma/vector2d.git"
+    "vector": "git+https://github.com/b-ma/vector2d.git",
+    "platform.js": "git://github.com/bestiejs/platform.js#master"
   },
   "devDependencies": {
     "gulp": "~3.8.7",
