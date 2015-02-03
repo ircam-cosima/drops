@@ -83,7 +83,7 @@ class Looper {
       x: soundParams.x,
       y: soundParams.y,
       duration: this.audioBuffers[soundParams.index].duration,
-      velocity: 100 + soundParams.gain * 200,
+      velocity: 40 + soundParams.gain * 80,
       opacity: Math.sqrt(soundParams.gain)
     });
 
@@ -139,7 +139,11 @@ class PlayerPerformance extends clientSide.Performance {
 
     var canvas = document.createElement('canvas');
     canvas.setAttribute('id', 'scene');
-    document.body.appendChild(canvas);
+    this.displayDiv.appendChild(canvas);
+
+    this.textDiv = document.createElement('div');
+    this.textDiv.classList.add('text');
+    this.displayDiv.appendChild(this.textDiv);
 
     this.state = 'reset';
     this.maxDrops = 0;
@@ -264,28 +268,30 @@ class PlayerPerformance extends clientSide.Performance {
   }
 
   updateCount() {
+    var str = "";
+
     if (this.state == 'reset') {
-      this.displayDiv.innerHTML = "<p> </p> <p>Waiting for<br>everybody<br>getting ready...</p>";
+      str = "<p>Waiting for<br>everybody<br>getting ready...</p>";
     } else if (this.state == 'end' && this.looper.loops.length === 0) {
-      this.displayDiv.innerHTML = "<p> </p> <p>That's all.<br>Thanks!</p>";
+      str = "<p>That's all.<br>Thanks!</p>";
     } else {
       var numAvailable = Math.max(0, this.maxDrops - this.looper.numLocalLoops);
 
-      this.displayDiv.innerHTML = "<p> </p>";
-
       if (numAvailable > 0) {
-        this.displayDiv.innerHTML += "<p>You have</p>";
+        str = "<p>You have</p>";
 
         if (numAvailable === this.maxDrops) {
           if (numAvailable === 1)
-            this.displayDiv.innerHTML += "<p class='big'>1</p> <p>drop to play</p>";
+            str += "<p class='big'>1</p> <p>drop to play</p>";
           else
-            this.displayDiv.innerHTML += "<p class='big'>" + numAvailable + "</p> <p>drops to play</p>";
+            str += "<p class='big'>" + numAvailable + "</p> <p>drops to play</p>";
         } else
-          this.displayDiv.innerHTML += "<p class='big'>" + numAvailable + " of " + this.maxDrops + "</p> <p>drops to play</p>";
+          str += "<p class='big'>" + numAvailable + " of " + this.maxDrops + "</p> <p>drops to play</p>";
       } else
-        this.displayDiv.innerHTML += "<p> </p> <p class='medium'>Listen!</p>";
+        str = "<p class='listen'>Listen!</p>";
     }
+
+    this.textDiv.innerHTML = str;
   }
 
   autoTrigger() {

@@ -17,7 +17,7 @@ class Circle {
     this.opacity = options.opacity || 1;
     this.index = options.index || 0;
 
-    this.growthVelocity = options.velocity || 200; // pixels / sec
+    this.growthVelocity = options.velocity || 50; // pixels / sec
     this.minVelocity = 50; // if gain is < 0.25 => constant growth
     this.friction = -50; // pixels / sec
 
