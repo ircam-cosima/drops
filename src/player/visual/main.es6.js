@@ -9,6 +9,9 @@ var $canvas;
 var ctx;
 
 var setSize = function() {
+  // var style = window.getComputedStyle($canvas);
+  // w = style.getPropertyValue('width');
+  // h = style.getPropertyValue('height');
   w = window.innerWidth;
   h = window.innerHeight;
   ctx.canvas.width = w;
