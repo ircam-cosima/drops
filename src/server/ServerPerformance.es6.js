@@ -4,12 +4,12 @@ var serverSide = require('soundworks/server');
 var ioServer = serverSide.ioServer;
 
 class ServerPerformance extends serverSide.Performance {
-  constructor(adminParams, adminDisplay) {
+  constructor(conductorParams, conductorDisplay) {
     super();
 
     this.numPlayers = 0;
-    this.adminParams = adminParams;
-    this.adminDisplay = adminDisplay;
+    this.conductorParams = conductorParams;
+    this.conductorDisplay = conductorDisplay;
   }
 
   connect(socket, player) {
@@ -18,12 +18,12 @@ class ServerPerformance extends serverSide.Performance {
     // initialize echo sockets
     player.privateState.echoSockets = [];
 
-    // send global parameters
-    socket.emit("admin_params", this.adminParams);
+    // send conductor parameters
+    socket.emit("conductor_params", this.conductorParams);
 
     // increment number of players
-    this.adminDisplay.numPlayers++;
-    ioServer.io.of('/admin').emit('admin_display_numPlayers', this.adminDisplay.numPlayers);
+    this.conductorDisplay.numPlayers++;
+    ioServer.io.of('/conductor').emit('conductor_display_numPlayers', this.conductorDisplay.numPlayers);
 
     socket.on('perf_sound', (time, soundParams) => {
       var numPlayers = players.length;
@@ -83,8 +83,8 @@ class ServerPerformance extends serverSide.Performance {
 
     if (player.place !== null) {
       // decrement number of players
-      this.adminDisplay.numPlayers--;
-      ioServer.io.of('/admin').emit('admin_display_numPlayers', this.adminDisplay.numPlayers);
+      this.conductorDisplay.numPlayers--;
+      ioServer.io.of('/conductor').emit('conductor_display_numPlayers', this.conductorDisplay.numPlayers);
     }
   }
 }

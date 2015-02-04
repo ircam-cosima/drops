@@ -4,7 +4,7 @@ var clientSide = require('soundworks/client');
 var ioClient = clientSide.ioClient;
 var inputModule = clientSide.inputModule;
 
-ioClient.init('/admin');
+ioClient.init('/conductor');
 
 var paramList = [];
 var displayList = [];
@@ -50,7 +50,7 @@ class Param {
         break;
     }
 
-    ioClient.socket.on('admin_param_' + name, (val) => {
+    ioClient.socket.on('conductor_param_' + name, (val) => {
       param.set(val);
     });
   }
@@ -62,7 +62,7 @@ class Param {
         this.box.value = this.value.toString();
 
         if (send)
-          ioClient.socket.emit('admin_param_' + this.name, this.value);
+          ioClient.socket.emit('conductor_param_' + this.name, this.value);
 
         break;
 
@@ -71,7 +71,7 @@ class Param {
         this.box.value = val;
 
         if (send)
-          ioClient.socket.emit('admin_param_' + this.name, val);
+          ioClient.socket.emit('conductor_param_' + this.name, val);
 
         break;
     }
@@ -92,7 +92,7 @@ class Display {
 
     var display = this;
 
-    ioClient.socket.on('admin_display_' + name, (val) => {
+    ioClient.socket.on('conductor_display_' + name, (val) => {
       display.set(val);
     });
   }
@@ -103,8 +103,8 @@ class Display {
   }
 }
 
-window.addEventListener('load', () => {
-  var div = document.getElementById('admin');
+window.addEventListener('DOMContentLoaded', () => {
+  var div = document.getElementById('conductor');
 
   paramList.push(new Param('select', 'state', 'state'));
   paramList.push(new Param('number', 'maxDrops', 'max drops', 0, 0, 100, 1));
@@ -112,27 +112,26 @@ window.addEventListener('load', () => {
   paramList.push(new Param('number', 'loopPeriod', 'loop div', 7.5, 1, 30, 0.1));
   paramList.push(new Param('number', 'loopAttenuation', 'loop atten', 0.71, 0, 1, 0.01));
   paramList.push(new Param('number', 'minGain', 'min gain', 0.1, 0, 1, 0.01));
+  paramList.push(new Param('select', 'autoPlay', 'auto play'));
 
   displayList.push(new Display('number', 'numPlayers', 'num players', ''));
 
   var clearButton = document.getElementById('clear-btn');
   clearButton.onclick = clearButton.ontouchstart = function() {
-    ioClient.socket.emit('admin_clear');
+    ioClient.socket.emit('conductor_clear');
   };
 
-  ioClient.socket.on('admin_params', (params) => {
+  ioClient.socket.on('conductor_params', (params) => {
     for (let param of paramList) {
       let val = params[param.name];
       param.set(val, false);
     }
   });
 
-  ioClient.socket.on('admin_display', (displays) => {
+  ioClient.socket.on('conductor_display', (displays) => {
     for (let display of displayList) {
       let val = displays[display.name];
       display.set(val, false);
     }
   });
-
-  inputModule.enableTouch(div);
 });

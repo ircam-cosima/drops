@@ -9,7 +9,7 @@ html
     link(rel='stylesheet', href='/stylesheets/style.css')
   body
     h1 #{title}
-    script(src="/javascripts/admin.js")
+    script(src="/javascripts/conductor.js")
     #admin.admin
       #numPlayers-div
       | state: 
@@ -44,3 +44,8 @@ html
       button(id='minGain-incr', width='0.5em') >
       <br>
       button(id='clear-btn') clear
+      <br>
+      | auto play: 
+      select(id="autoPlay-box")
+        option off
+        option on

@@ -22,51 +22,52 @@ app.get('/env', function(req, res) {
   });
 });
 
-app.get('/admin', function(req, res) {
-  res.render('admin', {
-    title: 'Drops — Admin'
+app.get('/conductor', function(req, res) {
+  res.render('conductor', {
+    title: 'Drops — Conductor'
   });
 });
 
-var adminParams = {
+var conductorParams = {
   state: "reset", // "running", "end"
   maxDrops: 1,
   loopDiv: 3,
   loopPeriod: 7.5,
   loopAttenuation: 0.71,
   minGain: 0.1,
+  autoPlay: "off"
 };
 
-var adminDisplay = {
+var conductorDisplay = {
   numPlayers: 0
 };
 
 // init socket io server
 serverSide.ioServer.init(app);
 
-function serveGlobalParam(socket, name) {
-  socket.on('admin_param_' + name, (val) => {
-    adminParams[name] = val;
+function listenGlobalParam(socket, name) {
+  socket.on('conductor_param_' + name, (val) => {
+    conductorParams[name] = val;
 
-    // send global params to admin client
-    socket.broadcast.emit('admin_param_' + name, val);
+    // send conductor params to conductor client
+    socket.broadcast.emit('conductor_param_' + name, val);
 
     // propagate drops parameter to players
-    io.of('/play').emit('admin_param_' + name, val);
+    io.of('/play').emit('conductor_param_' + name, val);
   });
 }
 
 var io = serverSide.ioServer.io;
-io.of("/admin").on('connection', (socket) => {
-  // listen to global parameters
-  for (let key of Object.keys(adminParams))
-    serveGlobalParam(socket, key);
+io.of("/conductor").on('connection', (socket) => {
+  // listen to conductor parameters
+  for (let key of Object.keys(conductorParams))
+    listenGlobalParam(socket, key);
 
-  // send global params and display to admin client
-  socket.emit("admin_params", adminParams, true);
-  socket.emit("admin_display", adminDisplay, false);  
+  // send conductor params and display to conductor client
+  socket.emit("conductor_params", conductorParams, true);
+  socket.emit("conductor_display", conductorDisplay, false);  
 
-  socket.on('admin_clear', () => {
+  socket.on('conductor_clear', () => {
     io.of('/play').emit('perf_clear', "all");
   });
 });
@@ -74,5 +75,5 @@ io.of("/admin").on('connection', (socket) => {
 // start server side
 var placement = new serverSide.SetupPlacementAssigned({maxPlaces: 200, order: 'ascending'});
 var sync = new serverSide.SetupSync();
-var performance = new ServerPerformance(adminParams, adminDisplay);
+var performance = new ServerPerformance(conductorParams, conductorDisplay);
 var manager = new serverSide.ManagerPlayers([sync, placement], performance);

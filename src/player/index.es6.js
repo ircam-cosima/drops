@@ -120,16 +120,6 @@ var audioFiles = dropsFiles;
 
 var welcome = "<p>Welcome to <b>Drops</b>.</p>";
 
-var impulseResponseParams = {
-  sampleRate: 44100, // Hz FROM CONTEXT
-  numChannels: 1, // FROM CONTEXT (2 for stereo, 4 for true stereo)
-  fadeIntime: 0.2, // seconds
-  decayThreshold: -20, // dB
-  decayTime: 5, // seconds
-  lowPassFreqStart: 15000, // Hz
-  lowPassFreqEnd: 100, // Hz
-};
-
 function parseVersionString(string) {
   if (string) {
     var a = string.split('.');
@@ -143,9 +133,27 @@ function parseVersionString(string) {
   return null;
 }
 
+var conductorParams = {
+  state: "reset", // "running", "end"
+  maxDrops: 1,
+  loopDiv: 3,
+  loopPeriod: 7.5,
+  loopAttenuation: 0.71,
+  minGain: 0.1,
+  autoPlay: "off"
+};
+
+function listenGlobalParam(socket, name, callback) {
+  socket.on('conductor_param_' + name, (value) => {
+    conductorParams[name] = value;
+    callback(conductorParams, name, value);
+  });
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   window.top.scrollTo(0, 1);
 
+  // platform test (TODO: generalize!)
   var osVersion = parseVersionString(platform.os.version);
   var browserVersion = parseVersionString(platform.version);
   var msg = null;
@@ -203,10 +211,21 @@ window.addEventListener('DOMContentLoaded', () => {
       var placement = new clientSide.SetupPlacementAssigned({
         display: false
       });
-      var performance = new PlayerPerformance(audioBuffers, sync, placement);
+      var performance = new PlayerPerformance(audioBuffers, sync, placement, conductorParams);
       var manager = new clientSide.Manager([sync, placement], performance);
 
       manager.displayDiv.innerHTML = welcome + "<p>Touch the screen to join!</p>";
+
+      // conductor params handling (TODO: generalize!)
+      ioClient.socket.on('conductor_params', (params) => {
+        performance.conductorParams = params;
+      });
+
+      // listen to conductor parameters
+      for (let key of Object.keys(conductorParams))
+        listenGlobalParam(ioClient.socket, key, (params, name, value) => {
+          performance.conductorParams = params;
+        });
 
       ioClient.start(() => {
         manager.start();

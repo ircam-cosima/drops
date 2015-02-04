@@ -128,7 +128,7 @@ class Looper {
 }
 
 class PlayerPerformance extends clientSide.Performance {
-  constructor(audioBuffers, sync, placement, params = {}) {
+  constructor(audioBuffers, sync, placement, conductorParams, params = {}) {
     super();
 
     this.sync = sync;
@@ -145,15 +145,18 @@ class PlayerPerformance extends clientSide.Performance {
     this.textDiv.classList.add('text');
     this.displayDiv.appendChild(this.textDiv);
 
+    // conductor params
     this.state = 'reset';
     this.maxDrops = 0;
-
     this.loopDiv = 3;
     this.loopPeriod = 7.5;
     this.loopAttenuation = 0.70710678118655;
     this.minGain = 0.1;
-    this.quantize = 0.250;
+    this.autoPlay = false;
 
+    this.conductorParams = conductorParams;
+
+    this.quantize = 0.250;
     this.numLocalLoops = 0;
 
     this.looper = new Looper(this.synth, audioBuffers, () => {
@@ -192,46 +195,30 @@ class PlayerPerformance extends clientSide.Performance {
       else
         this.looper.remove(index);
     });
+  }
 
-    ioClient.socket.on('admin_params', (params) => {
+  set conductorParams(params) {
+    if (params.state !== this.state ||  params.maxDrops !== this.maxDrops) {
       this.state = params.state;
       this.maxDrops = params.maxDrops;
-      this.loopDiv = params.loopDiv;
-      this.loopPeriod = params.loopPeriod;
-      this.loopAttenuation = params.loopAttenuation;
-      this.minGain = params.minGain;
       this.updateCount();
-    });
+    }
 
-    ioClient.socket.on('admin_param_state', (state) => {
-      this.state = state;
-      this.updateCount();
-    });
+    this.loopDiv = params.loopDiv;
+    this.loopPeriod = params.loopPeriod;
+    this.loopAttenuation = params.loopAttenuation;
+    this.minGain = params.minGain;
 
-    ioClient.socket.on('admin_param_maxDrops', (maxDrops) => {
-      this.maxDrops = maxDrops;
-      this.updateCount();
-    });
+    var autoPlay = (params.autoPlay == "on");
 
-    ioClient.socket.on('admin_param_loopDiv', (loopDiv) => {
-      this.loopDiv = loopDiv;
-      this.updateCount();
-    });
+    if (autoPlay !== this.autoPlay) {
+      if (autoPlay) {
+        this.autoTrigger();
+        this.autoClear();
+      }
 
-    ioClient.socket.on('admin_param_loopPeriod', (loopPeriod) => {
-      this.loopPeriod = loopPeriod;
-      this.updateCount();
-    });
-
-    ioClient.socket.on('admin_param_loopAttenuation', (loopAttenuation) => {
-      this.loopAttenuation = loopAttenuation;
-      this.updateCount();
-    });
-
-    ioClient.socket.on('admin_param_minGain', (minGain) => {
-      this.minGain = minGain;
-      this.updateCount();
-    });
+      this.autoPlay = autoPlay;
+    }
   }
 
   trigger(x, y) {
@@ -322,8 +309,10 @@ class PlayerPerformance extends clientSide.Performance {
     inputModule.enableDeviceMotion();
 
     // for testing
-    // this.autoTrigger();
-    //this.autoClear();
+    if (this.autoPlay) {
+      this.autoTrigger();
+      this.autoClear();
+    }
   }
 }
 
