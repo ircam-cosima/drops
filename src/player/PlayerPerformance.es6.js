@@ -152,7 +152,7 @@ class PlayerPerformance extends clientSide.Performance {
     this.loopPeriod = 7.5;
     this.loopAttenuation = 0.70710678118655;
     this.minGain = 0.1;
-    this.autoPlay = false;
+    this.autoPlay = 'off';
 
     this.conductorParams = conductorParams;
 
@@ -169,8 +169,10 @@ class PlayerPerformance extends clientSide.Performance {
       var accZ = data.accelerationIncludingGravity.z;
       var mag = Math.sqrt(accX * accX + accY * accY + accZ * accZ);
 
-      if (mag > 20)
+      if (mag > 20) {
         this.clear();
+        this.autoPlay = 'manual';
+      }
     });
 
     // setup input listeners
@@ -181,6 +183,8 @@ class PlayerPerformance extends clientSide.Performance {
 
         this.trigger(x, y);
       }
+
+      this.autoPlay = 'manual';
     });
 
     // setup performance control listeners
@@ -209,15 +213,13 @@ class PlayerPerformance extends clientSide.Performance {
     this.loopAttenuation = params.loopAttenuation;
     this.minGain = params.minGain;
 
-    var autoPlay = (params.autoPlay == "on");
+    if (this.autoPlay != 'manual' && params.autoPlay != this.autoPlay) {
+      this.autoPlay = params.autoPlay;
 
-    if (autoPlay !== this.autoPlay) {
-      if (autoPlay) {
+      if (params.autoPlay == 'on') {
         this.autoTrigger();
         this.autoClear();
       }
-
-      this.autoPlay = autoPlay;
     }
   }
 
@@ -282,21 +284,25 @@ class PlayerPerformance extends clientSide.Performance {
   }
 
   autoTrigger() {
-    if (this.state == 'running' && this.looper.numLocalLoops < this.maxDrops)
-      this.trigger(Math.random(), Math.random());
+    if (this.autoPlay == 'on') {
+      if (this.state == 'running' && this.looper.numLocalLoops < this.maxDrops)
+        this.trigger(Math.random(), Math.random());
 
-    setTimeout(() => {
-      this.autoTrigger();
-    }, Math.random() * 2000 + 50);
+      setTimeout(() => {
+        this.autoTrigger();
+      }, Math.random() * 2000 + 50);
+    }
   }
 
   autoClear() {
-    if (this.looper.numLocalLoops > 0)
-      this.clear(Math.random(), Math.random());
+    if (this.autoPlay == 'on') {
+      if (this.looper.numLocalLoops > 0)
+        this.clear(Math.random(), Math.random());
 
-    setTimeout(() => {
-      this.autoClear();
-    }, Math.random() * 60000 + 60000);
+      setTimeout(() => {
+        this.autoClear();
+      }, Math.random() * 60000 + 60000);
+    }
   }
 
   start() {

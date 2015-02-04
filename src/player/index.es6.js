@@ -146,7 +146,7 @@ var conductorParams = {
 function listenGlobalParam(socket, name, callback) {
   socket.on('conductor_param_' + name, (value) => {
     conductorParams[name] = value;
-    callback(conductorParams, name, value);
+    callback(name, value);
   });
 }
 
@@ -218,13 +218,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
       // conductor params handling (TODO: generalize!)
       ioClient.socket.on('conductor_params', (params) => {
+        conductorParams = params;
         performance.conductorParams = params;
       });
 
       // listen to conductor parameters
       for (let key of Object.keys(conductorParams))
-        listenGlobalParam(ioClient.socket, key, (params, name, value) => {
-          performance.conductorParams = params;
+        listenGlobalParam(ioClient.socket, key, (name, value) => {
+          performance.conductorParams = conductorParams;
         });
 
       ioClient.start(() => {
