@@ -4,7 +4,7 @@ var clientSide = require('soundworks/client');
 var PlayerPerformance = require('./PlayerPerformance');
 var ioClient = clientSide.ioClient;
 var AudioBufferLoader = require('loaders').AudioBufferLoader;
-var platform = require('platform.js');
+var platform = require('platform');
 
 ioClient.init('/play');
 
