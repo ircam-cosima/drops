@@ -51,7 +51,7 @@ class ServerPerformance extends serverSide.Performance {
           echoDelay += echoPeriod;
           soundParams.gain *= echoAttenuation;
 
-          echoSocket.emit('perf_echo', time + echoDelay, soundParams);
+          echoSocket.volatile.emit('perf_echo', time + echoDelay, soundParams);
         }
       }
     });
