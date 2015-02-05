@@ -76,13 +76,13 @@ class Looper {
       return null;
     }
 
-    this.synth.trigger(time, soundParams);
+    var duration = this.synth.trigger(time, soundParams, !loop.local);
 
     visual.createCircle({
       index: soundParams.index,
       x: soundParams.x,
       y: soundParams.y,
-      duration: this.audioBuffers[soundParams.index].duration,
+      duration: duration,
       velocity: 40 + soundParams.gain * 80,
       opacity: Math.sqrt(soundParams.gain)
     });
