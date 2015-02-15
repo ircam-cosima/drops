@@ -1,8 +1,8 @@
 'use strict';
 
 var clientSide = require('soundworks/client');
-var ioClient = clientSide.ioClient;
-var inputModule = clientSide.inputModule;
+var client = clientSide.client;
+var input = clientSide.input;
 var audioContext = require('audio-context');
 var TimeEngine = require('time-engine');
 var scheduler = require('scheduler');
@@ -127,9 +127,9 @@ class Looper {
   }
 }
 
-class PlayerPerformance extends clientSide.Performance {
+class Performance extends clientSide.Module {
   constructor(audioBuffers, sync, placement, conductorParams, params = {}) {
-    super();
+    super('performance', true);
 
     this.sync = sync;
     this.placement = placement;
@@ -163,7 +163,7 @@ class PlayerPerformance extends clientSide.Performance {
       this.updateCount();
     });
 
-    inputModule.on('devicemotion', (data) => {
+    input.on('devicemotion', (data) => {
       var accX = data.accelerationIncludingGravity.x;
       var accY = data.accelerationIncludingGravity.y;
       var accZ = data.accelerationIncludingGravity.z;
@@ -176,7 +176,7 @@ class PlayerPerformance extends clientSide.Performance {
     });
 
     // setup input listeners
-    inputModule.on('touchstart', (data) => {
+    input.on('touchstart', (data) => {
       if (this.state == 'running' && this.looper.numLocalLoops < this.maxDrops) {
         var x = (data.coordinates[0] - this.displayDiv.offsetLeft + window.scrollX) / this.displayDiv.offsetWidth;
         var y = (data.coordinates[1] - this.displayDiv.offsetTop + window.scrollY) / this.displayDiv.offsetHeight;
@@ -188,12 +188,12 @@ class PlayerPerformance extends clientSide.Performance {
     });
 
     // setup performance control listeners
-    ioClient.socket.on('perf_echo', (serverTime, soundParams) => {
+    client.socket.on('perf_echo', (serverTime, soundParams) => {
       var time = this.sync.getLocalTime(serverTime);
       this.looper.start(time, soundParams);
     });
 
-    ioClient.socket.on('perf_clear', (index) => {
+    client.socket.on('perf_clear', (index) => {
       if (index == 'all')
         this.looper.removeAll();
       else
@@ -225,7 +225,7 @@ class PlayerPerformance extends clientSide.Performance {
 
   trigger(x, y) {
     var soundParams = {
-      index: this.placement.place,
+      index: this.placement.index,
       gain: 1,
       x: x,
       y: y,
@@ -243,17 +243,17 @@ class PlayerPerformance extends clientSide.Performance {
     // time = this.sync.getLocalTime(serverTime);
 
     this.looper.start(time, soundParams, true);
-    ioClient.socket.emit('perf_sound', serverTime, soundParams);
+    client.socket.emit('perf_sound', serverTime, soundParams);
   }
 
   clear() {
-    var index = this.placement.place;
+    var index = this.placement.index;
 
     // remove at own looper
     this.looper.remove(index, true);
 
     // remove at other players
-    ioClient.socket.emit('perf_clear', index);
+    client.socket.emit('perf_clear', index);
   }
 
   updateCount() {
@@ -306,13 +306,17 @@ class PlayerPerformance extends clientSide.Performance {
   }
 
   start() {
+    super.start();
+
+    client.socket.emit("perf_start");
+
     visual.start();
     super.start();
 
     this.updateCount();
 
-    inputModule.enableTouch(this.displayDiv);
-    inputModule.enableDeviceMotion();
+    input.enableTouch(this.displayDiv);
+    input.enableDeviceMotion();
 
     // for testing
     if (this.autoPlay) {
@@ -322,4 +326,4 @@ class PlayerPerformance extends clientSide.Performance {
   }
 }
 
-module.exports = PlayerPerformance;
+module.exports = Performance;

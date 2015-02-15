@@ -1,15 +1,17 @@
 'use strict';
 
 var clientSide = require('soundworks/client');
-var ioClient = clientSide.ioClient;
+var client = clientSide.client;
 var inputModule = clientSide.inputModule;
 
-ioClient.init('/conductor');
+client.init('/conductor');
 
-var paramList = [];
-var displayList = [];
+class Command {
+  constructor(name, label) {
+  }
+}
 
-class Param {
+class Control {
   constructor(type, name, label, init, min, max, step) {
     this.type = type;
     this.name = name;
@@ -50,7 +52,7 @@ class Param {
         break;
     }
 
-    ioClient.socket.on('conductor_param_' + name, (val) => {
+    client.socket.on('conductor_control_' + name, (val) => {
       param.set(val);
     });
   }
@@ -62,7 +64,7 @@ class Param {
         this.box.value = this.value.toString();
 
         if (send)
-          ioClient.socket.emit('conductor_param_' + this.name, this.value);
+          client.socket.emit('conductor_control_' + this.name, this.value);
 
         break;
 
@@ -71,7 +73,7 @@ class Param {
         this.box.value = val;
 
         if (send)
-          ioClient.socket.emit('conductor_param_' + this.name, val);
+          client.socket.emit('conductor_control_' + this.name, val);
 
         break;
     }
@@ -92,7 +94,7 @@ class Display {
 
     var display = this;
 
-    ioClient.socket.on('conductor_display_' + name, (val) => {
+    client.socket.on('conductor_display_' + name, (val) => {
       display.set(val);
     });
   }
@@ -103,35 +105,49 @@ class Display {
   }
 }
 
+class Conductor extends clientSide.Module {
+  constructor() {
+    super('conductor', true);
+
+    this.paramList = [];
+    this.displayList = [];
+
+    this.paramList.push(new Control('select', 'state', 'state'));
+    this.paramList.push(new Control('number', 'maxDrops', 'max drops', 0, 0, 100, 1));
+    this.paramList.push(new Control('number', 'loopDiv', 'loop div', 1, 1, 100, 1));
+    this.paramList.push(new Control('number', 'loopPeriod', 'loop period', 7.5, 1, 30, 0.1));
+    this.paramList.push(new Control('number', 'loopAttenuation', 'loop atten', 0.71, 0, 1, 0.01));
+    this.paramList.push(new Control('number', 'minGain', 'min gain', 0.1, 0, 1, 0.01));
+    this.paramList.push(new Control('select', 'autoPlay', 'auto play'));
+
+    this.displayList.push(new Display('number', 'numPlayers', 'num players', ''));
+
+    var clearButton = document.getElementById('clear-btn');
+    clearButton.onclick = clearButton.ontouchstart = function() {
+      client.socket.emit('conductor_clear');
+    };
+
+    client.socket.on('conductor_control', (params) => {
+      for (let param of this.paramList) {
+        let val = params[param.name];
+        param.set(val, false);
+      }
+    });
+
+    client.socket.on('conductor_display', (displays) => {
+      for (let display of this.displayList) {
+        let val = displays[display.name];
+        display.set(val, false);
+      }
+    });
+  }
+
+  start() {
+
+  }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
-  var div = document.getElementById('conductor');
-
-  paramList.push(new Param('select', 'state', 'state'));
-  paramList.push(new Param('number', 'maxDrops', 'max drops', 0, 0, 100, 1));
-  paramList.push(new Param('number', 'loopDiv', 'loop div', 1, 1, 100, 1));
-  paramList.push(new Param('number', 'loopPeriod', 'loop div', 7.5, 1, 30, 0.1));
-  paramList.push(new Param('number', 'loopAttenuation', 'loop atten', 0.71, 0, 1, 0.01));
-  paramList.push(new Param('number', 'minGain', 'min gain', 0.1, 0, 1, 0.01));
-  paramList.push(new Param('select', 'autoPlay', 'auto play'));
-
-  displayList.push(new Display('number', 'numPlayers', 'num players', ''));
-
-  var clearButton = document.getElementById('clear-btn');
-  clearButton.onclick = clearButton.ontouchstart = function() {
-    ioClient.socket.emit('conductor_clear');
-  };
-
-  ioClient.socket.on('conductor_params', (params) => {
-    for (let param of paramList) {
-      let val = params[param.name];
-      param.set(val, false);
-    }
-  });
-
-  ioClient.socket.on('conductor_display', (displays) => {
-    for (let display of displayList) {
-      let val = displays[display.name];
-      display.set(val, false);
-    }
-  });
+  var conductor = new Conductor();
+  client.start(conductor);
 });

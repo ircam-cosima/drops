@@ -1,12 +1,12 @@
 'use strict';
 
 var clientSide = require('soundworks/client');
-var PlayerPerformance = require('./PlayerPerformance');
-var ioClient = clientSide.ioClient;
+var Performance = require('./Performance');
 var AudioBufferLoader = require('loaders').AudioBufferLoader;
 var platform = require('platform');
+var client = clientSide.client;
 
-ioClient.init('/play');
+client.init('/player');
 
 var dropsFiles = [
   'sounds/drops/01-drops-A-C2.mp3',
@@ -118,8 +118,6 @@ var voxFiles = [
 
 var audioFiles = dropsFiles;
 
-var welcome = "<p>Welcome to <b>Drops</b>.</p>";
-
 function parseVersionString(string) {
   if (string) {
     var a = string.split('.');
@@ -144,7 +142,7 @@ var conductorParams = {
 };
 
 function listenGlobalParam(socket, name, callback) {
-  socket.on('conductor_param_' + name, (value) => {
+  socket.on('conductor_control_' + name, (value) => {
     conductorParams[name] = value;
     callback(name, value);
   });
@@ -174,7 +172,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   if (msg !== null) {
     var sorryDiv = document.createElement('div');
-    sorryDiv.classList.add('welcome');
+    sorryDiv.classList.add('preamb');
     container.appendChild(sorryDiv);
     sorryDiv.innerHTML = "<p>Sorry, this doesn't work as it should.</p> <p>" + msg + "</p>";
     return;
@@ -186,7 +184,7 @@ window.addEventListener('DOMContentLoaded', () => {
   var loaderProgress = 0;
 
   var progressDiv = document.createElement('div');
-  progressDiv.classList.add('welcome');
+  progressDiv.classList.add('preamb');
   container.appendChild(progressDiv);
 
   // for (let i = 0; i < audioFiles.length; i++)
@@ -207,42 +205,51 @@ window.addEventListener('DOMContentLoaded', () => {
     .then(function(audioBuffers) {
       container.removeChild(progressDiv);
 
-      var sync = new clientSide.SetupSync();
-      var placement = new clientSide.SetupPlacementAssigned({
-        display: false
+      var welcome = new clientSide.Dialog({
+        id: 'welcome',
+        text: "<p>Welcome to <b>Drops</b>.</p> <p>Touch the screen to join!</p>",
+        activateAudio: true
       });
-      var performance = new PlayerPerformance(audioBuffers, sync, placement, conductorParams);
-      var manager = new clientSide.Manager([sync, placement], performance);
 
-      manager.displayDiv.innerHTML = welcome + "<p>Touch the screen to join!</p>";
+      var sync = new clientSide.Sync();
+
+      var placement = new clientSide.Placement({
+        dialog: false
+      });
+
+      var performance = new Performance(audioBuffers, sync, placement, conductorParams);
 
       // conductor params handling (TODO: generalize!)
-      ioClient.socket.on('conductor_params', (params) => {
+      client.socket.on('conductor_control', (params) => {
         conductorParams = params;
         performance.conductorParams = params;
       });
 
       // listen to conductor parameters
       for (let key of Object.keys(conductorParams))
-        listenGlobalParam(ioClient.socket, key, (name, value) => {
+        listenGlobalParam(client.socket, key, (name, value) => {
           performance.conductorParams = conductorParams;
         });
 
-      ioClient.start(() => {
-        manager.start();
-      });
+      client.start(
+        client.serial(
+          welcome,
+          client.parallel(
+            sync,
+            placement
+          ),
+          performance
+        )
+      );
+
+      // client.start([
+      //   'serial',
+      //   welcome, [
+      //     'parallel',
+      //     sync,
+      //     placement
+      //   ],
+      //   performance
+      // ]);      
     });
 });
-
-/** @private
-    @return {number} A random number from -1 to 1. */
-var randomSample = function() {
-  return Math.random() * 2 - 1;
-};
-
-
-/** @private
-    @return {number} An exponential gain value (1e-6 for -60dB) */
-var dBToPower = function(dBValue) {
-  return Math.pow(10, dBValue / 10);
-};

@@ -42,12 +42,7 @@ h1 {
   text-align: center;
 }
 
-#grid {
-  display: block;
-  position: relative;
-}
-
-.welcome {
+.preamb {
   background: #000;
   height: 100%;
   width: 80%;
@@ -55,26 +50,23 @@ h1 {
   text-align: center;
 }
 
-.setup {
+#welcome {
   background: #000;
   height: 100%;
-  width: 100%;
+  width: 80%;
+  margin: 0 auto;
   text-align: center;
 }
 
-.setup .small {
-  font-size: 0.5em;
-  margin: 2em 0;
-}
-
-.sync {
+#sync {
   background: #000;
   height: 100%;
   width: 75%;
+  text-align: center;
   margin: 0 auto;
 }
 
-.performance {
+#performance {
   position: absolute;
   height: 100%;
   width: 100%;
@@ -82,25 +74,25 @@ h1 {
   color: #555;
 }
 
-.performance .text {
+#performance .text {
   position: absolute;
   top: 1em;
   width: 100%;
 }
 
-.performance p {
+#performance p {
   font-size: 3rem;
   font-weight: bold;
   margin: 0em;
 }
 
-.performance .big {
+#performance .big {
   font-size: 6rem;
   font-weight: bold;
   margin: 20px 0;
 }
 
-.performance .listen {
+#performance .listen {
   position: relative;
   font-size: 4rem;
   font-weight: bold;

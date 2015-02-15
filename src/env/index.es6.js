@@ -1,11 +1,15 @@
 'use strict';
 
 var clientSide = require('soundworks/client');
-var ioClient = clientSide.ioClient;
+var client = clientSide.client;
 
-class EnvPerformance extends clientSide.Performance {
+client.init('/env');
+
+class Env extends clientSide.Module {
   constructor() {
-    var socket = ioClient.socket;
+    super('env', true);
+
+    var socket = client.socket;
 
     socket.on('perf_control', (soloistId, pos, d, s) => {
       //console.log('env perf_control', soloistId, pos, d, s);
@@ -13,16 +17,9 @@ class EnvPerformance extends clientSide.Performance {
   }
 }
 
-ioClient.init('/env');
-
-window.addEventListener('load', () => {
-  var topology = new clientSide.TopologyGeneric();
+window.addEventListener('DOMContentLoaded', () => {
   var sync = new clientSide.SetupSync();
-  var placement = new clientSide.SetupPlacementAssigned();
-  var performance = new EnvPerformance();
-  var manager = new clientSide.Manager([sync, placement], performance, topology);
+  var env = new Env();
 
-  ioClient.start(() => {
-    manager.start();
-  });
+  client.start(client.serial(sync, env));
 });
