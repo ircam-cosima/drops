@@ -128,11 +128,12 @@ class Looper {
 }
 
 class Performance extends clientSide.Module {
-  constructor(audioBuffers, sync, placement, conductorParams, params = {}) {
+  constructor(audioBuffers, conductor, sync, placement, params = {}) {
     super('performance', true);
 
     this.sync = sync;
     this.placement = placement;
+    this.conductor = conductor;
     this.synth = new SampleSynth(audioBuffers);
 
     this.numTriggers = 6;
@@ -154,13 +155,15 @@ class Performance extends clientSide.Module {
     this.minGain = 0.1;
     this.autoPlay = 'off';
 
-    this.conductorParams = conductorParams;
-
     this.quantize = 0.250;
     this.numLocalLoops = 0;
 
     this.looper = new Looper(this.synth, audioBuffers, () => {
       this.updateCount();
+    });
+
+    conductor.on('conductor_control', (name, val) => {
+      this.updateControls();
     });
 
     input.on('devicemotion', (data) => {
@@ -177,7 +180,7 @@ class Performance extends clientSide.Module {
 
     // setup input listeners
     input.on('touchstart', (data) => {
-      if (this.state == 'running' && this.looper.numLocalLoops < this.maxDrops) {
+      if (this.state === 'running' && this.looper.numLocalLoops < this.maxDrops) {
         var x = (data.coordinates[0] - this.displayDiv.offsetLeft + window.scrollX) / this.displayDiv.offsetWidth;
         var y = (data.coordinates[1] - this.displayDiv.offsetTop + window.scrollY) / this.displayDiv.offsetHeight;
 
@@ -194,33 +197,11 @@ class Performance extends clientSide.Module {
     });
 
     client.socket.on('perf_clear', (index) => {
-      if (index == 'all')
+      if (index === 'all')
         this.looper.removeAll();
       else
         this.looper.remove(index);
     });
-  }
-
-  set conductorParams(params) {
-    if (params.state !== this.state ||  params.maxDrops !== this.maxDrops) {
-      this.state = params.state;
-      this.maxDrops = params.maxDrops;
-      this.updateCount();
-    }
-
-    this.loopDiv = params.loopDiv;
-    this.loopPeriod = params.loopPeriod;
-    this.loopAttenuation = params.loopAttenuation;
-    this.minGain = params.minGain;
-
-    if (this.autoPlay != 'manual' && params.autoPlay != this.autoPlay) {
-      this.autoPlay = params.autoPlay;
-
-      if (params.autoPlay == 'on') {
-        this.autoTrigger();
-        this.autoClear();
-      }
-    }
   }
 
   trigger(x, y) {
@@ -259,9 +240,9 @@ class Performance extends clientSide.Module {
   updateCount() {
     var str = "";
 
-    if (this.state == 'reset') {
+    if (this.state === 'reset') {
       str = "<p>Waiting for<br>everybody<br>getting ready...</p>";
-    } else if (this.state == 'end' && this.looper.loops.length === 0) {
+    } else if (this.state === 'end' && this.looper.loops.length === 0) {
       str = "<p>That's all.<br>Thanks!</p>";
     } else {
       var numAvailable = Math.max(0, this.maxDrops - this.looper.numLocalLoops);
@@ -283,9 +264,33 @@ class Performance extends clientSide.Module {
     this.textDiv.innerHTML = str;
   }
 
+  updateControls() {
+    var controls = this.conductor.controls;
+
+    if (controls.state.value !== this.state ||  controls.maxDrops.value !== this.maxDrops) {
+      this.state = controls.state.value;
+      this.maxDrops = controls.maxDrops.value;
+      this.updateCount();
+    }
+
+    this.loopDiv = controls.loopDiv.value;
+    this.loopPeriod = controls.loopPeriod.value;
+    this.loopAttenuation = controls.loopAttenuation.value;
+    this.minGain = controls.minGain.value;
+
+    if (this.autoPlay != 'manual' && controls.autoPlay != this.autoPlay) {
+      this.autoPlay = controls.autoPlay.value;
+
+      if (controls.autoPlay.value === 'on') {
+        this.autoTrigger();
+        this.autoClear();
+      }
+    }
+  }
+
   autoTrigger() {
-    if (this.autoPlay == 'on') {
-      if (this.state == 'running' && this.looper.numLocalLoops < this.maxDrops)
+    if (this.autoPlay === 'on') {
+      if (this.state === 'running' && this.looper.numLocalLoops < this.maxDrops)
         this.trigger(Math.random(), Math.random());
 
       setTimeout(() => {
@@ -295,7 +300,7 @@ class Performance extends clientSide.Module {
   }
 
   autoClear() {
-    if (this.autoPlay == 'on') {
+    if (this.autoPlay === 'on') {
       if (this.looper.numLocalLoops > 0)
         this.clear(Math.random(), Math.random());
 
@@ -308,6 +313,7 @@ class Performance extends clientSide.Module {
   start() {
     super.start();
 
+    this.updateControls();
     client.socket.emit("perf_start");
 
     visual.start();

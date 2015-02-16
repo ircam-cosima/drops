@@ -19,59 +19,27 @@ function arrayRemove(array, value) {
 
 /***********************************************************
  *
- *  Conductor
+ *  Parameters
  *
  */
-class Conductor extends serverSide.Module {
+
+class DropsParameters extends serverSide.Parameters {
   constructor() {
-    this.control = {};
-    this.display = {};
-  }
+    super();
 
-  listenControl(socket, name) {
-    socket.on('conductor_control_' + name, (val) => {
-      this.control[name] = val;
+    this.addControlSelect('state', 'state', ['reset', 'running', 'end'], 'reset');
+    this.addControlNumber('maxDrops', 'max drops', 0, 100, 1, 1);
+    this.addControlNumber('loopDiv', 'loop div', 1, 100, 1, 3);
+    this.addControlNumber('loopPeriod', 'loop period', 1, 30, 0.1, 7.5);
+    this.addControlNumber('loopAttenuation', 'loop atten', 0, 1, 0.01, 0.71);
+    this.addControlNumber('minGain', 'min gain', 0, 1, 0.01, 0.1);
+    this.addControlSelect('autoPlay', 'auto play', ['off', 'on'], 'off');
 
-      // send conductor control to conductor client
-      socket.broadcast.emit('conductor_control_' + name, val);
-
-      // propagate drops parameter to players
-      server.io.of('/player').emit('conductor_control_' + name, val);
-    });
-  }
-}
-
-class DropsConductor extends Conductor {
-  constructor() {
-    this.control = {
-      state: "reset", // "running", "end"
-      maxDrops: 1,
-      loopDiv: 3,
-      loopPeriod: 7.5,
-      loopAttenuation: 0.71,
-      minGain: 0.1,
-      autoPlay: "off"
-    };
-
-    this.display = {
-      numPlayers: 0
-    };
-  }
-
-  connect(client) {
-    var socket = client.socket;
-
-    // listen to conductor parameters
-    for (let key of Object.keys(this.control))
-      this.listenControl(socket, key);
-
-    // send conductor control and display to conductor client
-    socket.emit("conductor_control", this.control, true);
-    socket.emit("conductor_display", this.display, false);
-
-    socket.on('conductor_clear', () => {
+    this.addCommand('clear', 'clear', () => {
       server.io.of('/player').emit('perf_clear', "all");
     });
+
+    this.addDisplay('numPlayers', 'num players', 0);
   }
 }
 
@@ -94,15 +62,15 @@ class DropsPerformance extends serverSide.Module {
     // initialize echo sockets
     client.privateState.echoSockets = [];
 
-    // send conductor parameters
-    socket.emit("conductor_control", this.conductor.control);
+    // init conductor controls at player client
+    socket.emit("conductor_init", this.conductor.controls);
 
     socket.on('perf_start', () => {
       this.players.push(client);
 
       var numPlayers = this.players.length;
-      this.conductor.display.numPlayers = numPlayers;
-      server.io.of('/conductor').emit('conductor_display_numPlayers', numPlayers);
+      this.conductor.displays.numPlayers = numPlayers;
+      server.io.of('/conductor').emit('conductor_display', 'numPlayers', numPlayers);
     });
 
     socket.on('perf_sound', (time, soundParams) => {
@@ -161,8 +129,8 @@ class DropsPerformance extends serverSide.Module {
     arrayRemove(this.players, client);
 
     var numPlayers = this.players.length;
-    this.conductor.display.numPlayers = numPlayers;
-    server.io.of('/conductor').emit('conductor_display_numPlayers', numPlayers);
+    this.conductor.displays.numPlayers = numPlayers;
+    server.io.of('/conductor').emit('conductor_display', 'numPlayers', numPlayers);
   }
 }
 
@@ -183,7 +151,7 @@ var placement = new serverSide.Placement({
   order: 'ascending'
 });
 
-var conductor = new DropsConductor();
+var conductor = new DropsParameters();
 var performance = new DropsPerformance(conductor);
 
 server.start(app);

@@ -116,7 +116,7 @@ h1 {
   position: absolute;
 }
 
-.admin {
+#conductor {
   height: 100%;
   width: 90%;
   color: #fff;
@@ -124,21 +124,21 @@ h1 {
   margin: 0 auto;
 }
 
-.admin input {
+#conductor input {
   text-align: center;
   background-color: #000;
   border: 0;
   padding: 0
 }
 
-.admin button {
+#conductor button {
   text-align: center;
   background-color: #000;
   border: 0;
   padding: 0 0 0 0;
 }
 
-.admin select {
+#conductor select {
   text-align: center;
   color: #fff;
   background-color: #000;
@@ -146,7 +146,7 @@ h1 {
   padding: 0
 }
 
-.admin option {
+#conductor option {
   color: #fff;
   background-color: #000;
 }

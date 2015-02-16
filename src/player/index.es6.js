@@ -131,23 +131,6 @@ function parseVersionString(string) {
   return null;
 }
 
-var conductorParams = {
-  state: "reset", // "running", "end"
-  maxDrops: 1,
-  loopDiv: 3,
-  loopPeriod: 7.5,
-  loopAttenuation: 0.71,
-  minGain: 0.1,
-  autoPlay: "off"
-};
-
-function listenGlobalParam(socket, name, callback) {
-  socket.on('conductor_control_' + name, (value) => {
-    conductorParams[name] = value;
-    callback(name, value);
-  });
-}
-
 window.addEventListener('DOMContentLoaded', () => {
   window.top.scrollTo(0, 1);
 
@@ -217,23 +200,14 @@ window.addEventListener('DOMContentLoaded', () => {
         dialog: false
       });
 
-      var performance = new Performance(audioBuffers, sync, placement, conductorParams);
+      var conductor = new clientSide.Parameters();
 
-      // conductor params handling (TODO: generalize!)
-      client.socket.on('conductor_control', (params) => {
-        conductorParams = params;
-        performance.conductorParams = params;
-      });
-
-      // listen to conductor parameters
-      for (let key of Object.keys(conductorParams))
-        listenGlobalParam(client.socket, key, (name, value) => {
-          performance.conductorParams = conductorParams;
-        });
+      var performance = new Performance(audioBuffers, conductor, sync, placement);
 
       client.start(
         client.serial(
           welcome,
+          conductor,
           client.parallel(
             sync,
             placement
