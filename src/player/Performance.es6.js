@@ -308,7 +308,7 @@ class Performance extends clientSide.Module {
   start() {
     super.start();
 
-    client.socket.emit("perf_start");
+    client.socket.emit('perf_start');
 
     visual.start();
     super.start();

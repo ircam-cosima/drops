@@ -95,7 +95,7 @@ class DropsPerformance extends serverSide.Module {
     client.privateState.echoSockets = [];
 
     // send conductor parameters
-    socket.emit("conductor_control", this.conductor.control);
+    socket.emit('conductor_control', this.conductor.control);
 
     socket.on('perf_start', () => {
       this.players.push(client);
