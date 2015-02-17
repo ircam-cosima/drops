@@ -49,10 +49,10 @@ class DropsParameters extends serverSide.Parameters {
  *
  */
 class DropsPerformance extends serverSide.Module {
-  constructor(conductor) {
+  constructor(parameters) {
     super();
 
-    this.conductor = conductor;
+    this.parameters = parameters;
     this.players = [];
   }
 
@@ -62,15 +62,12 @@ class DropsPerformance extends serverSide.Module {
     // initialize echo sockets
     client.privateState.echoSockets = [];
 
-    // init conductor controls at player client
-    socket.emit("conductor_init", this.conductor.controls);
-
     socket.on('perf_start', () => {
       this.players.push(client);
 
       var numPlayers = this.players.length;
-      this.conductor.displays.numPlayers = numPlayers;
-      server.io.of('/conductor').emit('conductor_display', 'numPlayers', numPlayers);
+      this.parameters.displays.numPlayers = numPlayers;
+      server.io.of('/conductor').emit('parameters_display', 'numPlayers', numPlayers);
     });
 
     socket.on('perf_sound', (time, soundParams) => {
@@ -129,8 +126,8 @@ class DropsPerformance extends serverSide.Module {
     arrayRemove(this.players, client);
 
     var numPlayers = this.players.length;
-    this.conductor.displays.numPlayers = numPlayers;
-    server.io.of('/conductor').emit('conductor_display', 'numPlayers', numPlayers);
+    this.parameters.displays.numPlayers = numPlayers;
+    server.io.of('/conductor').emit('parameters_display', 'numPlayers', numPlayers);
   }
 }
 
@@ -151,10 +148,10 @@ var placement = new serverSide.Placement({
   order: 'ascending'
 });
 
-var conductor = new DropsParameters();
-var performance = new DropsPerformance(conductor);
+var parameters = new DropsParameters();
+var performance = new DropsPerformance(parameters);
 
 server.start(app);
-server.map('/conductor', 'Drops — Conductor', conductor);
-server.map('/player', 'Drops', sync, placement, performance);
+server.map('/conductor', 'Drops — Conductor', parameters);
+server.map('/player', 'Drops', parameters, sync, placement, performance);
 server.map('/env', 'Drops — Environment', sync, performance);

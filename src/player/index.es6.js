@@ -195,19 +195,17 @@ window.addEventListener('DOMContentLoaded', () => {
       });
 
       var sync = new clientSide.Sync();
-
       var placement = new clientSide.Placement({
         dialog: false
       });
 
-      var conductor = new clientSide.Parameters();
-
-      var performance = new Performance(audioBuffers, conductor, sync, placement);
+      var parameters = new clientSide.Parameters();
+      var performance = new Performance(audioBuffers, parameters, sync, placement);
 
       client.start(
         client.serial(
           welcome,
-          conductor,
+          parameters,
           client.parallel(
             sync,
             placement
@@ -215,15 +213,5 @@ window.addEventListener('DOMContentLoaded', () => {
           performance
         )
       );
-
-      // client.start([
-      //   'serial',
-      //   welcome, [
-      //     'parallel',
-      //     sync,
-      //     placement
-      //   ],
-      //   performance
-      // ]);      
     });
 });

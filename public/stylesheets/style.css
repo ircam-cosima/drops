@@ -106,47 +106,45 @@ h1 {
   left: 0;
 }
 
-.button {
-  width: 200px;
-  height: 200px;
-  margin-left: -100px;
-  margin-top: -100px;
-  opacity: 0.8;
-  border-radius: 50%;
-  position: absolute;
-}
-
-#conductor {
+#parameters {
   height: 100%;
   width: 90%;
-  color: #fff;
+  color: #aaa;
   text-align: center;
   margin: 0 auto;
 }
 
-#conductor input {
+#parameters input {
   text-align: center;
   background-color: #000;
   border: 0;
   padding: 0
 }
 
-#conductor button {
+#parameters button {
   text-align: center;
   background-color: #000;
   border: 0;
   padding: 0 0 0 0;
 }
 
-#conductor select {
+#parameters select {
   text-align: center;
-  color: #fff;
+  color: #aaa;
   background-color: #000;
   border: 0;
   padding: 0
 }
 
-#conductor option {
-  color: #fff;
+#parameters option {
+  color: #aaa;
   background-color: #000;
+}
+
+#parameters .command:hover {
+  cursor: pointer;
+}
+
+#parameters .command:active {
+  color: #fff;
 }
