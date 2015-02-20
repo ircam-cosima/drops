@@ -128,12 +128,12 @@ class Looper {
 }
 
 class Performance extends clientSide.Module {
-  constructor(audioBuffers, parameters, sync, placement, params = {}) {
+  constructor(audioBuffers, control, sync, placement, params = {}) {
     super('performance', true);
 
     this.sync = sync;
     this.placement = placement;
-    this.parameters = parameters;
+    this.control = control;
     this.synth = new SampleSynth(audioBuffers);
 
     this.numTriggers = 6;
@@ -162,7 +162,7 @@ class Performance extends clientSide.Module {
       this.updateCount();
     });
 
-    parameters.on('parameters_control', (name, val) => {
+    control.on('control_parameter', (name, val) => {
       this.updateControls();
     });
 
@@ -265,7 +265,7 @@ class Performance extends clientSide.Module {
   }
 
   updateControls() {
-    var controls = this.parameters.controls;
+    var controls = this.control.controls;
 
     if (controls.state.value !== this.state ||  controls.maxDrops.value !== this.maxDrops) {
       this.state = controls.state.value;

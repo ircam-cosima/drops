@@ -199,13 +199,13 @@ window.addEventListener('DOMContentLoaded', () => {
         dialog: false
       });
 
-      var parameters = new clientSide.Parameters();
-      var performance = new Performance(audioBuffers, parameters, sync, placement);
+      var control = new clientSide.Control();
+      var performance = new Performance(audioBuffers, control, sync, placement);
 
       client.start(
         client.serial(
           welcome,
-          parameters,
+          control,
           client.parallel(
             sync,
             placement

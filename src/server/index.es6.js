@@ -19,11 +19,11 @@ function arrayRemove(array, value) {
 
 /***********************************************************
  *
- *  Parameters
+ *  Control
  *
  */
 
-class DropsParameters extends serverSide.Parameters {
+class DropsControl extends serverSide.Control {
   constructor() {
     super();
 
@@ -49,10 +49,10 @@ class DropsParameters extends serverSide.Parameters {
  *
  */
 class DropsPerformance extends serverSide.Module {
-  constructor(parameters) {
+  constructor(control) {
     super();
 
-    this.parameters = parameters;
+    this.control = control;
     this.players = [];
   }
 
@@ -66,8 +66,8 @@ class DropsPerformance extends serverSide.Module {
       this.players.push(client);
 
       var numPlayers = this.players.length;
-      this.parameters.displays.numPlayers = numPlayers;
-      server.io.of('/conductor').emit('parameters_display', 'numPlayers', numPlayers);
+      this.control.displays.numPlayers = numPlayers;
+      server.io.of('/conductor').emit('control_display', 'numPlayers', numPlayers);
     });
 
     socket.on('perf_sound', (time, soundParams) => {
@@ -126,8 +126,8 @@ class DropsPerformance extends serverSide.Module {
     arrayRemove(this.players, client);
 
     var numPlayers = this.players.length;
-    this.parameters.displays.numPlayers = numPlayers;
-    server.io.of('/conductor').emit('parameters_display', 'numPlayers', numPlayers);
+    this.control.displays.numPlayers = numPlayers;
+    server.io.of('/conductor').emit('control_display', 'numPlayers', numPlayers);
   }
 }
 
@@ -148,10 +148,10 @@ var placement = new serverSide.Placement({
   order: 'ascending'
 });
 
-var parameters = new DropsParameters();
-var performance = new DropsPerformance(parameters);
+var control = new DropsControl();
+var performance = new DropsPerformance(control);
 
 server.start(app);
-server.map('/conductor', 'Drops — Conductor', parameters);
-server.map('/player', 'Drops', parameters, sync, placement, performance);
+server.map('/conductor', 'Drops — Conductor', control);
+server.map('/player', 'Drops', control, sync, placement, performance);
 server.map('/env', 'Drops — Environment', sync, performance);

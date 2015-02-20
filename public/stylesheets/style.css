@@ -106,7 +106,7 @@ h1 {
   left: 0;
 }
 
-#parameters {
+#control {
   height: 100%;
   width: 90%;
   color: #aaa;
@@ -114,21 +114,21 @@ h1 {
   margin: 0 auto;
 }
 
-#parameters input {
+#control input {
   text-align: center;
   background-color: #000;
   border: 0;
   padding: 0
 }
 
-#parameters button {
+#control button {
   text-align: center;
   background-color: #000;
   border: 0;
   padding: 0 0 0 0;
 }
 
-#parameters select {
+#control select {
   text-align: center;
   color: #aaa;
   background-color: #000;
@@ -136,15 +136,15 @@ h1 {
   padding: 0
 }
 
-#parameters option {
+#control option {
   color: #aaa;
   background-color: #000;
 }
 
-#parameters .command:hover {
+#control .command:hover {
   cursor: pointer;
 }
 
-#parameters .command:active {
+#control .command:active {
   color: #fff;
 }
