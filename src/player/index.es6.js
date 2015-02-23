@@ -118,100 +118,39 @@ var voxFiles = [
 
 var audioFiles = dropsFiles;
 
-function parseVersionString(string) {
-  if (string) {
-    var a = string.split('.');
-
-    if (a[1] >= 0)
-      return parseFloat(a[0] + "." + a[1]);
-
-    return parseFloat(a[0]);
-  }
-
-  return null;
-}
-
 window.addEventListener('DOMContentLoaded', () => {
   window.top.scrollTo(0, 1);
 
-  // platform test (TODO: generalize!)
-  var osVersion = parseVersionString(platform.os.version);
-  var browserVersion = parseVersionString(platform.version);
-  var msg = null;
+  var platformCheck = new clientSide.Platform();
+  var loader = new clientSide.Loader(audioFiles);
+  var welcome = new clientSide.Dialog({
+    id: 'welcome',
+    text: "<p>Welcome to <b>Drops</b>.</p> <p>Touch the screen to join!</p>",
+    activateAudio: true
+  });
+  var sync = new clientSide.Sync();
+  var placement = new clientSide.Placement({
+    dialog: false
+  });
+  var control = new clientSide.Control();
+  var performance = new Performance(loader, control, sync, placement);  
+  
 
-  if (platform.os.family == "iOS") {
-    if (osVersion < 7)
-      msg = "This application requires at least iOS 7.<br/>You have iOS " + platform.os.version + ".";
-  } else if (platform.os.family == "Android") {
-    if (osVersion < 4.2)
-      msg = "This application requires at least Android 4.2.";
-    else if (platform.name != 'Chrome Mobile')
-      msg = "You have to use Chrome to run this application on an Android device.";
-    else if (browserVersion < 35)
-      msg = "Consider using a recent version of Chrome to run this application.";
-  } else {
-    msg = "This application is designed for mobile devices and currently runs only on iOS or Android.";
-  }
+  client.start(
+    client.serial(
+      platformCheck,
+      client.parallel(
+        welcome,
+        loader
+      ),
+      control,
+      client.parallel(
+        sync,
+        placement
+      ),
+      performance
+    )
+  );
 
-  if (msg !== null) {
-    var sorryDiv = document.createElement('div');
-    sorryDiv.classList.add('preamb');
-    container.appendChild(sorryDiv);
-    sorryDiv.innerHTML = "<p>Sorry, this doesn't work as it should.</p> <p>" + msg + "</p>";
-    return;
-  }
 
-  // load audio files
-  var loader = new AudioBufferLoader();
-  // var fileProgress = [];
-  var loaderProgress = 0;
-
-  var progressDiv = document.createElement('div');
-  progressDiv.classList.add('preamb');
-  container.appendChild(progressDiv);
-
-  // for (let i = 0; i < audioFiles.length; i++)
-  //   fileProgress.push(0);
-
-  // loader.progressCallback = function(obj) {
-  //   var progress = obj.value;
-
-  //   loaderProgress += (progress - fileProgress[obj.index]);
-  //   fileProgress[obj.index] = progress;
-
-  //   progressDiv.innerHTML = "<p>Loading ...</p>";
-  // };
-
-  progressDiv.innerHTML = "<p>Loading ...</p>";
-
-  loader.load(audioFiles)
-    .then(function(audioBuffers) {
-      container.removeChild(progressDiv);
-
-      var welcome = new clientSide.Dialog({
-        id: 'welcome',
-        text: "<p>Welcome to <b>Drops</b>.</p> <p>Touch the screen to join!</p>",
-        activateAudio: true
-      });
-
-      var sync = new clientSide.Sync();
-      var placement = new clientSide.Placement({
-        dialog: false
-      });
-
-      var control = new clientSide.Control();
-      var performance = new Performance(audioBuffers, control, sync, placement);
-
-      client.start(
-        client.serial(
-          welcome,
-          control,
-          client.parallel(
-            sync,
-            placement
-          ),
-          performance
-        )
-      );
-    });
 });

@@ -7,17 +7,17 @@
     "start": "node src/server/index.js"
   },
   "dependencies": {
-    "audio-context": "git://github.com/Ircam-RnD/audio-context.git#master",
+    "audio-context": "Ircam-RnD/audio-context.git#master",
     "d3-scale-linear": "0.0.0",
     "dat-gui": "~0.5.0",
     "express": "~4.8.6",
     "jade": "~1.5.0",
-    "loaders": "git://github.com/Ircam-RnD/loaders.git#master",
+    "loaders": "Ircam-RnD/loaders.git#master",
     "platform": "^1.3.0",
-    "scheduler": "git://github.com/Ircam-RnD/scheduler.git#master",
+    "scheduler": "Ircam-RnD/scheduler.git#master",
     "socket.io": "~1.1.0",
-    "soundworks": "git://github.com/collective-soundworks/soundworks.git#master",
-    "time-engine": "git://github.com/Ircam-RnD/time-engine.git#master",
+    "soundworks": "collective-soundworks/soundworks.git#master",
+    "time-engine": "Ircam-RnD/time-engine.git#master",
     "vector": "git+https://github.com/b-ma/vector2d.git"
   },
   "devDependencies": {
