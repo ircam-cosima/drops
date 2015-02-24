@@ -42,9 +42,9 @@ class Loop extends TimeEngine {
 }
 
 class Looper {
-  constructor(synth, audioBuffers, updateCount) {
+  constructor(synth, loader, updateCount) {
     this.synth = synth;
-    this.audioBuffers = audioBuffers;
+    this.loader = loader
     this.updateCount = updateCount;
 
     this.loops = [];
@@ -128,13 +128,14 @@ class Looper {
 }
 
 class Performance extends clientSide.Module {
-  constructor(audioBuffers, control, sync, placement, params = {}) {
+  constructor(loader, control, sync, placement, params = {}) {
     super('performance', true);
 
+    this.loader = loader
     this.sync = sync;
     this.placement = placement;
     this.control = control;
-    this.synth = new SampleSynth(audioBuffers);
+    this.synth = new SampleSynth(loader);
 
     this.numTriggers = 6;
 
@@ -158,7 +159,7 @@ class Performance extends clientSide.Module {
     this.quantize = 0.250;
     this.numLocalLoops = 0;
 
-    this.looper = new Looper(this.synth, audioBuffers, () => {
+    this.looper = new Looper(this.synth, loader, () => {
       this.updateCount();
     });
 
@@ -241,7 +242,7 @@ class Performance extends clientSide.Module {
     var str = "";
 
     if (this.state === 'reset') {
-      str = "<p>Waiting for<br>everybody<br>getting ready...</p>";
+      str = "<p>Waiting for<br>everybody<br>getting ready…</p>";
     } else if (this.state === 'end' && this.looper.loops.length === 0) {
       str = "<p>That's all.<br>Thanks!</p>";
     } else {
@@ -317,7 +318,6 @@ class Performance extends clientSide.Module {
     client.socket.emit("perf_start");
 
     visual.start();
-    super.start();
 
     this.updateCount();
 
