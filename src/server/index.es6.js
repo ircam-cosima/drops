@@ -27,13 +27,13 @@ class DropsControl extends serverSide.Control {
   constructor() {
     super();
 
-    this.addControlSelect('state', 'state', ['reset', 'running', 'end'], 'reset');
-    this.addControlNumber('maxDrops', 'max drops', 0, 100, 1, 1);
-    this.addControlNumber('loopDiv', 'loop div', 1, 100, 1, 3);
-    this.addControlNumber('loopPeriod', 'loop period', 1, 30, 0.1, 7.5);
-    this.addControlNumber('loopAttenuation', 'loop atten', 0, 1, 0.01, 0.71);
-    this.addControlNumber('minGain', 'min gain', 0, 1, 0.01, 0.1);
-    this.addControlSelect('autoPlay', 'auto play', ['off', 'on'], 'off');
+    this.addParameterSelect('state', 'state', ['reset', 'running', 'end'], 'reset');
+    this.addParameterNumber('maxDrops', 'max drops', 0, 100, 1, 1);
+    this.addParameterNumber('loopDiv', 'loop div', 1, 100, 1, 3);
+    this.addParameterNumber('loopPeriod', 'loop period', 1, 30, 0.1, 7.5);
+    this.addParameterNumber('loopAttenuation', 'loop atten', 0, 1, 0.01, 0.71);
+    this.addParameterNumber('minGain', 'min gain', 0, 1, 0.01, 0.1);
+    this.addParameterSelect('autoPlay', 'auto play', ['off', 'on'], 'off');
 
     this.addCommand('clear', 'clear', () => {
       server.io.of('/player').emit('perf_clear', "all");
@@ -64,10 +64,7 @@ class DropsPerformance extends serverSide.Module {
 
     socket.on('perf_start', () => {
       this.players.push(client);
-
-      var numPlayers = this.players.length;
-      this.control.displays.numPlayers = numPlayers;
-      server.io.of('/conductor').emit('control_display', 'numPlayers', numPlayers);
+      this.control.setDisplay('numPlayers', this.players.length);
     });
 
     socket.on('perf_sound', (time, soundParams) => {
@@ -124,10 +121,7 @@ class DropsPerformance extends serverSide.Module {
     }
 
     arrayRemove(this.players, client);
-
-    var numPlayers = this.players.length;
-    this.control.displays.numPlayers = numPlayers;
-    server.io.of('/conductor').emit('control_display', 'numPlayers', numPlayers);
+    this.control.setDisplay('numPlayers', this.players.length);
   }
 }
 

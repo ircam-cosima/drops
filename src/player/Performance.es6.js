@@ -163,7 +163,7 @@ class Performance extends clientSide.Module {
     });
 
     control.on('control_parameter', (name, val) => {
-      this.updateControls();
+      this.updateControlParameters();
     });
 
     input.on('devicemotion', (data) => {
@@ -264,24 +264,24 @@ class Performance extends clientSide.Module {
     this.textDiv.innerHTML = str;
   }
 
-  updateControls() {
-    var controls = this.control.controls;
+  updateControlParameters() {
+    var parameters = this.control.parameters;
 
-    if (controls.state.value !== this.state ||  controls.maxDrops.value !== this.maxDrops) {
-      this.state = controls.state.value;
-      this.maxDrops = controls.maxDrops.value;
+    if (parameters.state.value !== this.state ||  parameters.maxDrops.value !== this.maxDrops) {
+      this.state = parameters.state.value;
+      this.maxDrops = parameters.maxDrops.value;
       this.updateCount();
     }
 
-    this.loopDiv = controls.loopDiv.value;
-    this.loopPeriod = controls.loopPeriod.value;
-    this.loopAttenuation = controls.loopAttenuation.value;
-    this.minGain = controls.minGain.value;
+    this.loopDiv = parameters.loopDiv.value;
+    this.loopPeriod = parameters.loopPeriod.value;
+    this.loopAttenuation = parameters.loopAttenuation.value;
+    this.minGain = parameters.minGain.value;
 
-    if (this.autoPlay != 'manual' && controls.autoPlay != this.autoPlay) {
-      this.autoPlay = controls.autoPlay.value;
+    if (this.autoPlay != 'manual' && parameters.autoPlay != this.autoPlay) {
+      this.autoPlay = parameters.autoPlay.value;
 
-      if (controls.autoPlay.value === 'on') {
+      if (parameters.autoPlay.value === 'on') {
         this.autoTrigger();
         this.autoClear();
       }
@@ -313,7 +313,7 @@ class Performance extends clientSide.Module {
   start() {
     super.start();
 
-    this.updateControls();
+    this.updateControlParameters();
     client.socket.emit("perf_start");
 
     visual.start();
