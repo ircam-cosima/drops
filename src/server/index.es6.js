@@ -2,9 +2,9 @@
 
 var serverSide = require('soundworks/server');
 var server = serverSide.server;
-var path = require('path');
 var express = require('express');
 var app = express();
+var path = require('path');
 
 function arrayRemove(array, value) {
   var index = array.indexOf(value);
@@ -60,7 +60,8 @@ class DropsPerformance extends serverSide.Module {
     var socket = client.socket;
 
     // initialize echo sockets
-    client.privateState.echoSockets = [];
+    client.data.performance = {};
+    client.data.performance.echoSockets = [];
 
     socket.on('perf_start', () => {
       this.players.push(client);
@@ -73,7 +74,7 @@ class DropsPerformance extends serverSide.Module {
       var echoPeriod = soundParams.loopPeriod / soundParams.loopDiv;
       var echoAttenuation = Math.pow(soundParams.loopAttenuation, 1 / soundParams.loopDiv);
       var echoDelay = 0;
-      var echoSockets = client.privateState.echoSockets;
+      var echoSockets = client.data.performance.echoSockets;
 
       if (numEchoPlayers > numPlayers - 1)
         numEchoPlayers = numPlayers - 1;
@@ -100,24 +101,24 @@ class DropsPerformance extends serverSide.Module {
     });
 
     socket.on('perf_clear', () => {
-      var echoSockets = client.privateState.echoSockets;
+      var echoSockets = client.data.performance.echoSockets;
 
       for (let i = 0; i < echoSockets.length; i++)
         echoSockets[i].emit('perf_clear', client.index);
 
       // clear echo sockets
-      client.privateState.echoSockets = [];
+      client.data.performance.echoSockets = [];
     });
   }
 
   disconnect(client) {
-    var echoSockets = client.privateState.echoSockets;
+    if (client.data.performance && client.data.performance.echoSockets) {
+      var echoSockets = client.data.performance.echoSockets;
 
-    if (echoSockets) {
       for (let i = 0; i < echoSockets.length; i++)
         echoSockets[i].emit('perf_clear', client.index);
 
-      client.privateState.echoSockets = null;
+      client.data.performance.echoSockets = null;
     }
 
     arrayRemove(this.players, client);
@@ -130,14 +131,10 @@ class DropsPerformance extends serverSide.Module {
  *  Scenario
  *
  */
-app.set('port', process.env.PORT || 8600);
-app.set('view engine', 'jade');
-app.use(express.static(path.join(__dirname, '../../public')));
-
 // start server side
 var sync = new serverSide.Sync();
 
-var placement = new serverSide.Placement({
+var checkin = new serverSide.Checkin({
   numPlaces: 9999,
   order: 'ascending'
 });
@@ -145,7 +142,11 @@ var placement = new serverSide.Placement({
 var control = new DropsControl();
 var performance = new DropsPerformance(control);
 
-server.start(app);
+var dir = path.join(__dirname, '../../public');
+
+console.log(dir);
+
+server.start(app, dir, 8600);
 server.map('/conductor', 'Drops — Conductor', control);
-server.map('/player', 'Drops', control, sync, placement, performance);
+server.map('/player', 'Drops', control, sync, checkin, performance);
 server.map('/env', 'Drops — Environment', sync, performance);

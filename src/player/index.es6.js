@@ -129,11 +129,11 @@ window.addEventListener('DOMContentLoaded', () => {
     activateAudio: true
   });
   var sync = new clientSide.Sync();
-  var placement = new clientSide.Placement({
+  var checkin = new clientSide.Checkin({
     dialog: false
   });
   var control = new clientSide.Control();
-  var performance = new Performance(loader, control, sync, placement);  
+  var performance = new Performance(loader, control, sync, checkin);  
   
 
   client.start(
@@ -146,7 +146,7 @@ window.addEventListener('DOMContentLoaded', () => {
       control,
       client.parallel(
         sync,
-        placement
+        checkin
       ),
       performance
     )

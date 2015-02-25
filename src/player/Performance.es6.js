@@ -128,12 +128,12 @@ class Looper {
 }
 
 class Performance extends clientSide.Module {
-  constructor(loader, control, sync, placement, params = {}) {
+  constructor(loader, control, sync, checkin, options = {}) {
     super('performance', true);
 
     this.loader = loader
     this.sync = sync;
-    this.placement = placement;
+    this.checkin = checkin;
     this.control = control;
     this.synth = new SampleSynth(loader);
 
@@ -207,7 +207,7 @@ class Performance extends clientSide.Module {
 
   trigger(x, y) {
     var soundParams = {
-      index: this.placement.index,
+      index: this.checkin.index,
       gain: 1,
       x: x,
       y: y,
@@ -229,7 +229,7 @@ class Performance extends clientSide.Module {
   }
 
   clear() {
-    var index = this.placement.index;
+    var index = this.checkin.index;
 
     // remove at own looper
     this.looper.remove(index, true);
