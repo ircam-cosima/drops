@@ -1,10 +1,8 @@
 'use strict';
 
 var clientSide = require('soundworks/client');
-var Performance = require('./Performance');
-var AudioBufferLoader = require('loaders').AudioBufferLoader;
-var platform = require('platform');
 var client = clientSide.client;
+var Performance = require('./Performance');
 
 client.init('/player');
 

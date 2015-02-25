@@ -1,11 +1,16 @@
 'use strict';
 
+// Soundworks library
 var serverSide = require('soundworks/server');
 var server = serverSide.server;
+
+// Express application
 var express = require('express');
 var app = express();
 var path = require('path');
+var dir = path.join(__dirname, '../../public');
 
+// Helper functions
 function arrayRemove(array, value) {
   var index = array.indexOf(value);
 
@@ -17,11 +22,9 @@ function arrayRemove(array, value) {
   return false;
 }
 
-/***********************************************************
- *
+/*
  *  Control
- *
- */
+ * ======================================================================= */
 
 class DropsControl extends serverSide.Control {
   constructor() {
@@ -43,11 +46,10 @@ class DropsControl extends serverSide.Control {
   }
 }
 
-/***********************************************************
- *
+/*
  *  Performance
- *
- */
+ * ======================================================================= */
+
 class DropsPerformance extends serverSide.Module {
   constructor(control) {
     super();
@@ -126,11 +128,10 @@ class DropsPerformance extends serverSide.Module {
   }
 }
 
-/***********************************************************
- *
+/*
  *  Scenario
- *
- */
+ * ======================================================================= */
+
 // start server side
 var sync = new serverSide.Sync();
 
@@ -141,10 +142,6 @@ var checkin = new serverSide.Checkin({
 
 var control = new DropsControl();
 var performance = new DropsPerformance(control);
-
-var dir = path.join(__dirname, '../../public');
-
-console.log(dir);
 
 server.start(app, dir, 8600);
 server.map('/conductor', 'Drops — Conductor', control);

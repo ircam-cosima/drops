@@ -156,11 +156,9 @@ body {
 }
 
 #control {
-  height: 100%;
-  width: 90%;
   color: #aaa;
+  margin: 1em auto;
   text-align: center;
-  margin: 0 auto;
 }
 
 #control input {
