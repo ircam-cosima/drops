@@ -133,7 +133,6 @@ window.addEventListener('DOMContentLoaded', () => {
   var control = new clientSide.Control();
   var performance = new Performance(loader, control, sync, checkin);  
   
-
   client.start(
     client.serial(
       platformCheck,
@@ -149,6 +148,4 @@ window.addEventListener('DOMContentLoaded', () => {
       performance
     )
   );
-
-
 });

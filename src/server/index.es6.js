@@ -59,12 +59,13 @@ class DropsPerformance extends serverSide.Module {
   }
 
   connect(client) {
-    var socket = client.socket;
+    super.connect();
 
     // initialize echo sockets
     client.data.performance = {};
     client.data.performance.echoSockets = [];
 
+    var socket = client.socket;
     socket.on('perf_start', () => {
       this.players.push(client);
       this.control.setDisplay('numPlayers', this.players.length);
@@ -114,17 +115,17 @@ class DropsPerformance extends serverSide.Module {
   }
 
   disconnect(client) {
-    if (client.data.performance && client.data.performance.echoSockets) {
-      var echoSockets = client.data.performance.echoSockets;
+    var echoSockets = client.data.performance.echoSockets;
 
-      for (let i = 0; i < echoSockets.length; i++)
-        echoSockets[i].emit('perf_clear', client.index);
+    for (let i = 0; i < echoSockets.length; i++)
+      echoSockets[i].emit('perf_clear', client.index);
 
-      client.data.performance.echoSockets = null;
-    }
+    client.data.performance.echoSockets = null;
 
     arrayRemove(this.players, client);
     this.control.setDisplay('numPlayers', this.players.length);
+
+    super.disconnect();
   }
 }
 
@@ -134,16 +135,15 @@ class DropsPerformance extends serverSide.Module {
 
 // start server side
 var sync = new serverSide.Sync();
-
 var checkin = new serverSide.Checkin({
   numPlaces: 9999,
   order: 'ascending'
 });
-
 var control = new DropsControl();
 var performance = new DropsPerformance(control);
 
 server.start(app, dir, 8600);
+
 server.map('/conductor', 'Drops — Conductor', control);
 server.map('/player', 'Drops', control, sync, checkin, performance);
 server.map('/env', 'Drops — Environment', sync, performance);

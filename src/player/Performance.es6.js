@@ -141,11 +141,11 @@ class Performance extends clientSide.Module {
 
     var canvas = document.createElement('canvas');
     canvas.setAttribute('id', 'scene');
-    this.displayDiv.appendChild(canvas);
+    this.view.appendChild(canvas);
 
     this.textDiv = document.createElement('div');
     this.textDiv.classList.add('text');
-    this.displayDiv.appendChild(this.textDiv);
+    this.view.appendChild(this.textDiv);
 
     // parameters
     this.state = 'reset';
@@ -182,8 +182,8 @@ class Performance extends clientSide.Module {
     // setup input listeners
     input.on('touchstart', (data) => {
       if (this.state === 'running' && this.looper.numLocalLoops < this.maxDrops) {
-        var x = (data.coordinates[0] - this.displayDiv.offsetLeft + window.scrollX) / this.displayDiv.offsetWidth;
-        var y = (data.coordinates[1] - this.displayDiv.offsetTop + window.scrollY) / this.displayDiv.offsetHeight;
+        var x = (data.coordinates[0] - this.view.offsetLeft + window.scrollX) / this.view.offsetWidth;
+        var y = (data.coordinates[1] - this.view.offsetTop + window.scrollY) / this.view.offsetHeight;
 
         this.trigger(x, y);
       }
@@ -321,7 +321,7 @@ class Performance extends clientSide.Module {
 
     this.updateCount();
 
-    input.enableTouch(this.displayDiv);
+    input.enableTouch(this.view);
     input.enableDeviceMotion();
 
     // for testing
