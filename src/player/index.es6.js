@@ -119,14 +119,15 @@ var audioFiles = dropsFiles;
 window.addEventListener('DOMContentLoaded', () => {
   window.top.scrollTo(0, 1);
 
-  var platformCheck = new clientSide.Platform();
-  var loader = new clientSide.Loader(audioFiles);
+  var platformCheck = new clientSide.Platform({color: 'midnight-blue'});
+  var loader = new clientSide.Loader(audioFiles, {color: 'midnight-blue'});
   var welcome = new clientSide.Dialog({
     id: 'welcome',
     text: "<p>Welcome to <b>Drops</b>.</p> <p>Touch the screen to join!</p>",
-    activateAudio: true
+    activateAudio: true,
+    color: 'midnight-blue'
   });
-  var sync = new clientSide.Sync();
+  var sync = new clientSide.Sync({color: 'midnight-blue'});
   var checkin = new clientSide.Checkin({
     dialog: false
   });

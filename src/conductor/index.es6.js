@@ -8,6 +8,9 @@ var Control = clientSide.Control;
 client.init('/conductor');
 
 window.addEventListener('DOMContentLoaded', () => {
-  var control = new Control({gui: true});
+  var control = new Control({
+    gui: true,
+    color: 'midnight-blue'
+  });
   client.start(control);
 });

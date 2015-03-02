@@ -140,12 +140,15 @@ class Performance extends clientSide.Module {
     this.numTriggers = 6;
 
     var canvas = document.createElement('canvas');
+    canvas.classList.add('scene');
     canvas.setAttribute('id', 'scene');
     this.view.appendChild(canvas);
 
-    this.textDiv = document.createElement('div');
-    this.textDiv.classList.add('text');
-    this.view.appendChild(this.textDiv);
+    super.createViewContent();
+    this.viewContent.classList.add('text');
+    // this.textDiv = document.createElement('div');
+    // this.textDiv.classList.add('text');
+    // this.view.appendChild(this.textDiv);
 
     // parameters
     this.state = 'reset';
@@ -221,8 +224,8 @@ class Performance extends clientSide.Module {
     var serverTime = this.sync.getServerTime(time);
 
     // quantize
-    // serverTime = Math.ceil(serverTime / this.quantize) * this.quantize;
-    // time = this.sync.getLocalTime(serverTime);
+    serverTime = Math.ceil(serverTime / this.quantize) * this.quantize;
+    time = this.sync.getLocalTime(serverTime);
 
     this.looper.start(time, soundParams, true);
     client.socket.emit('perf_sound', serverTime, soundParams);
@@ -242,7 +245,7 @@ class Performance extends clientSide.Module {
     var str = "";
 
     if (this.state === 'reset') {
-      str = "<p>Waiting for<br>everybody<br>getting ready…</p>";
+      str = "<p class='soft-blink'>Waiting for<br>everybody<br>getting ready…</p>";
     } else if (this.state === 'end' && this.looper.loops.length === 0) {
       str = "<p>That's all.<br>Thanks!</p>";
     } else {
@@ -262,7 +265,7 @@ class Performance extends clientSide.Module {
         str = "<p class='listen'>Listen!</p>";
     }
 
-    this.textDiv.innerHTML = str;
+    this.viewContent.innerHTML = str;
   }
 
   updateControlParameters() {

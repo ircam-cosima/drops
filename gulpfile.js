@@ -4,15 +4,18 @@ var clean = require('gulp-clean');
 var es6 = require('gulp-es6-transpiler');
 var nodemon = require('gulp-nodemon');
 var rename = require('gulp-rename');
+var sass = require('gulp-sass');
 var transform = require('vinyl-transform');
 var watch = require('gulp-watch');
 
+// Other filders to watch, if any
 var watchOthers = ['node_modules/soundworks/'];
 
-var tasks = ['transpile-app', 'clean'];
+// Tasks to execute before 'browserify' command
+var tasks = ['transpile-app', 'clean-js'];
+// If there is the lib path in watchOthers, add transpile-lib to these tasks
 if (watchOthers && watchOthers.length) {
   tasks.unshift('transpile-lib');
-  console.log(tasks);
 }
 
 gulp.task('browserify', tasks, function() {
@@ -27,9 +30,24 @@ gulp.task('browserify', tasks, function() {
     .pipe(gulp.dest('public/javascripts'));
 });
 
-gulp.task('clean', function() {
-  return gulp.src('public/javascripts', { read: false })
+gulp.task('clean-js', function() {
+  return gulp.src('public/javascripts', {
+      read: false
+    })
     .pipe(clean());
+});
+
+gulp.task('clean-css', function() {
+  return gulp.src('public/stylesheets', {
+      read: false
+    })
+    .pipe(clean());
+});
+
+gulp.task('sass', ['clean-css'], function() {
+  return gulp.src(['src/sass/*.scss', '!src/sass/_*.scss'])
+    .pipe(sass())
+    .pipe(gulp.dest('./public/stylesheets/'));
 });
 
 gulp.task('transpile-app', function() {
@@ -58,6 +76,7 @@ gulp.task('transpile-lib', function() {
 
 gulp.task('watch', function() {
   gulp.watch(['src/**/*.es6.js'], ['browserify']);
+  gulp.watch(['src/sass/*.scss'], ['sass']);
 
   if (watchOthers && watchOthers.length) {
     watchOthers.forEach(function(otherPath) {
@@ -77,4 +96,4 @@ gulp.task('serve', ['transpile-app', 'transpile-lib'], function() {
   });
 });
 
-gulp.task('default', ['browserify', 'serve', 'watch']);
+gulp.task('default', ['sass', 'browserify', 'serve', 'watch']);
