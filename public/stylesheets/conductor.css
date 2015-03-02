@@ -108,7 +108,7 @@ body {
   color: rgba(255, 255, 255, 0.9);
   font-family: 'Quicksand', 'Lato', 'Helvetica Neue', 'Helvetica', sans-serif;
   font-size: 2rem;
-  line-height: 2.5rem; }
+  line-height: auto; }
 
 h1, h2, h3, h4, h5, h6 {
   font-weight: bold; }
@@ -173,9 +173,10 @@ h1, h2, h3, h4, h5, h6 {
     margin: 15% auto;
     text-align: center; }
   .module p {
-    margin-bottom: 1rem; }
-  .module p.small {
-    font-size: 0.5rem;
+    margin-bottom: 1rem;
+    line-height: 2.5rem; }
+  .module small {
+    font-size: 1rem;
     line-height: 1.2rem; }
 
 .soft-blink {
@@ -184,6 +185,10 @@ h1, h2, h3, h4, h5, h6 {
   -ms-animation: soft-blink 3.6s ease-in-out infinite;
   -o-animation: soft-blink 3.6s ease-in-out infinite;
   animation: soft-blink 3.6s ease-in-out infinite; }
+
+.hidden {
+  display: none !important;
+  visibility: hidden; }
 
 /* =======================================================
  * CONTROL

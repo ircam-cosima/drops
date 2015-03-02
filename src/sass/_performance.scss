@@ -15,9 +15,6 @@
     .listen {
       font-size: 1.4em;
     }
-    .waiting {
-      @include animation('soft-blink 4s ease-in-out infinite');
-    }
   }
   .scene {
     position: fixed;
