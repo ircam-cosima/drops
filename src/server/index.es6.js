@@ -39,7 +39,7 @@ class DropsControl extends serverSide.Control {
     this.addParameterSelect('autoPlay', 'auto play', ['off', 'on'], 'off');
 
     this.addCommand('clear', 'clear', () => {
-      server.io.of('/player').emit('perf_clear', "all");
+      server.broadcast('/player', 'perf_clear', "all");
     });
 
     this.addDisplay('numPlayers', 'num players', 0);
@@ -61,23 +61,22 @@ class DropsPerformance extends serverSide.Module {
   connect(client) {
     super.connect();
 
-    // initialize echo sockets
+    // initialize echo players
     client.data.performance = {};
-    client.data.performance.echoSockets = [];
+    client.data.performance.echoPlayers = [];
 
-    var socket = client.socket;
-    socket.on('perf_start', () => {
+    client.receive('perf_start', () => {
       this.players.push(client);
       this.control.setDisplay('numPlayers', this.players.length);
     });
 
-    socket.on('perf_sound', (time, soundParams) => {
+    client.receive('perf_sound', (time, soundParams) => {
       var numPlayers = this.players.length;
       var numEchoPlayers = soundParams.loopDiv - 1;
       var echoPeriod = soundParams.loopPeriod / soundParams.loopDiv;
       var echoAttenuation = Math.pow(soundParams.loopAttenuation, 1 / soundParams.loopDiv);
       var echoDelay = 0;
-      var echoSockets = client.data.performance.echoSockets;
+      var echoPlayers = client.data.performance.echoPlayers;
 
       if (numEchoPlayers > numPlayers - 1)
         numEchoPlayers = numPlayers - 1;
@@ -89,38 +88,35 @@ class DropsPerformance extends serverSide.Module {
         for (let i = 1; i <= numEchoPlayers; i++) {
           var echoPlayerIndex = (index + i) % numPlayers;
           var echoPlayer = players[echoPlayerIndex];
-          var echoSocket = echoPlayer.socket;
 
-          // memorize (new) echo player's socket
-          if (echoSockets.indexOf(echoSocket) < 0)
-            echoSockets.push(echoSocket);
+          echoPlayers.push(echoPlayer)
 
           echoDelay += echoPeriod;
           soundParams.gain *= echoAttenuation;
 
-          echoSocket.volatile.emit('perf_echo', time + echoDelay, soundParams);
+          echoPlayer.send('perf_echo', time + echoDelay, soundParams);
         }
       }
     });
 
-    socket.on('perf_clear', () => {
-      var echoSockets = client.data.performance.echoSockets;
+    client.receive('perf_clear', () => {
+      var echoPlayers = client.data.performance.echoPlayers;
 
-      for (let i = 0; i < echoSockets.length; i++)
-        echoSockets[i].emit('perf_clear', client.index);
+      for (let i = 0; i < echoPlayers.length; i++)
+        echoPlayers[i].send('perf_clear', client.index);
 
-      // clear echo sockets
-      client.data.performance.echoSockets = [];
+      // clear echo players
+      client.data.performance.echoPlayers = [];
     });
   }
 
   disconnect(client) {
-    var echoSockets = client.data.performance.echoSockets;
+    var echoPlayers = client.data.performance.echoPlayers;
 
-    for (let i = 0; i < echoSockets.length; i++)
-      echoSockets[i].emit('perf_clear', client.index);
+    for (let i = 0; i < echoPlayers.length; i++)
+      echoPlayers[i].send('perf_clear', client.index);
 
-    client.data.performance.echoSockets = null;
+    client.data.performance.echoPlayers = null;
 
     arrayRemove(this.players, client);
     this.control.setDisplay('numPlayers', this.players.length);

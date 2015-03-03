@@ -144,7 +144,7 @@ class Performance extends clientSide.Module {
     canvas.setAttribute('id', 'scene');
     this.view.appendChild(canvas);
 
-    super.createViewContent();
+    this.__createViewContent();
     this.viewContent.classList.add('text');
     // this.textDiv = document.createElement('div');
     // this.textDiv.classList.add('text');
@@ -195,12 +195,13 @@ class Performance extends clientSide.Module {
     });
 
     // setup performance control listeners
-    client.socket.on('perf_echo', (serverTime, soundParams) => {
+    client.receive('perf_echo', (serverTime, soundParams) => {
       var time = this.sync.getLocalTime(serverTime);
       this.looper.start(time, soundParams);
+      console.log('perf_echo', serverTime, soundParams);
     });
 
-    client.socket.on('perf_clear', (index) => {
+    client.receive('perf_clear', (index) => {
       if (index === 'all')
         this.looper.removeAll();
       else
@@ -228,7 +229,7 @@ class Performance extends clientSide.Module {
     time = this.sync.getLocalTime(serverTime);
 
     this.looper.start(time, soundParams, true);
-    client.socket.emit('perf_sound', serverTime, soundParams);
+    client.send('perf_sound', serverTime, soundParams);
   }
 
   clear() {
@@ -238,7 +239,7 @@ class Performance extends clientSide.Module {
     this.looper.remove(index, true);
 
     // remove at other players
-    client.socket.emit('perf_clear', index);
+    client.send('perf_clear', index);
   }
 
   updateCount() {
@@ -318,7 +319,7 @@ class Performance extends clientSide.Module {
     super.start();
 
     this.updateControlParameters();
-    client.socket.emit("perf_start");
+    client.send("perf_start");
 
     visual.start();
 
