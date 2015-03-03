@@ -144,8 +144,8 @@ class Performance extends clientSide.Module {
     canvas.setAttribute('id', 'scene');
     this.view.appendChild(canvas);
 
-    this.__createViewContent();
-    this.viewContent.classList.add('text');
+    //  this.__createViewContent();
+    // this.viewContent.classList.add('text');
     // this.textDiv = document.createElement('div');
     // this.textDiv.classList.add('text');
     // this.view.appendChild(this.textDiv);
@@ -266,7 +266,7 @@ class Performance extends clientSide.Module {
         str = "<p class='listen'>Listen!</p>";
     }
 
-    this.viewContent.innerHTML = str;
+    this.setViewText(str, 'text');
   }
 
   updateControlParameters() {
