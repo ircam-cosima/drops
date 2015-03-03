@@ -222,7 +222,7 @@ class Performance extends clientSide.Module {
     };
 
     var time = scheduler.currentTime;
-    var serverTime = this.sync.getServerTime(time);
+    var serverTime = this.sync.getMasterTime(time);
 
     // quantize
     serverTime = Math.ceil(serverTime / this.quantize) * this.quantize;
