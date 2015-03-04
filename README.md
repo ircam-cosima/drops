@@ -1,7 +1,7 @@
 
 # Drops
 
-*Drops* is a collaborative performance based on [*Soundworks*](https://github.com/collective-soundworks/soundworks).
+*Drops* is a collective performance based on [*Soundworks*](https://github.com/collective-soundworks/soundworks).
 
 ## Description
 
