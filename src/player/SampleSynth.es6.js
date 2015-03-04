@@ -7,8 +7,8 @@ function cent2lin(cent) {
 }
 
 class SampleSynth {
-  constructor(loader) {
-    this.loader = loader;
+  constructor(audioBuffers) {
+    this.audioBuffers = audioBuffers;
     this.output = audioContext.createGain();
     this.output.connect(audioContext.destination);
     this.output.gain.value = 1;
@@ -19,7 +19,7 @@ class SampleSynth {
     var y = params.y || 0.5;
     var index = Math.floor((1 - y) * 12);
     var level = transformed ? 1 : 0;
-    var buffer = this.loader.audioBuffers[2 * index + level];
+    var buffer = this.audioBuffers[2 * index + level];
 
     var g = audioContext.createGain();
     g.connect(this.output);

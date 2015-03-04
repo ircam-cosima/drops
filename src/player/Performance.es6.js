@@ -42,9 +42,8 @@ class Loop extends TimeEngine {
 }
 
 class Looper {
-  constructor(synth, loader, updateCount) {
+  constructor(synth, updateCount) {
     this.synth = synth;
-    this.loader = loader
     this.updateCount = updateCount;
 
     this.loops = [];
@@ -131,11 +130,11 @@ class Performance extends clientSide.Module {
   constructor(loader, control, sync, checkin, options = {}) {
     super('performance', true);
 
-    this.loader = loader
+    this.loader = loader;
     this.sync = sync;
     this.checkin = checkin;
     this.control = control;
-    this.synth = new SampleSynth(loader);
+    this.synth = new SampleSynth(null);
 
     this.numTriggers = 6;
 
@@ -162,7 +161,7 @@ class Performance extends clientSide.Module {
     this.quantize = 0.250;
     this.numLocalLoops = 0;
 
-    this.looper = new Looper(this.synth, loader, () => {
+    this.looper = new Looper(this.synth, () => {
       this.updateCount();
     });
 
@@ -327,6 +326,8 @@ class Performance extends clientSide.Module {
 
     input.enableTouch(this.view);
     input.enableDeviceMotion();
+
+    this.synth.audioBuffers = this.loader.audioBuffers;
 
     // for testing
     if (this.autoPlay) {
