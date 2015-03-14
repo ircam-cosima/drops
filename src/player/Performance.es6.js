@@ -126,9 +126,9 @@ class Looper {
   }
 }
 
-class Performance extends clientSide.Module {
+class Performance extends clientSide.Performance {
   constructor(loader, control, sync, checkin, options = {}) {
-    super('performance', true);
+    super(options);
 
     this.loader = loader;
     this.sync = sync;
@@ -142,12 +142,6 @@ class Performance extends clientSide.Module {
     canvas.classList.add('scene');
     canvas.setAttribute('id', 'scene');
     this.view.appendChild(canvas);
-
-    //  this.__createViewContent();
-    // this.viewContent.classList.add('text');
-    // this.textDiv = document.createElement('div');
-    // this.textDiv.classList.add('text');
-    // this.view.appendChild(this.textDiv);
 
     // parameters
     this.state = 'reset';
@@ -194,13 +188,13 @@ class Performance extends clientSide.Module {
     });
 
     // setup performance control listeners
-    client.receive('perf_echo', (serverTime, soundParams) => {
+    client.receive('performance:echo', (serverTime, soundParams) => {
       var time = this.sync.getLocalTime(serverTime);
       this.looper.start(time, soundParams);
-      console.log('perf_echo', serverTime, soundParams);
+      console.log('performance:echo', serverTime, soundParams);
     });
 
-    client.receive('perf_clear', (index) => {
+    client.receive('performance:clear', (index) => {
       if (index === 'all')
         this.looper.removeAll();
       else
@@ -228,7 +222,7 @@ class Performance extends clientSide.Module {
     time = this.sync.getLocalTime(serverTime);
 
     this.looper.start(time, soundParams, true);
-    client.send('perf_sound', serverTime, soundParams);
+    client.send('performance:sound', serverTime, soundParams);
   }
 
   clear() {
@@ -238,7 +232,7 @@ class Performance extends clientSide.Module {
     this.looper.remove(index, true);
 
     // remove at other players
-    client.send('perf_clear', index);
+    client.send('performance:clear', index);
   }
 
   updateCount() {
@@ -265,7 +259,7 @@ class Performance extends clientSide.Module {
         str = "<p class='listen'>Listen!</p>";
     }
 
-    this.setViewText(str, 'text');
+    this.setCenteredViewContent(str);
   }
 
   updateControlParameters() {
@@ -318,7 +312,6 @@ class Performance extends clientSide.Module {
     super.start();
 
     this.updateControlParameters();
-    client.send("perf_start");
 
     visual.start();
 

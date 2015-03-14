@@ -10,18 +10,6 @@ var app = express();
 var path = require('path');
 var dir = path.join(__dirname, '../../public');
 
-// Helper functions
-function arrayRemove(array, value) {
-  var index = array.indexOf(value);
-
-  if (index >= 0) {
-    array.splice(index, 1);
-    return true;
-  }
-
-  return false;
-}
-
 /*
  *  Control
  * ======================================================================= */
@@ -39,7 +27,7 @@ class DropsControl extends serverSide.Control {
     this.addParameterSelect('autoPlay', 'auto play', ['off', 'on'], 'off');
 
     this.addCommand('clear', 'clear', () => {
-      server.broadcast('/player', 'perf_clear', "all");
+      server.broadcast('/player', 'performance:clear', "all");
     });
 
     this.addDisplay('numPlayers', 'num players', 0);
@@ -50,27 +38,25 @@ class DropsControl extends serverSide.Control {
  *  Performance
  * ======================================================================= */
 
-class DropsPerformance extends serverSide.Module {
+class DropsPerformance extends serverSide.Performance {
   constructor(control) {
     super();
 
     this.control = control;
-    this.players = [];
   }
 
   connect(client) {
-    super.connect();
+    super.connect(client);
 
     // initialize echo players
     client.data.performance = {};
     client.data.performance.echoPlayers = [];
 
-    client.receive('perf_start', () => {
-      this.players.push(client);
+    client.receive('performance:start', () => {
       this.control.setDisplay('numPlayers', this.players.length);
     });
 
-    client.receive('perf_sound', (time, soundParams) => {
+    client.receive('performance:sound', (time, soundParams) => {
       var numPlayers = this.players.length;
       var numEchoPlayers = soundParams.loopDiv - 1;
       var echoPeriod = soundParams.loopPeriod / soundParams.loopDiv;
@@ -94,16 +80,16 @@ class DropsPerformance extends serverSide.Module {
           echoDelay += echoPeriod;
           soundParams.gain *= echoAttenuation;
 
-          echoPlayer.send('perf_echo', time + echoDelay, soundParams);
+          echoPlayer.send('performance:echo', time + echoDelay, soundParams);
         }
       }
     });
 
-    client.receive('perf_clear', () => {
+    client.receive('performance:clear', () => {
       var echoPlayers = client.data.performance.echoPlayers;
 
       for (let i = 0; i < echoPlayers.length; i++)
-        echoPlayers[i].send('perf_clear', client.index);
+        echoPlayers[i].send('performance:clear', client.index);
 
       // clear echo players
       client.data.performance.echoPlayers = [];
@@ -114,11 +100,10 @@ class DropsPerformance extends serverSide.Module {
     var echoPlayers = client.data.performance.echoPlayers;
 
     for (let i = 0; i < echoPlayers.length; i++)
-      echoPlayers[i].send('perf_clear', client.index);
+      echoPlayers[i].send('performance:clear', client.index);
 
     client.data.performance.echoPlayers = null;
 
-    arrayRemove(this.players, client);
     this.control.setDisplay('numPlayers', this.players.length);
 
     super.disconnect();
