@@ -119,8 +119,8 @@ var audioFiles = dropsFiles;
 window.addEventListener('DOMContentLoaded', () => {
   window.top.scrollTo(0, 1);
 
-  var platformCheck = new clientSide.Platform({color: 'midnight-blue'});
-  var loader = new clientSide.Loader(audioFiles, {color: 'midnight-blue'});
+  var platformCheck = new clientSide.Platform({color: 'black'});
+  var loader = new clientSide.Loader(audioFiles, {color: 'black'});
   var welcome = new clientSide.Dialog({
     id: 'welcome',
     text: "<p>Welcome to <b>Drops</b>.</p> <p>Touch the screen to join!</p>",
