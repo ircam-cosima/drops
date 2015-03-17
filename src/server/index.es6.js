@@ -30,7 +30,7 @@ class DropsControl extends serverSide.Control {
       server.broadcast('/player', 'performance:clear', "all");
     });
 
-    this.addDisplay('numPlayers', 'num players', 0);
+    this.addInformation('numPlayers', 'num players', 0);
   }
 }
 

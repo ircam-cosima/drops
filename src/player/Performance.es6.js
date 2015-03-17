@@ -159,7 +159,7 @@ class Performance extends clientSide.Performance {
       this.updateCount();
     });
 
-    control.on('control_parameter', (name, val) => {
+    control.on('control:parameter', (name, val) => {
       this.updateControlParameters();
     });
 
