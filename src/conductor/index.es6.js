@@ -9,8 +9,7 @@ client.init('/conductor');
 
 window.addEventListener('DOMContentLoaded', () => {
   var control = new Control({
-    gui: true,
-    color: 'midnight-blue'
+    gui: true
   });
   client.start(control);
 });

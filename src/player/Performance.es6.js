@@ -1,14 +1,13 @@
 'use strict';
 
 var clientSide = require('soundworks/client');
+var waves = require('waves-audio');
 var client = clientSide.client;
 var input = clientSide.input;
-var audioContext = require('audio-context');
-var TimeEngine = require('time-engine');
-var scheduler = require('scheduler');
 var SampleSynth = require('./SampleSynth');
 var visual = require('./visual/main');
 
+var scheduler = waves.getScheduler();
 scheduler.lookahead = 0.050;
 
 function arrayRemove(array, value) {
@@ -27,7 +26,7 @@ function changeBackgroundColor(d) {
   document.body.style.backgroundColor = 'rgb(' + value + ', ' + value + ', ' + value + ')';
 }
 
-class Loop extends TimeEngine {
+class Loop extends waves.TimeEngine {
   constructor(looper, soundParams, local = false) {
     super();
     this.looper = looper;
@@ -152,14 +151,14 @@ class Performance extends clientSide.Performance {
     this.minGain = 0.1;
     this.autoPlay = 'off';
 
-    this.quantize = 0.250;
+    this.quantize = 0;
     this.numLocalLoops = 0;
 
     this.looper = new Looper(this.synth, () => {
       this.updateCount();
     });
 
-    control.on('control_parameter', (name, val) => {
+    control.on('control:parameter', (name, val) => {
       this.updateControlParameters();
     });
 
@@ -218,8 +217,10 @@ class Performance extends clientSide.Performance {
     var serverTime = this.sync.getSyncTime(time);
 
     // quantize
-    serverTime = Math.ceil(serverTime / this.quantize) * this.quantize;
-    time = this.sync.getLocalTime(serverTime);
+    if (this.quantize > 0) {
+      serverTime = Math.ceil(serverTime / this.quantize) * this.quantize;
+      time = this.sync.getLocalTime(serverTime);
+    }
 
     this.looper.start(time, soundParams, true);
     client.send('performance:sound', serverTime, soundParams);
