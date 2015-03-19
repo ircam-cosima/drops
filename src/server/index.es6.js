@@ -49,12 +49,7 @@ class DropsPerformance extends serverSide.Performance {
     super.connect(client);
 
     // initialize echo players
-    client.data.performance = {};
-    client.data.performance.echoPlayers = [];
-
-    client.receive('performance:start', () => {
-      this.control.setDisplay('numPlayers', this.players.length);
-    });
+    client.modules.performance.echoPlayers = [];
 
     client.receive('performance:sound', (time, soundParams) => {
       var numPlayers = this.players.length;
@@ -62,7 +57,7 @@ class DropsPerformance extends serverSide.Performance {
       var echoPeriod = soundParams.loopPeriod / soundParams.loopDiv;
       var echoAttenuation = Math.pow(soundParams.loopAttenuation, 1 / soundParams.loopDiv);
       var echoDelay = 0;
-      var echoPlayers = client.data.performance.echoPlayers;
+      var echoPlayers = client.modules.performance.echoPlayers;
 
       if (numEchoPlayers > numPlayers - 1)
         numEchoPlayers = numPlayers - 1;
@@ -86,27 +81,33 @@ class DropsPerformance extends serverSide.Performance {
     });
 
     client.receive('performance:clear', () => {
-      var echoPlayers = client.data.performance.echoPlayers;
+      var echoPlayers = client.modules.performance.echoPlayers;
 
       for (let i = 0; i < echoPlayers.length; i++)
         echoPlayers[i].send('performance:clear', client.index);
 
       // clear echo players
-      client.data.performance.echoPlayers = [];
+      client.modules.performance.echoPlayers = [];
     });
   }
 
   disconnect(client) {
-    var echoPlayers = client.data.performance.echoPlayers;
+    var echoPlayers = client.modules.performance.echoPlayers;
 
     for (let i = 0; i < echoPlayers.length; i++)
       echoPlayers[i].send('performance:clear', client.index);
 
-    client.data.performance.echoPlayers = null;
+    client.modules.performance.echoPlayers = null;
 
-    this.control.setDisplay('numPlayers', this.players.length);
+    this.control.setInformation('numPlayers', this.players.length);
 
     super.disconnect();
+  }
+
+  enter(client) {
+    super.enter(client);
+
+    this.control.setInformation('numPlayers', this.players.length);
   }
 }
 
