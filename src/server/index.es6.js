@@ -94,7 +94,7 @@ class DropsPerformance extends serverSide.Performance {
   enter(client) {
     super.enter(client);
 
-    this.control.setInformation('numPlayers', this.players.length);
+    this.control.setInfo('numPlayers', this.players.length);
   }
 
   exit(client) {
