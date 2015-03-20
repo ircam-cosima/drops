@@ -9,7 +9,7 @@ var transform = require('vinyl-transform');
 var watch = require('gulp-watch');
 
 // Other filders to watch, if any
-var watchOthers = ['node_modules/soundworks/'];
+var watchOthers = ['node_modules/soundworks/', 'node_modules/soundworks/node_modules/sync/'];
 
 // Tasks to execute before 'browserify' command
 var tasks = ['transpile-app', 'clean-js'];

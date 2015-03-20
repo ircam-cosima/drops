@@ -48,9 +48,6 @@ class DropsPerformance extends serverSide.Performance {
   connect(client) {
     super.connect(client);
 
-    // initialize echo players
-    client.modules.performance.echoPlayers = [];
-
     client.receive('performance:sound', (time, soundParams) => {
       var numPlayers = this.players.length;
       var numEchoPlayers = soundParams.loopDiv - 1;
@@ -81,32 +78,31 @@ class DropsPerformance extends serverSide.Performance {
     });
 
     client.receive('performance:clear', () => {
-      var echoPlayers = client.modules.performance.echoPlayers;
-
-      for (let i = 0; i < echoPlayers.length; i++)
-        echoPlayers[i].send('performance:clear', client.index);
-
-      // clear echo players
-      client.modules.performance.echoPlayers = [];
+      this._clearEchoes(client);
     });
   }
 
   enter(client) {
     super.enter(client);
 
+    client.modules.performance.echoPlayers = [];
     this.control.setInfo('numPlayers', this.players.length);
   }
 
   exit(client) {
+    this._clearEchoes(client);
+    this.control.setInfo('numPlayers', this.players.length - 1);
+
+    super.exit(client);
+  }
+
+  _clearEchoes(client) {
     var echoPlayers = client.modules.performance.echoPlayers;
 
     for (let i = 0; i < echoPlayers.length; i++)
       echoPlayers[i].send('performance:clear', client.index);
 
-    client.modules.performance.echoPlayers = null;
-    this.control.setInfo('numPlayers', this.players.length);
-
-    super.exit();
+    client.modules.performance.echoPlayers = [];
   }
 }
 
