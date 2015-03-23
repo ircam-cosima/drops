@@ -90,10 +90,10 @@ class DropsPerformance extends serverSide.Performance {
   }
 
   exit(client) {
-    this._clearEchoes(client);
-    this.control.setInfo('numPlayers', this.players.length - 1);
-
     super.exit(client);
+
+    this._clearEchoes(client);
+    this.control.setInfo('numPlayers', this.players.length);
   }
 
   _clearEchoes(client) {
