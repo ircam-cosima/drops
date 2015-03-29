@@ -3,15 +3,13 @@
 var clientSide = require('soundworks/client');
 var client = clientSide.client;
 
-client.init('/env');
+client.init('env');
 
 class Env extends clientSide.Module {
   constructor() {
     super('env', true);
 
-    var socket = client.socket;
-
-    socket.on('perf_control', (soloistId, pos, d, s) => {
+    client.receive('perf_control', (soloistId, pos, d, s) => {
       //console.log('env perf_control', soloistId, pos, d, s);
     });
   }

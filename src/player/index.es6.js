@@ -4,7 +4,7 @@ var clientSide = require('soundworks/client');
 var client = clientSide.client;
 var Performance = require('./Performance');
 
-client.init('/player');
+client.init('player');
 
 var dropsFiles = [
   'sounds/drops/01-drops-A-C2.mp3',

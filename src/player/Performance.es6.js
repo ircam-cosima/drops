@@ -190,7 +190,6 @@ class Performance extends clientSide.Performance {
     client.receive('performance:echo', (serverTime, soundParams) => {
       var time = this.sync.getLocalTime(serverTime);
       this.looper.start(time, soundParams);
-      console.log('performance:echo', serverTime, soundParams);
     });
 
     client.receive('performance:clear', (index) => {
@@ -203,7 +202,7 @@ class Performance extends clientSide.Performance {
 
   trigger(x, y) {
     var soundParams = {
-      index: this.checkin.index,
+      index: client.index,
       gain: 1,
       x: x,
       y: y,
@@ -227,7 +226,7 @@ class Performance extends clientSide.Performance {
   }
 
   clear() {
-    var index = this.checkin.index;
+    var index = client.index;
 
     // remove at own looper
     this.looper.remove(index, true);
@@ -240,7 +239,7 @@ class Performance extends clientSide.Performance {
     var str = "";
 
     if (this.state === 'reset') {
-      str = "<p class='soft-blink'>Waiting for<br>everybody<br>getting ready…</p>";
+      str = "<p>Waiting for<br>everybody<br>getting ready…</p>";
     } else if (this.state === 'end' && this.looper.loops.length === 0) {
       str = "<p>That's all.<br>Thanks!</p>";
     } else {

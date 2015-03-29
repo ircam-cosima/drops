@@ -33,7 +33,7 @@ class Circle {
 
     this.color = colorMap[this.index % colorMap.length];
     this.radius = 0;
-    this.position = {};
+    this.coordinates = {};
     // console.log(this.index, this.color);
     this.isDead = false;
   }
@@ -47,9 +47,9 @@ class Circle {
   }
 
   update(dt, w, h) {
-    // update position - screen orientation
-    this.position.x = this.x * w;
-    this.position.y = this.y * h;
+    // update coordinates - screen orientation
+    this.coordinates.x = this.x * w;
+    this.coordinates.y = this.y * h;
 
     this.lifeTime -= dt;
     this.opacity = this.opacityScale(this.lifeTime);
@@ -74,7 +74,7 @@ class Circle {
     ctx.beginPath();
     ctx.fillStyle = this.color;
     ctx.globalAlpha = this.opacity;
-    ctx.arc(this.position.x, this.position.y, Math.round(this.radius), 0, Math.PI * 2, false);
+    ctx.arc(this.coordinates.x, this.coordinates.y, Math.round(this.radius), 0, Math.PI * 2, false);
     ctx.fill();
     ctx.closePath();
     ctx.restore();

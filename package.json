@@ -5,7 +5,7 @@
     "Sébastien Robaszkiewicz"
   ],
 "description": "Drops is a collective performance based on Soundworks that enables players to create drops that are echoed by a few other smartphones.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "scripts": {
     "start": "node src/server/index.js"
   },

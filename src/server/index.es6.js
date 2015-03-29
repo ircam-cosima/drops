@@ -27,7 +27,7 @@ class DropsControl extends serverSide.Control {
     this.addParameterSelect('autoPlay', 'auto play', ['off', 'on'], 'off');
 
     this.addCommand('clear', 'clear', () => {
-      server.broadcast('/player', 'performance:clear', "all");
+      server.broadcast('player', 'performance:clear', "all");
     });
 
     this.addInfo('numPlayers', 'num players', 0);
@@ -49,7 +49,7 @@ class DropsPerformance extends serverSide.Performance {
     super.connect(client);
 
     client.receive('performance:sound', (time, soundParams) => {
-      var numPlayers = this.players.length;
+      var numPlayers = this.clients.length;
       var numEchoPlayers = soundParams.loopDiv - 1;
       var echoPeriod = soundParams.loopPeriod / soundParams.loopDiv;
       var echoAttenuation = Math.pow(soundParams.loopAttenuation, 1 / soundParams.loopDiv);
@@ -60,7 +60,7 @@ class DropsPerformance extends serverSide.Performance {
         numEchoPlayers = numPlayers - 1;
 
       if (numEchoPlayers > 0) {
-        var players = this.players;
+        var players = this.clients;
         var index = players.indexOf(client);
 
         for (let i = 1; i <= numEchoPlayers; i++) {
@@ -86,14 +86,14 @@ class DropsPerformance extends serverSide.Performance {
     super.enter(client);
 
     client.modules.performance.echoPlayers = [];
-    this.control.setInfo('numPlayers', this.players.length);
+    this.control.setInfo('numPlayers', this.clients.length);
   }
 
   exit(client) {
     super.exit(client);
 
     this._clearEchoes(client);
-    this.control.setInfo('numPlayers', this.players.length);
+    this.control.setInfo('numPlayers', this.clients.length);
   }
 
   _clearEchoes(client) {
@@ -121,6 +121,6 @@ var performance = new DropsPerformance(control);
 
 server.start(app, dir, 8600);
 
-server.map('/conductor', 'Drops — Conductor', control);
-server.map('/player', 'Drops', control, sync, checkin, performance);
-server.map('/env', 'Drops — Environment', sync, performance);
+server.map('conductor', control);
+server.map('player', control, sync, checkin, performance);
+server.map('env', sync, performance);
