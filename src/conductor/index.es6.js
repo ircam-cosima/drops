@@ -7,7 +7,7 @@ var Control = clientSide.Control;
 
 client.init('conductor');
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
   var control = new Control({
     gui: true
   });

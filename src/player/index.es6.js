@@ -116,7 +116,7 @@ var voxFiles = [
 
 var audioFiles = dropsFiles;
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('load', () => {
   window.top.scrollTo(0, 1);
 
   var platformCheck = new clientSide.Platform();
