@@ -113,8 +113,7 @@ class DropsPerformance extends serverSide.Performance {
 // start server side
 var sync = new serverSide.Sync();
 var checkin = new serverSide.Checkin({
-  numPlaces: 9999,
-  order: 'ascending'
+  maxClients: 9999
 });
 var control = new DropsControl();
 var performance = new DropsPerformance(control);
