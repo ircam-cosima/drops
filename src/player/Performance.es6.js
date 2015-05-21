@@ -126,7 +126,7 @@ class Looper {
 }
 
 class Performance extends clientSide.Performance {
-  constructor(loader, control, sync, checkin, options = {}) {
+  constructor(loader, control, sync, checkin) {
     super();
 
     this.loader = loader;
