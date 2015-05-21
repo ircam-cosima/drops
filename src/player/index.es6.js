@@ -120,19 +120,19 @@ window.addEventListener('load', () => {
   window.top.scrollTo(0, 1);
 
   var platformCheck = new clientSide.Platform();
-  var loader = new clientSide.Loader(audioFiles);
+  var loader = new clientSide.Loader({
+    files: audioFiles
+  });
   var welcome = new clientSide.Dialog({
     id: 'welcome',
     text: "<p>Welcome to <b>Drops</b>.</p> <p>Touch the screen to join!</p>",
     activateAudio: true
   });
   var sync = new clientSide.Sync();
-  var checkin = new clientSide.Checkin({
-    dialog: false
-  });
+  var checkin = new clientSide.Checkin();
   var control = new clientSide.Control();
-  var performance = new Performance(loader, control, sync, checkin);  
-  
+  var performance = new Performance(loader, control, sync, checkin);
+
   client.start(
     client.serial(
       platformCheck,

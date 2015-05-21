@@ -127,7 +127,7 @@ class Looper {
 
 class Performance extends clientSide.Performance {
   constructor(loader, control, sync, checkin, options = {}) {
-    super(options);
+    super();
 
     this.loader = loader;
     this.sync = sync;
@@ -320,7 +320,7 @@ class Performance extends clientSide.Performance {
     input.enableTouch(this.view);
     input.enableDeviceMotion();
 
-    this.synth.audioBuffers = this.loader.audioBuffers;
+    this.synth.audioBuffers = this.loader.buffers;
 
     // for testing
     if (this.autoPlay) {
