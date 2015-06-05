@@ -10,10 +10,9 @@ var app = express();
 var path = require('path');
 var dir = path.join(__dirname, '../../public');
 
-/*
+/**
  *  Control
- * ======================================================================= */
-
+ */
 class DropsControl extends serverSide.Control {
   constructor() {
     super();
@@ -34,10 +33,9 @@ class DropsControl extends serverSide.Control {
   }
 }
 
-/*
+/**
  *  Performance
- * ======================================================================= */
-
+ */
 class DropsPerformance extends serverSide.Performance {
   constructor(control) {
     super();
@@ -45,8 +43,8 @@ class DropsPerformance extends serverSide.Performance {
     this.control = control;
   }
 
-  connect(client) {
-    super.connect(client);
+  enter(client) {
+    super.enter(client);
 
     client.receive('performance:sound', (time, soundParams) => {
       var numPlayers = this.clients.length;
@@ -80,10 +78,6 @@ class DropsPerformance extends serverSide.Performance {
     client.receive('performance:clear', () => {
       this._clearEchoes(client);
     });
-  }
-
-  enter(client) {
-    super.enter(client);
 
     client.modules.performance.echoPlayers = [];
     this.control.setInfo('numPlayers', this.clients.length);
@@ -100,15 +94,15 @@ class DropsPerformance extends serverSide.Performance {
     var echoPlayers = client.modules.performance.echoPlayers;
 
     for (let i = 0; i < echoPlayers.length; i++)
-      echoPlayers[i].send('performance:clear', client.index);
+      echoPlayers[i].send('performance:clear', client.modules.checkin.index);
 
     client.modules.performance.echoPlayers = [];
   }
 }
 
-/*
+/**
  *  Scenario
- * ======================================================================= */
+ */
 
 // start server side
 var sync = new serverSide.Sync();

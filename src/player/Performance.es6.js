@@ -135,6 +135,7 @@ class Performance extends clientSide.Performance {
     this.control = control;
     this.synth = new SampleSynth(null);
 
+    this.index = -1;
     this.numTriggers = 6;
 
     var canvas = document.createElement('canvas');
@@ -202,7 +203,7 @@ class Performance extends clientSide.Performance {
 
   trigger(x, y) {
     var soundParams = {
-      index: client.index,
+      index: this.index,
       gain: 1,
       x: x,
       y: y,
@@ -226,7 +227,7 @@ class Performance extends clientSide.Performance {
   }
 
   clear() {
-    var index = client.index;
+    var index = this.index;
 
     // remove at own looper
     this.looper.remove(index, true);
@@ -310,6 +311,8 @@ class Performance extends clientSide.Performance {
 
   start() {
     super.start();
+
+    this.index = this.checkin.index;
 
     this.updateControlParameters();
 
