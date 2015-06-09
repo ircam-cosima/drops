@@ -46,6 +46,8 @@ class DropsPerformance extends serverSide.Performance {
   enter(client) {
     super.enter(client);
 
+    client.modules.performance.echoPlayers = [];
+
     client.receive('performance:sound', (time, soundParams) => {
       var numPlayers = this.clients.length;
       var numEchoPlayers = soundParams.loopDiv - 1;
@@ -79,7 +81,6 @@ class DropsPerformance extends serverSide.Performance {
       this._clearEchoes(client);
     });
 
-    client.modules.performance.echoPlayers = [];
     this.control.setInfo('numPlayers', this.clients.length);
   }
 
