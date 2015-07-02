@@ -133,15 +133,15 @@ window.addEventListener('load', () => {
   var control = new clientSide.Control();
   var performance = new Performance(loader, control, sync, checkin);
 
-  client.start(
-    client.serial(
+  client.start((seq, par) => 
+    seq(
       platformCheck,
-      client.parallel(
+      par(
         welcome,
         loader
       ),
       control,
-      client.parallel(
+      par(
         sync,
         checkin
       ),
