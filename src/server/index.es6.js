@@ -17,19 +17,15 @@ class DropsControl extends serverSide.Control {
   constructor() {
     super();
 
-    this.addParameterSelect('state', 'state', ['reset', 'running', 'end'], 'reset');
-    this.addParameterNumber('maxDrops', 'max drops', 0, 100, 1, 1);
-    this.addParameterNumber('loopDiv', 'loop div', 1, 100, 1, 3);
-    this.addParameterNumber('loopPeriod', 'loop period', 1, 30, 0.1, 7.5);
-    this.addParameterNumber('loopAttenuation', 'loop atten', 0, 1, 0.01, 0.71);
-    this.addParameterNumber('minGain', 'min gain', 0, 1, 0.01, 0.1);
-    this.addParameterSelect('autoPlay', 'auto play', ['off', 'on'], 'off');
-
-    this.addCommand('clear', 'clear', () => {
-      server.broadcast('player', 'performance:clear', "all");
-    });
-
-    this.addInfo('numPlayers', 'num players', 0);
+    this.addInfo('numPlayers', 'num players', 0, ['conductor']);
+    this.addSelect('state', 'state', ['reset', 'running', 'end'], 'reset');
+    this.addNumber('maxDrops', 'max drops', 0, 100, 1, 1);
+    this.addNumber('loopDiv', 'loop div', 1, 100, 1, 3);
+    this.addNumber('loopPeriod', 'loop period', 1, 30, 0.1, 7.5);
+    this.addNumber('loopAttenuation', 'loop atten', 0, 1, 0.01, 0.71);
+    this.addNumber('minGain', 'min gain', 0, 1, 0.01, 0.1);
+    this.addSelect('autoPlay', 'auto play', ['off', 'on'], 'off');
+    this.addCommand('clear', 'clear', ['player']);
   }
 }
 
@@ -81,14 +77,14 @@ class DropsPerformance extends serverSide.Performance {
       this._clearEchoes(client);
     });
 
-    this.control.setInfo('numPlayers', this.clients.length);
+    this.control.broadcast('numPlayers', this.clients.length);
   }
 
   exit(client) {
     super.exit(client);
 
     this._clearEchoes(client);
-    this.control.setInfo('numPlayers', this.clients.length);
+    this.control.broadcast('numPlayers', this.clients.length);
   }
 
   _clearEchoes(client) {

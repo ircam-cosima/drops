@@ -143,7 +143,7 @@ class Performance extends clientSide.Performance {
     canvas.setAttribute('id', 'scene');
     this.view.appendChild(canvas);
 
-    // parameters
+    // control parameters
     this.state = 'reset';
     this.maxDrops = 0;
     this.loopDiv = 3;
@@ -159,8 +159,11 @@ class Performance extends clientSide.Performance {
       this.updateCount();
     });
 
-    control.on('control:parameter', (name, val) => {
-      this.updateControlParameters();
+    control.on('control:event', (name, val) => {
+      if(name === 'clear')
+        this.looper.removeAll();
+      else
+        this.updateControlParameters();
     });
 
     input.on('devicemotion', (data) => {
@@ -194,10 +197,7 @@ class Performance extends clientSide.Performance {
     });
 
     client.receive('performance:clear', (index) => {
-      if (index === 'all')
-        this.looper.removeAll();
-      else
-        this.looper.remove(index);
+      this.looper.remove(index);
     });
   }
 
@@ -264,23 +264,23 @@ class Performance extends clientSide.Performance {
   }
 
   updateControlParameters() {
-    var parameters = this.control.parameters;
+    var events = this.control.events;
 
-    if (parameters.state.value !== this.state ||  parameters.maxDrops.value !== this.maxDrops) {
-      this.state = parameters.state.value;
-      this.maxDrops = parameters.maxDrops.value;
+    if (events.state.value !== this.state ||  events.maxDrops.value !== this.maxDrops) {
+      this.state = events.state.value;
+      this.maxDrops = events.maxDrops.value;
       this.updateCount();
     }
 
-    this.loopDiv = parameters.loopDiv.value;
-    this.loopPeriod = parameters.loopPeriod.value;
-    this.loopAttenuation = parameters.loopAttenuation.value;
-    this.minGain = parameters.minGain.value;
+    this.loopDiv = events.loopDiv.value;
+    this.loopPeriod = events.loopPeriod.value;
+    this.loopAttenuation = events.loopAttenuation.value;
+    this.minGain = events.minGain.value;
 
-    if (this.autoPlay != 'manual' && parameters.autoPlay != this.autoPlay) {
-      this.autoPlay = parameters.autoPlay.value;
+    if (this.autoPlay != 'manual' && events.autoPlay != this.autoPlay) {
+      this.autoPlay = events.autoPlay.value;
 
-      if (parameters.autoPlay.value === 'on') {
+      if (events.autoPlay.value === 'on') {
         this.autoTrigger();
         this.autoClear();
       }
