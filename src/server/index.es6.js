@@ -103,9 +103,7 @@ class DropsPerformance extends serverSide.Performance {
 
 // start server side
 var sync = new serverSide.Sync();
-var checkin = new serverSide.Checkin({
-  maxClients: 9999
-});
+var checkin = new serverSide.Checkin();
 var control = new DropsControl();
 var performance = new DropsPerformance(control);
 
@@ -113,4 +111,3 @@ server.start(app, dir, 8600);
 
 server.map('conductor', control);
 server.map('player', control, sync, checkin, performance);
-server.map('env', sync, performance);
