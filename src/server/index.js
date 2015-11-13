@@ -1,14 +1,12 @@
-'use strict';
-
 // Soundworks library
-var serverSide = require('soundworks/server');
-var server = serverSide.server;
+import serverSide from 'soundworks/server';
+import express from 'express';
+import path from 'path';
 
+const server = serverSide.server;
 // Express application
-var express = require('express');
-var app = express();
-var path = require('path');
-var dir = path.join(process.cwd(), 'public');
+const app = express();
+const dir = path.join(process.cwd(), 'public');
 
 /**
  *  Control
@@ -45,23 +43,24 @@ class DropsPerformance extends serverSide.Performance {
     client.modules.performance.echoPlayers = [];
 
     client.receive('performance:sound', (time, soundParams) => {
-      var numPlayers = this.clients.length;
-      var numEchoPlayers = soundParams.loopDiv - 1;
-      var echoPeriod = soundParams.loopPeriod / soundParams.loopDiv;
-      var echoAttenuation = Math.pow(soundParams.loopAttenuation, 1 / soundParams.loopDiv);
-      var echoDelay = 0;
-      var echoPlayers = client.modules.performance.echoPlayers;
+      const numPlayers = this.clients.length;
+      const echoPeriod = soundParams.loopPeriod / soundParams.loopDiv;
+      const echoAttenuation = Math.pow(soundParams.loopAttenuation, 1 / soundParams.loopDiv);
+
+      let numEchoPlayers = soundParams.loopDiv - 1;
+      let echoDelay = 0;
+      let echoPlayers = client.modules.performance.echoPlayers;
 
       if (numEchoPlayers > numPlayers - 1)
         numEchoPlayers = numPlayers - 1;
 
       if (numEchoPlayers > 0) {
-        var players = this.clients;
-        var index = players.indexOf(client);
+        const players = this.clients;
+        const index = players.indexOf(client);
 
         for (let i = 1; i <= numEchoPlayers; i++) {
-          var echoPlayerIndex = (index + i) % numPlayers;
-          var echoPlayer = players[echoPlayerIndex];
+          const echoPlayerIndex = (index + i) % numPlayers;
+          const echoPlayer = players[echoPlayerIndex];
 
           echoPlayers.push(echoPlayer);
 
@@ -88,7 +87,7 @@ class DropsPerformance extends serverSide.Performance {
   }
 
   _clearEchoes(client) {
-    var echoPlayers = client.modules.performance.echoPlayers;
+    const echoPlayers = client.modules.performance.echoPlayers;
 
     for (let i = 0; i < echoPlayers.length; i++)
       echoPlayers[i].send('performance:clear', client.modules.checkin.index);
@@ -102,10 +101,10 @@ class DropsPerformance extends serverSide.Performance {
  */
 
 // start server side
-var sync = new serverSide.Sync();
-var checkin = new serverSide.Checkin();
-var control = new DropsControl();
-var performance = new DropsPerformance(control);
+const sync = new serverSide.Sync();
+const checkin = new serverSide.Checkin();
+const control = new DropsControl();
+const performance = new DropsPerformance(control);
 
 server.start(app, dir, 8600);
 
