@@ -236,27 +236,27 @@ export default class Performance extends clientSide.Performance {
   }
 
   updateCount() {
-    let str = "";
+    let str = '';
 
     if (this.state === 'reset') {
-      str = "<p>Waiting for<br>everybody<br>getting ready…</p>";
+      str = `<p>Waiting for<br>everybody<br>getting ready…</p>`;
     } else if (this.state === 'end' && this.looper.loops.length === 0) {
-      str = "<p>That's all.<br>Thanks!</p>";
+      str = `<p>That's all.<br>Thanks!</p>`;
     } else {
       const numAvailable = Math.max(0, this.maxDrops - this.looper.numLocalLoops);
 
       if (numAvailable > 0) {
-        str = "<p>You have</p>";
+        str = `<p>You have</p>`;
 
         if (numAvailable === this.maxDrops) {
           if (numAvailable === 1)
-            str += "<p class='big'>1</p> <p>drop to play</p>";
+            str += `<p class="big">1</p><p>drop to play</p>`;
           else
-            str += "<p class='big'>" + numAvailable + "</p> <p>drops to play</p>";
+            str += `<p class="big">${numAvailable}</p><p>drops to play</p>`;
         } else
-          str += "<p class='big'>" + numAvailable + " of " + this.maxDrops + "</p> <p>drops to play</p>";
+          str += `<p class="big">${numAvailable} of ${this.maxDrops}</p><p>drops to play</p>`;
       } else
-        str = "<p class='listen'>Listen!</p>";
+        str = `<p class="listen">Listen!</p>`;
     }
 
     this.setCenteredViewContent(str);
