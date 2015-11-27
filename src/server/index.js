@@ -4,9 +4,6 @@ import express from 'express';
 import path from 'path';
 
 const server = serverSide.server;
-// Express application
-const app = express();
-const dir = path.join(process.cwd(), 'public');
 
 /**
  *  Control
@@ -106,7 +103,7 @@ const checkin = new serverSide.Checkin();
 const control = new DropsControl();
 const performance = new DropsPerformance(control);
 
-server.start(app, dir, 8600);
+server.start();
 
 server.map('conductor', control);
 server.map('player', control, sync, checkin, performance);
