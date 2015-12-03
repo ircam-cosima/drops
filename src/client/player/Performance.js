@@ -1,10 +1,9 @@
-import clientSide from 'soundworks/client';
+import soundworks from 'soundworks/client';
 import waves from 'waves-audio';
 import SampleSynth from './SampleSynth';
 import visual from './visual/main';
 
-const client = clientSide.client;
-const input = clientSide.input;
+const input = soundworks.input;
 
 const scheduler = waves.getScheduler();
 scheduler.lookahead = 0.050;
@@ -124,7 +123,7 @@ class Looper {
   }
 }
 
-export default class Performance extends clientSide.Performance {
+export default class Performance extends soundworks.ClientPerformance {
   constructor(loader, control, sync, checkin) {
     super();
 
@@ -190,12 +189,12 @@ export default class Performance extends clientSide.Performance {
     });
 
     // setup performance control listeners
-    client.receive('performance:echo', (serverTime, soundParams) => {
+    this.receive('echo', (serverTime, soundParams) => {
       const time = this.sync.getLocalTime(serverTime);
       this.looper.start(time, soundParams);
     });
 
-    client.receive('performance:clear', (index) => {
+    this.receive('clear', (index) => {
       this.looper.remove(index);
     });
   }
@@ -222,7 +221,7 @@ export default class Performance extends clientSide.Performance {
     }
 
     this.looper.start(time, soundParams, true);
-    client.send('performance:sound', serverTime, soundParams);
+    this.send('sound', serverTime, soundParams);
   }
 
   clear() {
@@ -232,7 +231,7 @@ export default class Performance extends clientSide.Performance {
     this.looper.remove(index, true);
 
     // remove at other players
-    client.send('performance:clear', index);
+    this.send('clear', index);
   }
 
   updateCount() {

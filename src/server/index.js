@@ -1,14 +1,12 @@
 // Soundworks library
-import serverSide from 'soundworks/server';
+import soundworks from 'soundworks/server';
 import express from 'express';
 import path from 'path';
-
-const server = serverSide.server;
 
 /**
  *  Control
  */
-class DropsControl extends serverSide.Control {
+class DropsControl extends soundworks.ServerControl {
   constructor() {
     super();
 
@@ -27,7 +25,7 @@ class DropsControl extends serverSide.Control {
 /**
  *  Performance
  */
-class DropsPerformance extends serverSide.Performance {
+class DropsPerformance extends soundworks.ServerPerformance {
   constructor(control) {
     super();
 
@@ -39,7 +37,7 @@ class DropsPerformance extends serverSide.Performance {
 
     client.modules.performance.echoPlayers = [];
 
-    client.receive('performance:sound', (time, soundParams) => {
+    this.receive(client, 'sound', (time, soundParams) => {
       const numPlayers = this.clients.length;
       const echoPeriod = soundParams.loopPeriod / soundParams.loopDiv;
       const echoAttenuation = Math.pow(soundParams.loopAttenuation, 1 / soundParams.loopDiv);
@@ -64,12 +62,12 @@ class DropsPerformance extends serverSide.Performance {
           echoDelay += echoPeriod;
           soundParams.gain *= echoAttenuation;
 
-          echoPlayer.send('performance:echo', time + echoDelay, soundParams);
+          this.send(echoPlayer, 'echo', time + echoDelay, soundParams);
         }
       }
     });
 
-    client.receive('performance:clear', () => {
+    this.receive(client, 'clear', () => {
       this._clearEchoes(client);
     });
 
@@ -87,7 +85,7 @@ class DropsPerformance extends serverSide.Performance {
     const echoPlayers = client.modules.performance.echoPlayers;
 
     for (let i = 0; i < echoPlayers.length; i++)
-      echoPlayers[i].send('performance:clear', client.modules.checkin.index);
+      this.send(echoPlayers[i], 'clear', client.modules.checkin.index);
 
     client.modules.performance.echoPlayers = [];
   }
@@ -98,10 +96,11 @@ class DropsPerformance extends serverSide.Performance {
  */
 
 // start server side
-const sync = new serverSide.Sync();
-const checkin = new serverSide.Checkin();
+const sync = new soundworks.ServerSync();
+const checkin = new soundworks.ServerCheckin();
 const control = new DropsControl();
 const performance = new DropsPerformance(control);
+const server = soundworks.server;
 
 server.start();
 

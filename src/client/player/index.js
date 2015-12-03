@@ -1,7 +1,5 @@
-import clientSide from 'soundworks/client';
+import soundworks from 'soundworks/client';
 import Performance from './Performance';
-
-const client = clientSide.client;
 
 const dropsFiles = [
   'sounds/drops/01-drops-A-C2.mp3',
@@ -112,22 +110,23 @@ const voxFiles = [
 ];
 
 const audioFiles = dropsFiles;
+const client = soundworks.client;
 
 client.init('player');
 
 function bootstrap() {
   window.top.scrollTo(0, 1);
 
-  const platformCheck = new clientSide.Platform();
-  const loader = new clientSide.Loader({ files: audioFiles });
-  const welcome = new clientSide.Dialog({
+  const platformCheck = new soundworks.Platform();
+  const loader = new soundworks.Loader({ files: audioFiles });
+  const welcome = new soundworks.Dialog({
     id: 'welcome',
     text: "<p>Welcome to <b>Drops</b>.</p> <p>Touch the screen to join!</p>",
     activateAudio: true
   });
-  const sync = new clientSide.Sync();
-  const checkin = new clientSide.Checkin();
-  const control = new clientSide.Control();
+  const sync = new soundworks.ClientSync();
+  const checkin = new soundworks.ClientCheckin();
+  const control = new soundworks.ClientControl();
   const performance = new Performance(loader, control, sync, checkin);
 
   client.start((seq, par) =>
