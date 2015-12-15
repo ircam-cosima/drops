@@ -117,13 +117,8 @@ client.init('player');
 function bootstrap() {
   window.top.scrollTo(0, 1);
 
-  const platformCheck = new soundworks.Platform();
   const loader = new soundworks.Loader({ files: audioFiles });
-  const welcome = new soundworks.Dialog({
-    id: 'welcome',
-    text: "<p>Welcome to <b>Drops</b>.</p> <p>Touch the screen to join!</p>",
-    activateAudio: true
-  });
+  const welcome = new soundworks.Welcome();
   const sync = new soundworks.ClientSync();
   const checkin = new soundworks.ClientCheckin();
   const control = new soundworks.ClientControl();
@@ -131,7 +126,6 @@ function bootstrap() {
 
   client.start((seq, par) =>
     seq(
-      platformCheck,
       par(
         welcome,
         loader
