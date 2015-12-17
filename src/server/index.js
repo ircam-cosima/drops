@@ -18,7 +18,7 @@ class DropsControl extends soundworks.ServerControl {
     this.addNumber('loopAttenuation', 'loop atten', 0, 1, 0.01, 0.71);
     this.addNumber('minGain', 'min gain', 0, 1, 0.01, 0.1);
     this.addSelect('autoPlay', 'auto play', ['off', 'on'], 'off');
-    this.addCommand('clear', 'clear', ['player']);
+    this.addCommand('clear', 'clear', ['conductor', 'player']);
   }
 }
 
@@ -30,7 +30,7 @@ class DropsPerformance extends soundworks.ServerPerformance {
     super();
 
     this.control = control;
-  }
+  }excludeClient
 
   enter(client) {
     super.enter(client);

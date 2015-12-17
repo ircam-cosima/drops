@@ -136,11 +136,6 @@ export default class Performance extends soundworks.ClientPerformance {
     this.index = -1;
     this.numTriggers = 6;
 
-    const canvas = document.createElement('canvas');
-    canvas.classList.add('scene');
-    canvas.setAttribute('id', 'scene');
-    this.view.appendChild(canvas);
-
     // control parameters
     this.state = 'reset';
     this.maxDrops = 0;
@@ -157,46 +152,7 @@ export default class Performance extends soundworks.ClientPerformance {
       this.updateCount();
     });
 
-    control.on('control:event', (name, val) => {
-      if(name === 'clear')
-        this.looper.removeAll();
-      else
-        this.updateControlParameters();
-    });
-
-    input.on('devicemotion', (data) => {
-      const accX = data.accelerationIncludingGravity.x;
-      const accY = data.accelerationIncludingGravity.y;
-      const accZ = data.accelerationIncludingGravity.z;
-      const mag = Math.sqrt(accX * accX + accY * accY + accZ * accZ);
-
-      if (mag > 20) {
-        this.clear();
-        this.autoPlay = 'manual';
-      }
-    });
-
-    // setup input listeners
-    input.on('touchstart', (data) => {
-      if (this.state === 'running' && this.looper.numLocalLoops < this.maxDrops) {
-        const x = (data.coordinates[0] - this.view.offsetLeft + window.scrollX) / this.view.offsetWidth;
-        const y = (data.coordinates[1] - this.view.offsetTop + window.scrollY) / this.view.offsetHeight;
-
-        this.trigger(x, y);
-      }
-
-      this.autoPlay = 'manual';
-    });
-
-    // setup performance control listeners
-    this.receive('echo', (serverTime, soundParams) => {
-      const time = this.sync.getLocalTime(serverTime);
-      this.looper.start(time, soundParams);
-    });
-
-    this.receive('clear', (index) => {
-      this.looper.remove(index);
-    });
+    //this.view = this.createDefaultView();
   }
 
   trigger(x, y) {
@@ -258,7 +214,7 @@ export default class Performance extends soundworks.ClientPerformance {
         str = `<p class="listen">Listen!</p>`;
     }
 
-    this.setCenteredViewContent(str);
+    //this.view.innerHTML = str;
   }
 
   updateControlParameters() {
@@ -310,6 +266,59 @@ export default class Performance extends soundworks.ClientPerformance {
   start() {
     super.start();
 
+    const canvas = document.createElement('canvas');
+    canvas.classList.add('scene');
+    canvas.setAttribute('id', 'scene');
+    this.$container.appendChild(canvas);
+
+    this.control.on('update', (name, val) => {
+      if(name === 'clear')
+        this.looper.removeAll();
+      else
+        this.updateControlParameters();
+    });
+
+    input.on('devicemotion', (data) => {
+      const accX = data.accelerationIncludingGravity.x;
+      const accY = data.accelerationIncludingGravity.y;
+      const accZ = data.accelerationIncludingGravity.z;
+      const mag = Math.sqrt(accX * accX + accY * accY + accZ * accZ);
+
+      if (mag > 20) {
+        this.clear();
+        this.autoPlay = 'manual';
+      }
+    });
+
+    // setup input listeners
+    input.on('touchstart', (data) => {
+      if (this.state === 'running' && this.looper.numLocalLoops < this.maxDrops) {
+        const boundingRect = canvas.getBoundingClientRect();
+
+        const relX = data.coordinates[0] - boundingRect.left;
+        const relY = data.coordinates[1] - boundingRect.top;
+        const normX = relX / boundingRect.width;
+        const normY = relY / boundingRect.height;
+
+        // const x = (data.coordinates[0] - this.$container.offsetLeft + window.scrollX) / this.$container.offsetWidth;
+        // const y = (data.coordinates[1] - this.$container.offsetTop + window.scrollY) / this.$container.offsetHeight;
+
+        this.trigger(normX, normY);
+      }
+
+      this.autoPlay = 'manual';
+    });
+
+    // setup performance control listeners
+    this.receive('echo', (serverTime, soundParams) => {
+      const time = this.sync.getLocalTime(serverTime);
+      this.looper.start(time, soundParams);
+    });
+
+    this.receive('clear', (index) => {
+      this.looper.remove(index);
+    });
+
     this.index = this.checkin.index;
 
     this.updateControlParameters();
@@ -318,7 +327,7 @@ export default class Performance extends soundworks.ClientPerformance {
 
     this.updateCount();
 
-    input.enableTouch(this.view);
+    input.enableTouch(this.$container);
     input.enableDeviceMotion();
 
     this.synth.audioBuffers = this.loader.buffers;

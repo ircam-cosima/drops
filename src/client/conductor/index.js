@@ -5,7 +5,7 @@ const Control = soundworks.ClientControl;
 client.init('conductor');
 
 window.addEventListener('load', () => {
-  const control = new Control({ gui: true });
+  const control = new Control({ hasGui: true });
 
   client.start(control);
 });

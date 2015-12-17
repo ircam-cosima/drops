@@ -2,20 +2,22 @@
  * LOADER
  * ======================================================= */
 
-.loader {
-  .loading-text {
-    @include animation('soft-blink 3.8s ease-in-out infinite');
-  }
+// => ok
+
+#loader {
+  $progressBarHeight: 10px;
 
   .progress-wrap {
-    border: solid 3px white;
-    border-radius: 8px;
-    margin: 0.75em auto;
+    margin: 12px auto 0;
+    border: solid 1px white;
+    border-radius: 5px;
+    height: $progressBarHeight;
+    overflow: hidden;
+    flex-basis: 80%;
   }
-
   .progress-bar {
     background-color: white;
-    height: 10px;
-    width: 0%; // adjust with Javascript in the code
+    height: $progressBarHeight;
+    width: 0; // is updated from javascript
   }
 }
