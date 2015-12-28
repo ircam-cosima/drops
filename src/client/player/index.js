@@ -118,7 +118,7 @@ function bootstrap() {
   window.top.scrollTo(0, 1);
 
   const loader = new soundworks.Loader({ files: audioFiles });
-  const welcome = new soundworks.Welcome();
+  const welcome = new soundworks.Welcome({ fullScreen: false });
   const sync = new soundworks.ClientSync();
   const checkin = new soundworks.ClientCheckin();
   const control = new soundworks.ClientControl();

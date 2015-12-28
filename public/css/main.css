@@ -1,0 +1,671 @@
+@-webkit-keyframes $animation-name {
+  0% {
+    opacity: 1.0; }
+  50% {
+    opacity: 0.3; }
+  100% {
+    opacity: 1.0; } }
+
+@-moz-keyframes $animation-name {
+  0% {
+    opacity: 1.0; }
+  50% {
+    opacity: 0.3; }
+  100% {
+    opacity: 1.0; } }
+
+@-ms-keyframes $animation-name {
+  0% {
+    opacity: 1.0; }
+  50% {
+    opacity: 0.3; }
+  100% {
+    opacity: 1.0; } }
+
+@-o-keyframes $animation-name {
+  0% {
+    opacity: 1.0; }
+  50% {
+    opacity: 0.3; }
+  100% {
+    opacity: 1.0; } }
+
+@keyframes $animation-name {
+  0% {
+    opacity: 1.0; }
+  50% {
+    opacity: 0.3; }
+  100% {
+    opacity: 1.0; } }
+
+/**
+ * These color swatches were inspired by the swatches
+ * found in Flat UI, by designmodo.
+ * http://designmodo.com/flat-free/
+ */
+@font-face {
+  font-family: "Quicksand";
+  font-weight: 100;
+  src: url("../fonts/Quicksand-Light.ttf") format("truetype"); }
+
+@font-face {
+  font-family: "Quicksand";
+  font-weight: 400;
+  src: url("../fonts/Quicksand-Regular.ttf") format("truetype"); }
+
+@font-face {
+  font-family: "Quicksand";
+  font-weight: 700;
+  src: url("../fonts/Quicksand-Bold.ttf") format("truetype"); }
+
+/**
+ * The following code is inspired by:
+ *   http://meyerweb.com/eric/tools/css/reset/
+ *   v2.0 | 20110126
+ *   License: none (public domain)
+ */
+html, body, div, span, h1, h2, h3, h4, h5, h6, p, a, button, input, option, select {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline; }
+
+body {
+  line-height: 1; }
+
+ol, ul {
+  list-style: none; }
+
+html, body {
+  background-color: #080808; }
+
+body {
+  font-family: Quicksand, arial, sans-serif;
+  font-size: 62.5%;
+  line-height: normal;
+  color: rgba(255, 255, 255, 0.9); }
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: bold; }
+
+p {
+  margin: 0;
+  padding: 0; }
+
+#container {
+  position: relative; }
+
+.foreground {
+  position: relative;
+  z-index: 1; }
+
+.background {
+  position: absolute;
+  top: 0;
+  left: 0; }
+
+.flex-center, .flex-middle {
+  box-sizing: border-box;
+  padding: 10px;
+  display: flex; }
+  .flex-center > *, .flex-middle > * {
+    text-align: center;
+    flex-basis: 100%;
+    width: 100%; }
+
+.flex-middle {
+  align-items: center; }
+
+.huge {
+  font-size: 3rem; }
+
+.big {
+  font-size: 2rem; }
+
+p, .normal {
+  font-size: 1.5rem; }
+
+.small {
+  font-size: 1rem; }
+
+.bold {
+  font-weight: bold; }
+
+.italic {
+  font-style: italic; }
+
+.btn {
+  background-color: #080808;
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  border-radius: 2px;
+  color: rgba(255, 255, 255, 0.9);
+  padding: 6px 0;
+  font-size: 1rem;
+  display: block;
+  -webkit-transition: background-color 50ms;
+  -moz-transition: background-color 50ms;
+  -ms-transition: background-color 50ms;
+  -o-transition: background-color 50ms;
+  transition: background-color 50ms;
+  letter-spacing: 0.05em; }
+  .btn:active {
+    background-color: rgba(255, 255, 255, 0.9); }
+  .btn:focus {
+    outline: none; }
+  .btn.unselected, .btn.disabled, .btn[disabled] {
+    opacity: 0.5; }
+  .btn.selected {
+    opacity: 1; }
+
+.landscape .portrait-only {
+  display: none; }
+
+.landscape br.portrait-only {
+  content: ' ';
+  display: inline; }
+  .landscape br.portrait-only:after {
+    content: ' '; }
+
+.soft-blink {
+  -webkit-animation: soft-blink 3.6s ease-in-out infinite;
+  -moz-animation: soft-blink 3.6s ease-in-out infinite;
+  -ms-animation: soft-blink 3.6s ease-in-out infinite;
+  -o-animation: soft-blink 3.6s ease-in-out infinite;
+  animation: soft-blink 3.6s ease-in-out infinite; }
+
+.turquoise {
+  background-color: #1abc9c; }
+
+.green-sea {
+  background-color: #16a085; }
+
+.emerald {
+  background-color: #2ecc71; }
+
+.nephritis {
+  background-color: #27ae60; }
+
+.peter-river {
+  background-color: #3498db; }
+
+.belize-hole {
+  background-color: #2980b9; }
+
+.amethyst {
+  background-color: #9b59b6; }
+
+.wisteria {
+  background-color: #8e44ad; }
+
+.wet-asphalt {
+  background-color: #34495e; }
+
+.midnight-blue {
+  background-color: #2c3e50; }
+
+.sun-flower {
+  background-color: #f1c40f; }
+
+.orange {
+  background-color: #f39c12; }
+
+.carrot {
+  background-color: #e67e22; }
+
+.pumpkin {
+  background-color: #d35400; }
+
+.alizarin {
+  background-color: #e74c3c; }
+
+.pomegranate {
+  background-color: #c0392b; }
+
+.clouds {
+  background-color: #ecf0f1; }
+
+.silver {
+  background-color: #bdc3c7; }
+
+.concrete {
+  background-color: #95a5a6; }
+
+.asbestos {
+  background-color: #7f8c8d; }
+
+.black {
+  background-color: #000000; }
+
+.white {
+  background-color: #ffffff; }
+
+.space svg {
+  overflow: hidden; }
+
+.space .position {
+  fill: #ffffff; }
+  .space .position.selected {
+    fill: steelblue; }
+
+.buttons .btn {
+  width: 90%;
+  margin: 5%; }
+
+.select {
+  color: #080808;
+  background-color: #ffffff;
+  font-size: 1.3rem;
+  line-height: 3rem;
+  height: 3rem; }
+
+#checkin .checkin-label {
+  margin: 0 auto;
+  background-color: #2980b9;
+  border-radius: 50%; }
+
+#checkin.portrait .checkin-label {
+  flex-basis: 160px;
+  height: 160px; }
+  #checkin.portrait .checkin-label p {
+    line-height: 160px; }
+
+#checkin.landscape .checkin-label {
+  flex-basis: 120px;
+  height: 120px; }
+  #checkin.landscape .checkin-label p {
+    line-height: 120px; }
+
+#loader .progress-wrap {
+  margin: 12px auto 0;
+  border: solid 1px white;
+  border-radius: 5px;
+  height: 10px;
+  overflow: hidden;
+  flex-basis: 80%; }
+
+#loader .progress-bar {
+  background-color: white;
+  height: 10px;
+  width: 0; }
+
+#survey {
+  /* Special styling for WebKit/Blink */
+  /* All the same stuff for Firefox */ }
+  #survey .section-center {
+    padding: 10px;
+    box-sizing: border-box; }
+  #survey .question {
+    width: 100%;
+    height: 100%; }
+  #survey .label {
+    text-align: left;
+    padding-bottom: 6px;
+    font-style: italic;
+    font-size: 1.1rem; }
+  #survey .answer {
+    font-size: 1rem;
+    position: relative;
+    padding: 8px 0 6px 0;
+    margin-bottom: 1px;
+    border-radius: 2px;
+    -webkit-transition: background-color 0.2s;
+    -moz-transition: background-color 0.2s;
+    -ms-transition: background-color 0.2s;
+    -o-transition: background-color 0.2s;
+    transition: background-color 0.2s; }
+    #survey .answer.radio, #survey .answer.checkbox {
+      padding-left: 50px; }
+    #survey .answer.selected {
+      background-color: rgba(255, 255, 255, 0.2); }
+    #survey .answer.radio:before {
+      content: '';
+      display: block;
+      position: absolute;
+      left: 10px;
+      width: 16px;
+      height: 16px;
+      background-color: transparent;
+      border-radius: 50%;
+      border: 1px solid white;
+      -webkit-transition: background-color 0.2s;
+      -moz-transition: background-color 0.2s;
+      -ms-transition: background-color 0.2s;
+      -o-transition: background-color 0.2s;
+      transition: background-color 0.2s; }
+    #survey .answer.radio.selected:before {
+      background-color: white; }
+    #survey .answer.checkbox:before {
+      content: '';
+      display: block;
+      position: absolute;
+      left: 10px;
+      width: 16px;
+      height: 16px;
+      background-color: transparent;
+      border-radius: 2px;
+      border: 1px solid white;
+      -webkit-transition: background-color 0.2s;
+      -moz-transition: background-color 0.2s;
+      -ms-transition: background-color 0.2s;
+      -o-transition: background-color 0.2s;
+      transition: background-color 0.2s; }
+    #survey .answer.checkbox.selected:before {
+      background-color: white; }
+  #survey input[type=range] {
+    -webkit-appearance: none;
+    /* Hides the slider so that custom slider can be made */
+    width: 100%;
+    /* Specific width is required for Firefox. */
+    background-color: transparent; }
+  #survey input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; }
+  #survey input[type=range]:focus {
+    outline: none;
+    /* Removes the blue border. You should probably do some kind of focus styling for accessibility reasons though. */ }
+  #survey input[type=range]::-ms-track {
+    width: 100%;
+    cursor: pointer;
+    background: transparent;
+    /* Hides the slider so custom styles can be added */
+    border-color: transparent;
+    color: transparent; }
+  #survey input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer;
+    margin-top: -17px;
+    /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */ }
+  #survey input[type=range]::-moz-range-thumb {
+    box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    background: #ffffff;
+    cursor: pointer; }
+  #survey input[type=range]::-webkit-slider-runnable-track {
+    height: 8px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 3px;
+    border: 0.2px solid #010101; }
+  #survey input[type=range]:focus::-webkit-slider-runnable-track {
+    background: rgba(255, 255, 255, 0.9); }
+  #survey input[type=range]::-moz-range-track {
+    height: 8px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 3px;
+    border: 0.2px solid #010101; }
+  #survey input[type=range].slider {
+    width: 100%;
+    margin: 20px 0;
+    float: left; }
+  #survey .textarea {
+    color: #080808;
+    padding: 10px; }
+  #survey .feedback {
+    font-size: 2rem;
+    display: block;
+    text-align: center; }
+  #survey .counter {
+    font-size: 2rem;
+    font-style: italic;
+    position: absolute;
+    top: 20px;
+    right: 20px; }
+  #survey .thanks {
+    font-size: 2rem; }
+  @media (min-width: 10px) and (orientation: portrait) {
+    #survey {
+      position: relative; }
+    #survey .counter {
+      position: relative;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 20px;
+      text-align: right; } }
+
+#control {
+  /* 2 for borders */
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 10px;
+  box-sizing: border-box;
+  /* -------------------------------------------
+   TITLE
+   ------------------------------------------- */
+  /* -------------------------------------------
+     SLIDER
+     ------------------------------------------- */
+  /* -------------------------------------------
+     NUMBER BOX
+     ------------------------------------------- */
+  /* -------------------------------------------
+     SELECT LIST
+     ------------------------------------------- */
+  /* -------------------------------------------
+     SELECT BUTTONS
+     ------------------------------------------- */
+  /* -------------------------------------------
+     INFOS
+     ------------------------------------------- */ }
+  #control h1 {
+    margin: 8px 0; }
+  #control .waves-basic-controllers {
+    width: 100%;
+    max-width: 800px;
+    height: 36px;
+    padding: 3px;
+    margin: 4px auto;
+    background-color: #242424;
+    border: 1px solid #282828;
+    box-sizing: border-box;
+    border-radius: 2px;
+    display: block;
+    color: #ffffff; }
+    #control .waves-basic-controllers .legend {
+      font: italic bold 14px Quicksand, arial, sans-serif;
+      line-height: 28px;
+      overflow: hidden;
+      text-align: right;
+      padding: 0 12px 0 0;
+      display: block;
+      box-sizing: border-box;
+      width: 24%;
+      float: left;
+      white-space: nowrap;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      -o-user-select: none;
+      user-select: none; }
+    #control .waves-basic-controllers .inner-wrapper {
+      display: -webkit-inline-flex;
+      display: inline-flex;
+      -webkit-flex-wrap: no-wrap;
+      flex-wrap: no-wrap;
+      width: 76%;
+      float: left; }
+  #control .waves-basic-controllers.small:not(.align-small) {
+    height: auto; }
+    #control .waves-basic-controllers.small:not(.align-small) .legend {
+      width: 100%;
+      float: none;
+      text-align: left; }
+    #control .waves-basic-controllers.small:not(.align-small) .inner-wrapper {
+      width: 100%;
+      float: none; }
+  #control .waves-basic-controllers.small.align-small .legend {
+    display: block;
+    margin-right: 20px;
+    text-align: left; }
+  #control .waves-basic-controllers.small.align-small .inner-wrapper {
+    display: inline-block;
+    width: auto; }
+  #control .waves-basic-controllers .arrow-right, #control .waves-basic-controllers .arrow-left {
+    border-radius: 2px;
+    width: 14px;
+    height: 28px;
+    cursor: pointer;
+    background-color: #464646; }
+    #control .waves-basic-controllers .arrow-right line, #control .waves-basic-controllers .arrow-left line {
+      stroke-width: 3px;
+      stroke: #ffffff; }
+    #control .waves-basic-controllers .arrow-right:hover, #control .waves-basic-controllers .arrow-left:hover {
+      background-color: #686868; }
+    #control .waves-basic-controllers .arrow-right:active, #control .waves-basic-controllers .arrow-left:active {
+      background-color: #909090; }
+  #control .waves-basic-controllers .toggle-element {
+    width: 28px;
+    height: 28px;
+    border-radius: 2px;
+    background-color: #464646;
+    cursor: pointer; }
+    #control .waves-basic-controllers .toggle-element:hover {
+      background-color: #686868; }
+    #control .waves-basic-controllers .toggle-element line {
+      stroke-width: 3px; }
+    #control .waves-basic-controllers .toggle-element .x {
+      display: none; }
+    #control .waves-basic-controllers .toggle-element.active .x {
+      display: block; }
+  #control .waves-basic-controllers .btn {
+    display: block;
+    text-align: center;
+    font: normal normal 12px arial;
+    text-decoration: none;
+    height: 28px;
+    line-height: 28px;
+    background-color: #464646;
+    border: none;
+    color: #ffffff;
+    margin: 0 4px 0 0;
+    padding: 0;
+    box-sizing: border-box;
+    border-radius: 2px;
+    cursor: pointer;
+    -webkit-flex-grow: 1;
+    flex-grow: 1; }
+    #control .waves-basic-controllers .btn:last-child {
+      margin: 0; }
+    #control .waves-basic-controllers .btn:hover {
+      background-color: #686868; }
+    #control .waves-basic-controllers .btn:active, #control .waves-basic-controllers .btn.active {
+      background-color: #909090; }
+    #control .waves-basic-controllers .btn:focus {
+      outline: none; }
+  #control .waves-basic-controllers .number {
+    height: 28px;
+    display: inline-block;
+    position: relative;
+    font: normal normal 14px Quicksand, arial, sans-serif;
+    vertical-align: top;
+    border: none;
+    background: none;
+    color: #ffffff;
+    padding: 0 4px;
+    margin: 0;
+    background-color: #2e2e2e;
+    border-radius: 2px;
+    box-sizing: border-box; }
+    #control .waves-basic-controllers .number:focus {
+      outline: none; }
+  #control .waves-basic-controllers select {
+    height: 28px;
+    line-height: 28px;
+    background-color: #2e2e2e;
+    border-radius: 2px;
+    border: none;
+    vertical-align: top;
+    padding: 0;
+    margin: 0; }
+    #control .waves-basic-controllers select:focus {
+      outline: none; }
+  #control .waves-basic-controllers input[type=text] {
+    width: 100%;
+    height: 28px;
+    line-height: 28px;
+    border: 0;
+    padding: 0 4px;
+    background-color: #2e2e2e;
+    border-radius: 2px;
+    color: #cdcdcd; }
+  #control .waves-basic-controllers.title {
+    border: none !important;
+    margin-bottom: 0;
+    margin-top: 8px;
+    padding-top: 8px;
+    padding-bottom: 0;
+    background-color: transparent !important;
+    height: 25px; }
+    #control .waves-basic-controllers.title .legend {
+      font: normal bold 15px Quicksand, arial, sans-serif;
+      height: 100%;
+      overflow: hidden;
+      text-align: left;
+      padding: 0;
+      width: 100%;
+      box-sizing: border-box;
+      -webkit-flex-grow: 1;
+      flex-grow: 1; }
+  #control .waves-basic-controllers.slider .range {
+    height: 28px;
+    display: inline-block;
+    margin: 0;
+    -webkit-flex-grow: 4;
+    flex-grow: 4; }
+  #control .waves-basic-controllers.slider .number-wrapper {
+    display: inline;
+    height: 28px;
+    text-align: right;
+    -webkit-flex-grow: 3;
+    flex-grow: 3; }
+    #control .waves-basic-controllers.slider .number-wrapper .number {
+      left: 5px;
+      width: 54px;
+      text-align: right; }
+    #control .waves-basic-controllers.slider .number-wrapper .unit {
+      font: italic normal 14px Quicksand, arial, sans-serif;
+      line-height: 28px;
+      height: 28px;
+      width: 30px;
+      display: inline-block;
+      position: relative;
+      padding-left: 5px;
+      padding-right: 5px;
+      color: #cdcdcd; }
+      #control .waves-basic-controllers.slider .number-wrapper .unit sup {
+        line-height: 7px; }
+  #control .waves-basic-controllers.slider.slider-large .range {
+    -webkit-flex-grow: 50;
+    flex-grow: 50; }
+  #control .waves-basic-controllers.slider.slider-large .number-wrapper {
+    -webkit-flex-grow: 1;
+    flex-grow: 1; }
+  #control .waves-basic-controllers.slider.slider-small .range {
+    -webkit-flex-grow: 1;
+    flex-grow: 1; }
+  #control .waves-basic-controllers.slider.slider-small .number-wrapper {
+    -webkit-flex-grow: 7;
+    flex-grow: 7; }
+  #control .waves-basic-controllers.number-box .number {
+    width: 120px;
+    margin: 0 10px;
+    vertical-align: top; }
+  #control .waves-basic-controllers.select-list select {
+    margin: 0 10px;
+    width: 120px;
+    font: normal normal 14px Quicksand, arial, sans-serif;
+    color: #ffffff; }
+  #control .waves-basic-controllers.select-buttons .btn:first-of-type {
+    margin-left: 4px; }
+  #control .waves-basic-controllers.info input[type=text] {
+    font: normal normal 14px Quicksand, arial, sans-serif;
+    color: #ffffff; }

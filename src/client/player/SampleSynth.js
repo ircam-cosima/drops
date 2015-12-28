@@ -1,9 +1,9 @@
 import clientSide from 'soundworks/client';
 const audioContext = clientSide.audioContext;
 
-function cent2lin(cent) {
-  return Math.pow(2, cent / 1200);
-}
+// function cent2lin(cent) {
+//   return Math.pow(2, cent / 1200);
+// }
 
 export default class SampleSynth {
   constructor(audioBuffers) {
@@ -41,7 +41,6 @@ export default class SampleSynth {
       const y = params.y || 0.5;
 
       const index = Math.floor((1 - y) * 12);
-
       const b1 = audioBuffers[2 * index];
       duration += (1 - x) * b1.duration;
 

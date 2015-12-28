@@ -1,127 +1,35 @@
 import soundworks from 'soundworks/client';
-import waves from 'waves-audio';
 import SampleSynth from './SampleSynth';
-import visual from './visual/main';
+import Looper from './Looper';
+import Renderer from './visual/Renderer';
 
 const input = soundworks.input;
-
-const scheduler = waves.getScheduler();
-scheduler.lookahead = 0.050;
-
-function arrayRemove(array, value) {
-  const index = array.indexOf(value);
-
-  if (index >= 0) {
-    array.splice(index, 1);
-    return true;
-  }
-
-  return false;
-}
-
-function changeBackgroundColor(d) {
-  const value = Math.floor(Math.max(1 - d, 0) * 255);
-  document.body.style.backgroundColor = 'rgb(' + value + ', ' + value + ', ' + value + ')';
-}
-
-class Loop extends waves.TimeEngine {
-  constructor(looper, soundParams, local = false) {
-    super();
-    this.looper = looper;
-
-    this.soundParams = soundParams;
-    this.local = local;
-  }
-
-  advanceTime(time) {
-    return this.looper.advance(time, this);
-  }
-}
-
-class Looper {
-  constructor(synth, updateCount) {
-    this.synth = synth;
-    this.updateCount = updateCount;
-
-    this.loops = [];
-    this.numLocalLoops = 0;
-  }
-
-  start(time, soundParams, local = false) {
-    const loop = new Loop(this, soundParams, local);
-    scheduler.add(loop, time);
-    this.loops.push(loop);
-
-    if (local)
-      this.numLocalLoops++;
-
-    this.updateCount();
-  }
-
-  advance(time, loop) {
-    const soundParams = loop.soundParams;
-
-    if (soundParams.gain < soundParams.minGain) {
-      arrayRemove(this.loops, loop);
-
-      if (loop.local)
-        this.numLocalLoops--;
-
-      this.updateCount();
-
-      return null;
-    }
-
-    const duration = this.synth.trigger(time, soundParams, !loop.local);
-
-    visual.createCircle({
-      index: soundParams.index,
-      x: soundParams.x,
-      y: soundParams.y,
-      duration: duration,
-      velocity: 40 + soundParams.gain * 80,
-      opacity: Math.sqrt(soundParams.gain)
-    });
-
-    soundParams.gain *= soundParams.loopAttenuation;
-
-    return time + soundParams.loopPeriod;
-  }
-
-  remove(index) {
-    const loops = this.loops;
-    let i = 0;
-
-    while (i < loops.length) {
-      const loop = loops[i];
-
-      if (loop.soundParams.index === index) {
-        loops.splice(i, 1);
-
-        scheduler.remove(loop);
-
-        if (loop.local) {
-          this.numLocalLoops--;
-          visual.remove(index);
-        }
-      } else {
-        i++;
-      }
-    }
-
-    this.updateCount();
-  }
-
-  removeAll() {
-    for (let loop of this.loops)
-      scheduler.remove(loop);
-
-    this.loops = [];
-    this.numLocalLoops = 0;
-
-    this.updateCount();
-  }
-}
+const template = `
+  <canvas class="background"></canvas>
+  <div class="foreground">
+    <div class="section-top flex-middle"></div>
+    <div class="section-center flex-center">
+    <% if (message) { %>
+      <p><%= message %></p>
+    <% } else { %>
+      <p>
+      <% if (numAvailable > 0) { %>
+        You have<br />
+        <% if (numAvailable === maxDrops) { %>
+          <span class="huge"><%= numAvailable %></span>
+        <% } else { %>
+          <span class="huge"><%= numAvailable %> of <%= maxDrops %></span>
+        <% } %>
+        <br /><%= (numAvailable === 1) ? 'drop' : 'drops' %> to play
+      <% } else { %>
+        <span class="big">Listen!</span>
+      <% } %>
+      </p>
+    <% } %>
+    </div>
+    <div class="section-bottom flex-middle"></div>
+  </div>
+`;
 
 export default class Performance extends soundworks.ClientPerformance {
   constructor(loader, control, sync, checkin) {
@@ -148,11 +56,25 @@ export default class Performance extends soundworks.ClientPerformance {
     this.quantize = 0;
     this.numLocalLoops = 0;
 
-    this.looper = new Looper(this.synth, () => {
+    this.renderer = new Renderer();
+
+    this.looper = new Looper(this.synth, this.renderer, () => {
       this.updateCount();
     });
 
-    //this.view = this.createDefaultView();
+    this.init();
+  }
+
+  init() {
+    this.template = template;
+    this.viewCtor = soundworks.display.CanvasView;
+    this.content = {
+      message: '',
+      maxDrop: 0,
+      numAvailable: 0,
+    }
+
+    this.view = this.createDefaultView();
   }
 
   trigger(x, y) {
@@ -167,7 +89,7 @@ export default class Performance extends soundworks.ClientPerformance {
       minGain: this.minGain
     };
 
-    let time = scheduler.currentTime;
+    let time = this.looper.scheduler.currentTime;
     let serverTime = this.sync.getSyncTime(time);
 
     // quantize
@@ -191,50 +113,44 @@ export default class Performance extends soundworks.ClientPerformance {
   }
 
   updateCount() {
-    let str = '';
+    this.content.maxDrops = this.maxDrops;
+    this.content.message = undefined;
 
     if (this.state === 'reset') {
-      str = `<p>Waiting for<br>everybody<br>getting ready…</p>`;
+      this.content.message = 'Waiting for<br>everybody<br>getting ready…';
     } else if (this.state === 'end' && this.looper.loops.length === 0) {
-      str = `<p>That's all.<br>Thanks!</p>`;
+      this.content.message = `That's all.<br>Thanks!`;
     } else {
-      const numAvailable = Math.max(0, this.maxDrops - this.looper.numLocalLoops);
-
-      if (numAvailable > 0) {
-        str = `<p>You have</p>`;
-
-        if (numAvailable === this.maxDrops) {
-          if (numAvailable === 1)
-            str += `<p class="big">1</p><p>drop to play</p>`;
-          else
-            str += `<p class="big">${numAvailable}</p><p>drops to play</p>`;
-        } else
-          str += `<p class="big">${numAvailable} of ${this.maxDrops}</p><p>drops to play</p>`;
-      } else
-        str = `<p class="listen">Listen!</p>`;
+      this.content.numAvailable = Math.max(0, this.maxDrops - this.looper.numLocalLoops);
     }
 
-    //this.view.innerHTML = str;
+    this.view.render('.section-center');
   }
 
   updateControlParameters() {
-    const events = this.control.events;
+    // const controlUnits = this.control.controlUnits;
+    const control = this.control;
 
-    if (events.state.value !== this.state || events.maxDrops.value !== this.maxDrops) {
-      this.state = events.state.value;
-      this.maxDrops = events.maxDrops.value;
+    const state = control.getValue('state');
+    const maxDrops = control.getValue('maxDrops');
+
+    if (state !== this.state || maxDrops !== this.maxDrops) {
+      this.state = state;
+      this.maxDrops = maxDrops;
       this.updateCount();
     }
 
-    this.loopDiv = events.loopDiv.value;
-    this.loopPeriod = events.loopPeriod.value;
-    this.loopAttenuation = events.loopAttenuation.value;
-    this.minGain = events.minGain.value;
+    this.loopDiv = control.getValue('loopDiv');
+    this.loopPeriod = control.getValue('loopPeriod');
+    this.loopAttenuation = control.getValue('loopAttenuation');
+    this.minGain = control.getValue('minGain');
 
-    if (this.autoPlay != 'manual' && events.autoPlay != this.autoPlay) {
-      this.autoPlay = events.autoPlay.value;
+    const autoPlay = control.getValue('autoPlay')
 
-      if (events.autoPlay.value === 'on') {
+    if (this.autoPlay !== 'manual' && autoPlay !== this.autoPlay) {
+      this.autoPlay = autoPlay;
+
+      if (autoPlay === 'on') {
         this.autoTrigger();
         this.autoClear();
       }
@@ -266,13 +182,8 @@ export default class Performance extends soundworks.ClientPerformance {
   start() {
     super.start();
 
-    const canvas = document.createElement('canvas');
-    canvas.classList.add('scene');
-    canvas.setAttribute('id', 'scene');
-    this.$container.appendChild(canvas);
-
     this.control.on('update', (name, val) => {
-      if(name === 'clear')
+      if (name === 'clear')
         this.looper.removeAll();
       else
         this.updateControlParameters();
@@ -293,15 +204,10 @@ export default class Performance extends soundworks.ClientPerformance {
     // setup input listeners
     input.on('touchstart', (data) => {
       if (this.state === 'running' && this.looper.numLocalLoops < this.maxDrops) {
-        const boundingRect = canvas.getBoundingClientRect();
-
-        const relX = data.coordinates[0] - boundingRect.left;
-        const relY = data.coordinates[1] - boundingRect.top;
-        const normX = relX / boundingRect.width;
-        const normY = relY / boundingRect.height;
-
-        // const x = (data.coordinates[0] - this.$container.offsetLeft + window.scrollX) / this.$container.offsetWidth;
-        // const y = (data.coordinates[1] - this.$container.offsetTop + window.scrollY) / this.$container.offsetHeight;
+        const coords = data.coordinates;
+        const { left, top, width, height } = this.view.$el.getBoundingClientRect();
+        const normX = (coords[0] - left) / width;
+        const normY = (coords[1] - top) / height;
 
         this.trigger(normX, normY);
       }
@@ -322,14 +228,21 @@ export default class Performance extends soundworks.ClientPerformance {
     this.index = this.checkin.index;
 
     this.updateControlParameters();
-
-    visual.start();
-
     this.updateCount();
 
+    // init canvas rendering
+    this.view.setPreRender((ctx) => {
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, ctx.width, ctx.height);
+    });
+
+    this.view.addRenderer(this.renderer);
+
+    // init inputs
     input.enableTouch(this.$container);
     input.enableDeviceMotion();
 
+    // init synth buffers
     this.synth.audioBuffers = this.loader.buffers;
 
     // for testing

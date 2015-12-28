@@ -1,0 +1,12 @@
+// Define mixins and variables
+@import '01-definitions';
+// Define some global layout variables (background-color, text-color, etc...)
+// and small class helpers (.small, .big for font sizes, .btn, etc..)
+@import '02-commons';
+// Modules specific styles
+@import '03-modules';
+// Import and overrides `wavesjs/basic-controllers` sass files,
+// rendering of the controls can be configured though variables here
+@import '04-controls';
+// Application specific styling and overriding
+@import 'overrides';

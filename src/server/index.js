@@ -1,7 +1,5 @@
 // Soundworks library
 import soundworks from 'soundworks/server';
-import express from 'express';
-import path from 'path';
 
 /**
  *  Control
@@ -30,7 +28,7 @@ class DropsPerformance extends soundworks.ServerPerformance {
     super();
 
     this.control = control;
-  }excludeClient
+  }
 
   enter(client) {
     super.enter(client);
