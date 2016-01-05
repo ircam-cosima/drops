@@ -9,8 +9,10 @@ const template = `
   <div class="foreground">
     <div class="section-top flex-middle"></div>
     <div class="section-center flex-center">
-    <% if (message) { %>
-      <p><%= message %></p>
+    <% if (state === 'reset') { %>
+      <p>Waiting for<br>everybody<br>getting ready…</p>
+    <% } else if (state === 'end') { %>
+      <p>That's all.<br>Thanks!</p>
     <% } else { %>
       <p>
       <% if (numAvailable > 0) { %>
@@ -69,12 +71,12 @@ export default class Performance extends soundworks.ClientPerformance {
     this.template = template;
     this.viewCtor = soundworks.display.CanvasView;
     this.content = {
-      message: '',
+      state: this.state,
       maxDrop: 0,
       numAvailable: 0,
     }
 
-    this.view = this.createDefaultView();
+    this.view = this.createView();
   }
 
   trigger(x, y) {
@@ -117,10 +119,11 @@ export default class Performance extends soundworks.ClientPerformance {
     this.content.message = undefined;
 
     if (this.state === 'reset') {
-      this.content.message = 'Waiting for<br>everybody<br>getting ready…';
+      this.content.state = 'reset';
     } else if (this.state === 'end' && this.looper.loops.length === 0) {
-      this.content.message = `That's all.<br>Thanks!`;
+      this.content.state = 'end';
     } else {
+      this.content.state = this.state;
       this.content.numAvailable = Math.max(0, this.maxDrops - this.looper.numLocalLoops);
     }
 

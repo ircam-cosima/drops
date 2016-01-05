@@ -1,6 +1,6 @@
 {
   "name": "drops",
-    "authors": [
+  "authors": [
     "Norbert Schnell",
     "Sébastien Robaszkiewicz"
   ],
@@ -15,6 +15,7 @@
     "babel-runtime": "^5.8.34",
     "d3-scale-linear": "0.0.0",
     "soundworks": "collective-soundworks/soundworks#0.5.0",
+    "source-map-support": "^0.4.0",
     "waves-audio": "wavesjs/audio"
   },
   "devDependencies": {

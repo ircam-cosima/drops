@@ -8,9 +8,10 @@ window.addEventListener('load', () => {
   client.init('conductor');
   const control = new Control({ hasGui: true });
 
-  control.configureGui('state', { type: 'buttons' });
-  control.configureGui('loopAttenuation', { type: 'slider', size: 'large' });
-  control.configureGui('minGain', { type: 'slider', size: 'large' });
+  control.setGuiOptions('state', { type: 'buttons' });
+  control.setGuiOptions('loopAttenuation', { type: 'slider', size: 'large' });
+  control.setGuiOptions('minGain', { type: 'slider', size: 'large' });
+  control.setGuiOptions('clear', { confirm: true });
 
   client.start(control);
 });

@@ -1,3 +1,4 @@
+import 'source-map-support/register';
 // Soundworks library
 import soundworks from 'soundworks/server';
 
