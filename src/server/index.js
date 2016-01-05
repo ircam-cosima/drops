@@ -10,13 +10,13 @@ class DropsControl extends soundworks.ServerControl {
     super();
 
     this.addInfo('numPlayers', 'num players', 0, ['conductor']);
-    this.addSelect('state', 'state', ['reset', 'running', 'end'], 'reset');
+    this.addEnum('state', 'state', ['reset', 'running', 'end'], 'reset');
     this.addNumber('maxDrops', 'max drops', 0, 100, 1, 1);
     this.addNumber('loopDiv', 'loop div', 1, 100, 1, 3);
     this.addNumber('loopPeriod', 'loop period', 1, 30, 0.1, 7.5);
     this.addNumber('loopAttenuation', 'loop atten', 0, 1, 0.01, 0.71);
     this.addNumber('minGain', 'min gain', 0, 1, 0.01, 0.1);
-    this.addSelect('autoPlay', 'auto play', ['off', 'on'], 'off');
+    this.addEnum('autoPlay', 'auto play', ['off', 'on'], 'off');
     this.addCommand('clear', 'clear', ['conductor', 'player']);
   }
 }
