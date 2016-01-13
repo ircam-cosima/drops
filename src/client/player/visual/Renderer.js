@@ -25,15 +25,14 @@ export default class Renderer extends soundworks.display.Renderer {
     }
   }
 
-  createCircle(options) {
-    const circle = new Circle(options);
+  createCircle(id, x, y, options) {
+    const circle = new Circle(id, x, y, options);
     this.circles.push(circle);
-    return circle.id;
   }
 
-  remove(index) {
+  remove(id) {
     this.circles.forEach((circle) => {
-      if (circle.index === index)
+      if (circle.id === id)
         circle.isDead = true;
     });
   }

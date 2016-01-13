@@ -66,13 +66,11 @@ export default class Looper {
 
     const duration = this.synth.trigger(time, soundParams, !loop.local);
 
-    this.renderer.createCircle({
-      index: soundParams.index,
-      x: soundParams.x,
-      y: soundParams.y,
+    this.renderer.createCircle(soundParams.index, soundParams.x, soundParams.y, {
+      color: soundParams.index,
+      opacity: Math.sqrt(soundParams.gain),
       duration: duration,
       velocity: 40 + soundParams.gain * 80,
-      opacity: Math.sqrt(soundParams.gain)
     });
 
     soundParams.gain *= soundParams.loopAttenuation;

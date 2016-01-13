@@ -15,21 +15,16 @@ const colorMap = [
   '#CAFA79', '#FFFF64', '#FF9EFF', '#007AFF'
 ];
 
-
-let idCounter = 0;
 let colors = '';
 
 export default class Circle {
+  constructor(id, x, y, options) {
+    this.id = id;
+    this.x = x;
+    this.y = y;
 
-  constructor(options) {
-    this.id = idCounter;
-    // increment idCounter
-    idCounter += 1;
-
-    this.x = options.x || 0.5; // 0-1
-    this.y = options.y || 0.5; // 0.1
     this.opacity = options.opacity || 1;
-    this.index = options.index || 0;
+    this.color = colorMap[(options.color || 0) % colorMap.length];
 
     this.growthVelocity = options.velocity || 50; // pixels / sec
     this.minVelocity = 50; // if gain is < 0.25 => constant growth
@@ -37,18 +32,8 @@ export default class Circle {
 
     this.setDuration(options.duration);
 
-    // // generate colorMpas
-    // this.color = getRandomColor();
-    // if (idCounter < 20) {
-    //   colors += ', "' + this.color + '"';
-    // } else if (idCounter == 20) {
-    //   console.log(colors);
-    // }
-
-    this.color = colorMap[this.index % colorMap.length];
     this.radius = 0;
     this.coordinates = {};
-    // console.log(this.index, this.color);
     this.isDead = false;
   }
 

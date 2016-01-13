@@ -3,7 +3,9 @@ import SampleSynth from './SampleSynth';
 import Looper from './Looper';
 import Renderer from './visual/Renderer';
 
+const client = soundworks.client;
 const input = soundworks.input;
+
 const template = `
   <canvas class="background"></canvas>
   <div class="foreground">
@@ -43,7 +45,6 @@ export default class Performance extends soundworks.ClientPerformance {
     this.control = control;
     this.synth = new SampleSynth(null);
 
-    this.index = -1;
     this.numTriggers = 6;
 
     // control parameters
@@ -81,7 +82,7 @@ export default class Performance extends soundworks.ClientPerformance {
 
   trigger(x, y) {
     const soundParams = {
-      index: this.index,
+      index: this.checkin.index,
       gain: 1,
       x: x,
       y: y,
@@ -105,13 +106,11 @@ export default class Performance extends soundworks.ClientPerformance {
   }
 
   clear() {
-    const index = this.index;
-
     // remove at own looper
-    this.looper.remove(index, true);
+    this.looper.remove(this.checkin.index, true);
 
     // remove at other players
-    this.send('clear', index);
+    this.send('clear');
   }
 
   updateCount() {
@@ -128,36 +127,6 @@ export default class Performance extends soundworks.ClientPerformance {
     }
 
     this.view.render('.section-center');
-  }
-
-  updateControlParameters() {
-    // const controlUnits = this.control.controlUnits;
-    const control = this.control;
-
-    const state = control.getValue('state');
-    const maxDrops = control.getValue('maxDrops');
-
-    if (state !== this.state || maxDrops !== this.maxDrops) {
-      this.state = state;
-      this.maxDrops = maxDrops;
-      this.updateCount();
-    }
-
-    this.loopDiv = control.getValue('loopDiv');
-    this.loopPeriod = control.getValue('loopPeriod');
-    this.loopAttenuation = control.getValue('loopAttenuation');
-    this.minGain = control.getValue('minGain');
-
-    const autoPlay = control.getValue('autoPlay')
-
-    if (this.autoPlay !== 'manual' && autoPlay !== this.autoPlay) {
-      this.autoPlay = autoPlay;
-
-      if (autoPlay === 'on') {
-        this.autoTrigger();
-        this.autoClear();
-      }
-    }
   }
 
   autoTrigger() {
@@ -182,15 +151,44 @@ export default class Performance extends soundworks.ClientPerformance {
     }
   }
 
+  setState(state) {
+    if (state !== this.state) {
+      this.state = state;
+      this.updateCount();
+    }
+  }
+
+  setMaxDrops(maxDrops) {
+    if (maxDrops !== this.maxDrops) {
+      this.maxDrops = maxDrops;
+      this.updateCount();
+    }
+  }
+
+  setAutoPlay(autoPlay) {
+    if (this.autoPlay !== 'manual' && autoPlay !== this.autoPlay) {
+      this.autoPlay = autoPlay;
+
+      if (autoPlay === 'on') {
+        this.autoTrigger();
+        this.autoClear();
+      }
+    }
+  }
+
   start() {
     super.start();
 
-    this.control.on('update', (name, val) => {
-      if (name === 'clear')
-        this.looper.removeAll();
-      else
-        this.updateControlParameters();
-    });
+    const control = this.control;
+    control.addUnitListener('state', (state) => this.setState(state));
+    control.addUnitListener('maxDrops', (maxDrops) => this.setMaxDrops(maxDrops));
+    control.addUnitListener('loopDiv', (loopDiv) => this.loopDiv = loopDiv);
+    control.addUnitListener('loopPeriod', (loopPeriod) => this.loopPeriod = loopPeriod);
+    control.addUnitListener('loopAttenuation', (loopAttenuation) => this.loopAttenuation = loopAttenuation);
+    control.addUnitListener('minGain', (minGain) => this.minGain = minGain);
+    control.addUnitListener('loopPeriod', (loopPeriod) => this.loopPeriod = loopPeriod);
+    control.addUnitListener('autoPlay', (autoPlay) => this.setAutoPlay(autoPlay));
+    control.addUnitListener('clear', () => this.looper.removeAll());
 
     input.on('devicemotion', (data) => {
       const accX = data.accelerationIncludingGravity.x;
@@ -227,11 +225,6 @@ export default class Performance extends soundworks.ClientPerformance {
     this.receive('clear', (index) => {
       this.looper.remove(index);
     });
-
-    this.index = this.checkin.index;
-
-    this.updateControlParameters();
-    this.updateCount();
 
     // init canvas rendering
     this.view.setPreRender((ctx) => {
