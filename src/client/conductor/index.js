@@ -11,7 +11,7 @@ window.addEventListener('load', () => {
   control.setGuiOptions('state', { type: 'buttons' });
   control.setGuiOptions('loopAttenuation', { type: 'slider', size: 'large' });
   control.setGuiOptions('minGain', { type: 'slider', size: 'large' });
-  control.setGuiOptions('clear', { confirm: true });
+  control.setGuiOptions('clear');
 
   client.start(control);
 });
