@@ -1,25 +1,29 @@
-<!doctype html5>
+<!DOCTYPE html>
 <html>
   <head>
     <!-- settings -->
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
 
     <!-- title -->
     <title>
       <%= appName %>
       <% if (clientType !== defaultType) { %>| <%= clientType %><% } %>
     </title>
+
+    <!-- stylesheets -->
+    <link rel="stylesheet" href="<%= assetsDomain %>css/main.css">
   </head>
 
   <body>
     <div id="container" class="container"></div>
 
     <script>
-    window.SOCKET_CONFIG = JSON.parse('<%- socketIO %>');
+    window.CONFIG = {};
+    window.CONFIG.SOCKET_CONFIG = JSON.parse('<%- socketIO %>');
+    window.CONFIG.APP_NAME = '<%- appName %>';
     </script>
-    <!-- stylesheets -->
-    <link rel="stylesheet" href="<%= assetsDomain %>css/main.css">
+
     <script src="<%= assetsDomain %>js/<%= clientType %>.js"></script>
   </body>
 </html>

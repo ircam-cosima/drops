@@ -79,6 +79,8 @@ ol, ul {
   list-style: none; }
 
 html, body {
+  width: 100%;
+  height: 100%;
   background-color: #080808; }
 
 body {
@@ -109,14 +111,18 @@ p {
 .flex-center, .flex-middle {
   box-sizing: border-box;
   padding: 10px;
-  display: flex; }
+  display: flex;
+  display: -webkit-flex;
+  /* Safari */ }
   .flex-center > *, .flex-middle > * {
     text-align: center;
     flex-basis: 100%;
+    -webkit-flex-basis: 100%;
     width: 100%; }
 
 .flex-middle {
-  align-items: center; }
+  align-items: center;
+  -webkit-align-items: center; }
 
 .huge {
   font-size: 3rem; }
@@ -244,10 +250,19 @@ p, .normal {
 .space svg {
   overflow: hidden; }
 
-.space .position {
+.space .point {
   fill: #ffffff; }
-  .space .position.selected {
+  .space .point.selected {
     fill: steelblue; }
+
+.space .line {
+  stroke: #ffffff;
+  stroke-width: 1px; }
+  .space .line.arrow {
+    marker-mid: url(#marker-arrow); }
+
+.space .marker-arrow {
+  fill: #ffffff; }
 
 .buttons .btn {
   width: 90%;

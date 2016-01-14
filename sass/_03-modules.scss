@@ -7,14 +7,33 @@
     overflow: hidden;
   }
 
-  .position {
+  .point {
     fill: $foregroundColor;
 
     &.selected {
       fill: steelblue
     }
   }
+
+  .line {
+    stroke: $foregroundColor;
+    stroke-width: 1px;
+
+    &.arrow {
+      marker-mid: url(#marker-arrow);
+    }
+  }
+
+  // .marker-circle {
+  //   stroke: none;
+  //   fill: $foregroundColor;
+  // }
+
+  .marker-arrow {
+    fill: $foregroundColor;
+  }
 }
+
 
 .buttons {
   .btn {
