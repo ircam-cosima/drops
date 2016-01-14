@@ -38,7 +38,7 @@ class DropsPerformance extends soundworks.ServerPerformance {
     client.modules.performance.echoPlayers = [];
 
     this.receive(client, 'sound', (time, soundParams) => {
-      const playerList = this.checkin.clients;
+      const playerList = this.clients;
       const playerListLength = playerList.length;
       let numEchoPlayers = soundParams.loopDiv - 1;
 
@@ -46,7 +46,7 @@ class DropsPerformance extends soundworks.ServerPerformance {
         numEchoPlayers = playerListLength - 1;
 
       if (numEchoPlayers > 0) {
-        const index = client.modules.checkin.index;
+        const index = this.clients.indexOf(client);
         const echoPlayers = client.modules.performance.echoPlayers;
         const echoPeriod = soundParams.loopPeriod / soundParams.loopDiv;
         const echoAttenuation = Math.pow(soundParams.loopAttenuation, 1 / soundParams.loopDiv);
@@ -56,14 +56,11 @@ class DropsPerformance extends soundworks.ServerPerformance {
           const echoPlayerIndex = (index + i) % playerListLength;
           const echoPlayer = playerList[echoPlayerIndex];
 
-          if(echoPlayer) {
-            echoPlayers.push(echoPlayer);
+          echoPlayers.push(echoPlayer);
+          echoDelay += echoPeriod;
+          soundParams.gain *= echoAttenuation;
 
-            echoDelay += echoPeriod;
-            soundParams.gain *= echoAttenuation;
-
-            this.send(echoPlayer, 'echo', time + echoDelay, soundParams);
-          }
+          this.send(echoPlayer, 'echo', time + echoDelay, soundParams);
         }
       }
     });
@@ -86,7 +83,7 @@ class DropsPerformance extends soundworks.ServerPerformance {
     const echoPlayers = client.modules.performance.echoPlayers;
 
     for (let i = 0; i < echoPlayers.length; i++)
-      this.send(echoPlayers[i], 'clear', client.modules.checkin.index);
+      this.send(echoPlayers[i], 'clear', client.uid);
 
     client.modules.performance.echoPlayers = [];
   }

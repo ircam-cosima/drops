@@ -82,7 +82,7 @@ export default class Performance extends soundworks.ClientPerformance {
 
   trigger(x, y) {
     const soundParams = {
-      index: this.checkin.index,
+      index: client.uid,
       gain: 1,
       x: x,
       y: y,
@@ -107,7 +107,7 @@ export default class Performance extends soundworks.ClientPerformance {
 
   clear() {
     // remove at own looper
-    this.looper.remove(this.checkin.index, true);
+    this.looper.remove(client.uid, true);
 
     // remove at other players
     this.send('clear');

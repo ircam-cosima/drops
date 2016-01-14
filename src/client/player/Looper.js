@@ -1,6 +1,6 @@
-import waves from 'waves-audio';
+import soundworks from 'soundworks/client';
 
-const scheduler = waves.getScheduler();
+const scheduler = soundworks.audio.getScheduler();
 scheduler.lookahead = 0.050;
 
 function arrayRemove(array, value) {
@@ -14,7 +14,7 @@ function arrayRemove(array, value) {
   return false;
 }
 
-class Loop extends waves.TimeEngine {
+class Loop extends soundworks.audio.TimeEngine {
   constructor(looper, soundParams, local = false) {
     super();
     this.looper = looper;
