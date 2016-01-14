@@ -486,7 +486,7 @@ p, .normal {
     display: block;
     color: #ffffff; }
     #control .waves-basic-controllers .legend {
-      font: italic bold 14px Quicksand, arial, sans-serif;
+      font: italic normal 14px Quicksand, arial, sans-serif;
       line-height: 28px;
       overflow: hidden;
       text-align: right;
@@ -645,7 +645,8 @@ p, .normal {
     #control .waves-basic-controllers.slider .number-wrapper .number {
       left: 5px;
       width: 54px;
-      text-align: right; }
+      text-align: right;
+      font: normal normal 10px Quicksand, arial, sans-serif; }
     #control .waves-basic-controllers.slider .number-wrapper .unit {
       font: italic normal 14px Quicksand, arial, sans-serif;
       line-height: 28px;
