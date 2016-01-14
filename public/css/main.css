@@ -621,7 +621,7 @@ p, .normal {
     padding-top: 8px;
     padding-bottom: 0;
     background-color: transparent !important;
-    height: 25px; }
+    height: 30px !important; }
     #control .waves-basic-controllers.title .legend {
       font: normal bold 15px Quicksand, arial, sans-serif;
       height: 100%;
