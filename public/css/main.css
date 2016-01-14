@@ -524,6 +524,8 @@ p, .normal {
   #control .waves-basic-controllers.small.align-small .inner-wrapper {
     display: inline-block;
     width: auto; }
+  #control .waves-basic-controllers.small.buttons .legend {
+    display: none; }
   #control .waves-basic-controllers .arrow-right, #control .waves-basic-controllers .arrow-left {
     border-radius: 2px;
     width: 14px;
