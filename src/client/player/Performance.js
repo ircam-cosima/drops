@@ -5,6 +5,8 @@ import Renderer from './visual/Renderer';
 
 const client = soundworks.client;
 const input = soundworks.input;
+const motionInput = soundworks.motionInput;
+const TouchSurface = soundworks.display.TouchSurface;
 
 const template = `
   <canvas class="background"></canvas>
@@ -190,28 +192,29 @@ export default class Performance extends soundworks.ClientPerformance {
     control.addUnitListener('autoPlay', (autoPlay) => this.setAutoPlay(autoPlay));
     control.addUnitListener('clear', () => this.looper.removeAll());
 
-    input.on('devicemotion', (data) => {
-      const accX = data.accelerationIncludingGravity.x;
-      const accY = data.accelerationIncludingGravity.y;
-      const accZ = data.accelerationIncludingGravity.z;
-      const mag = Math.sqrt(accX * accX + accY * accY + accZ * accZ);
+    motionInput
+      .init('accelerationIncludingGravity')
+      .then((modules) => {
+        if (modules[0].isValid) {
+          motionInput.addListener('accelerationIncludingGravity', (data) => {
+            const accX = data[0];
+            const accY = data[1];
+            const accZ = data[2];
+            const mag = Math.sqrt(accX * accX + accY * accY + accZ * accZ);
 
-      if (mag > 20) {
-        this.clear();
-        this.autoPlay = 'manual';
-      }
-    });
+            if (mag > 20) {
+              this.clear();
+              this.autoPlay = 'manual';
+            }
+          });
+        }
+      });
 
+    const surface = new TouchSurface(this.view.$el);
     // setup input listeners
-    input.on('touchstart', (data) => {
-      if (this.state === 'running' && this.looper.numLocalLoops < this.maxDrops) {
-        const coords = data.coordinates;
-        const { left, top, width, height } = this.view.$el.getBoundingClientRect();
-        const normX = (coords[0] - left) / width;
-        const normY = (coords[1] - top) / height;
-
+    surface.addListener('touchstart', (id, normX, normY) => {
+      if (this.state === 'running' && this.looper.numLocalLoops < this.maxDrops)
         this.trigger(normX, normY);
-      }
 
       this.autoPlay = 'manual';
     });
@@ -233,10 +236,6 @@ export default class Performance extends soundworks.ClientPerformance {
     });
 
     this.view.addRenderer(this.renderer);
-
-    // init inputs
-    input.enableTouch(this.$container);
-    input.enableDeviceMotion();
 
     // init synth buffers
     this.synth.audioBuffers = this.loader.buffers;
