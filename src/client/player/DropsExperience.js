@@ -4,8 +4,6 @@ import Looper from './Looper';
 import Renderer from './visual/Renderer';
 
 const client = soundworks.client;
-const input = soundworks.input;
-const motionInput = soundworks.motionInput;
 const TouchSurface = soundworks.display.TouchSurface;
 
 const template = `
@@ -46,6 +44,9 @@ export default class DropsExperience extends soundworks.Experience {
     this.checkin = this.require('checkin');
     this.sync = this.require('sync');
     this.control = this.require('control');
+    this.motionInput = this.require('motion-input', {
+      descriptors: ['accelerationIncludingGravity']
+    });
 
     this.synth = new SampleSynth(null);
 
@@ -197,23 +198,19 @@ export default class DropsExperience extends soundworks.Experience {
     control.addUnitListener('autoPlay', (autoPlay) => this.setAutoPlay(autoPlay));
     control.addUnitListener('clear', () => this.looper.removeAll());
 
-    motionInput
-      .init('accelerationIncludingGravity')
-      .then((modules) => {
-        if (modules[0].isValid) {
-          motionInput.addListener('accelerationIncludingGravity', (data) => {
-            const accX = data[0];
-            const accY = data[1];
-            const accZ = data[2];
-            const mag = Math.sqrt(accX * accX + accY * accY + accZ * accZ);
+    if (this.motionInput.isValid('accelerationIncludingGravity')) {
+      this.motionInput.addListener('accelerationIncludingGravity', (data) => {
+        const accX = data[0];
+        const accY = data[1];
+        const accZ = data[2];
+        const mag = Math.sqrt(accX * accX + accY * accY + accZ * accZ);
 
-            if (mag > 20) {
-              this.clear();
-              this.autoPlay = 'manual';
-            }
-          });
+        if (mag > 20) {
+          this.clear();
+          this.autoPlay = 'manual';
         }
       });
+    }
 
     const surface = new TouchSurface(this.view.$el);
     // setup input listeners
