@@ -2,7 +2,8 @@
 // CONTROL MODULES - override wavesjs/basic-controllers styles
 // ------------------------------------------------------------
 
-#control {
+// https://mathiasbynens.be/notes/css-escapes
+#service\:control {
   // configure rendering
   $backgroundColor: #242424;
   $borderColor: #282828;

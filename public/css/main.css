@@ -447,7 +447,7 @@ p, .normal {
       padding: 20px;
       text-align: right; } }
 
-#control {
+#service\:control {
   /* 2 for borders */
   margin: 0 auto;
   max-width: 800px;
@@ -471,9 +471,9 @@ p, .normal {
   /* -------------------------------------------
      INFOS
      ------------------------------------------- */ }
-  #control h1 {
+  #service\:control h1 {
     margin: 8px 0; }
-  #control .waves-basic-controllers {
+  #service\:control .waves-basic-controllers {
     width: 100%;
     max-width: 800px;
     height: 36px;
@@ -485,7 +485,7 @@ p, .normal {
     border-radius: 2px;
     display: block;
     color: #ffffff; }
-    #control .waves-basic-controllers .legend {
+    #service\:control .waves-basic-controllers .legend {
       font: italic normal 14px Quicksand, arial, sans-serif;
       line-height: 28px;
       overflow: hidden;
@@ -501,59 +501,59 @@ p, .normal {
       -ms-user-select: none;
       -o-user-select: none;
       user-select: none; }
-    #control .waves-basic-controllers .inner-wrapper {
+    #service\:control .waves-basic-controllers .inner-wrapper {
       display: -webkit-inline-flex;
       display: inline-flex;
       -webkit-flex-wrap: no-wrap;
       flex-wrap: no-wrap;
       width: 76%;
       float: left; }
-  #control .waves-basic-controllers.small:not(.align-small) {
+  #service\:control .waves-basic-controllers.small:not(.align-small) {
     height: auto; }
-    #control .waves-basic-controllers.small:not(.align-small) .legend {
+    #service\:control .waves-basic-controllers.small:not(.align-small) .legend {
       width: 100%;
       float: none;
       text-align: left; }
-    #control .waves-basic-controllers.small:not(.align-small) .inner-wrapper {
+    #service\:control .waves-basic-controllers.small:not(.align-small) .inner-wrapper {
       width: 100%;
       float: none; }
-  #control .waves-basic-controllers.small.align-small .legend {
+  #service\:control .waves-basic-controllers.small.align-small .legend {
     display: block;
     margin-right: 20px;
     text-align: left; }
-  #control .waves-basic-controllers.small.align-small .inner-wrapper {
+  #service\:control .waves-basic-controllers.small.align-small .inner-wrapper {
     display: inline-block;
     width: auto; }
-  #control .waves-basic-controllers.small.buttons .legend {
+  #service\:control .waves-basic-controllers.small.buttons .legend {
     display: none; }
-  #control .waves-basic-controllers .arrow-right, #control .waves-basic-controllers .arrow-left {
+  #service\:control .waves-basic-controllers .arrow-right, #service\:control .waves-basic-controllers .arrow-left {
     border-radius: 2px;
     width: 14px;
     height: 28px;
     cursor: pointer;
     background-color: #464646; }
-    #control .waves-basic-controllers .arrow-right line, #control .waves-basic-controllers .arrow-left line {
+    #service\:control .waves-basic-controllers .arrow-right line, #service\:control .waves-basic-controllers .arrow-left line {
       stroke-width: 3px;
       stroke: #ffffff; }
-    #control .waves-basic-controllers .arrow-right:hover, #control .waves-basic-controllers .arrow-left:hover {
+    #service\:control .waves-basic-controllers .arrow-right:hover, #service\:control .waves-basic-controllers .arrow-left:hover {
       background-color: #686868; }
-    #control .waves-basic-controllers .arrow-right:active, #control .waves-basic-controllers .arrow-left:active {
+    #service\:control .waves-basic-controllers .arrow-right:active, #service\:control .waves-basic-controllers .arrow-left:active {
       background-color: #909090; }
-  #control .waves-basic-controllers .toggle-element {
+  #service\:control .waves-basic-controllers .toggle-element {
     width: 28px;
     height: 28px;
     border-radius: 2px;
     background-color: #464646;
     cursor: pointer; }
-    #control .waves-basic-controllers .toggle-element:hover {
+    #service\:control .waves-basic-controllers .toggle-element:hover {
       background-color: #686868; }
-    #control .waves-basic-controllers .toggle-element line {
+    #service\:control .waves-basic-controllers .toggle-element line {
       stroke-width: 3px; }
-    #control .waves-basic-controllers .toggle-element .x {
+    #service\:control .waves-basic-controllers .toggle-element .x {
       display: none; }
-    #control .waves-basic-controllers .toggle-element.active .x {
+    #service\:control .waves-basic-controllers .toggle-element.active .x {
       display: block; }
-  #control .waves-basic-controllers .btn {
+  #service\:control .waves-basic-controllers .btn {
     display: block;
     text-align: center;
     font: normal normal 12px arial;
@@ -570,15 +570,15 @@ p, .normal {
     cursor: pointer;
     -webkit-flex-grow: 1;
     flex-grow: 1; }
-    #control .waves-basic-controllers .btn:last-child {
+    #service\:control .waves-basic-controllers .btn:last-child {
       margin: 0; }
-    #control .waves-basic-controllers .btn:hover {
+    #service\:control .waves-basic-controllers .btn:hover {
       background-color: #686868; }
-    #control .waves-basic-controllers .btn:active, #control .waves-basic-controllers .btn.active {
+    #service\:control .waves-basic-controllers .btn:active, #service\:control .waves-basic-controllers .btn.active {
       background-color: #909090; }
-    #control .waves-basic-controllers .btn:focus {
+    #service\:control .waves-basic-controllers .btn:focus {
       outline: none; }
-  #control .waves-basic-controllers .number {
+  #service\:control .waves-basic-controllers .number {
     height: 28px;
     display: inline-block;
     position: relative;
@@ -592,9 +592,9 @@ p, .normal {
     background-color: #2e2e2e;
     border-radius: 2px;
     box-sizing: border-box; }
-    #control .waves-basic-controllers .number:focus {
+    #service\:control .waves-basic-controllers .number:focus {
       outline: none; }
-  #control .waves-basic-controllers select {
+  #service\:control .waves-basic-controllers select {
     height: 28px;
     line-height: 28px;
     background-color: #2e2e2e;
@@ -603,9 +603,9 @@ p, .normal {
     vertical-align: top;
     padding: 0;
     margin: 0; }
-    #control .waves-basic-controllers select:focus {
+    #service\:control .waves-basic-controllers select:focus {
       outline: none; }
-  #control .waves-basic-controllers input[type=text] {
+  #service\:control .waves-basic-controllers input[type=text] {
     width: 100%;
     height: 28px;
     line-height: 28px;
@@ -614,7 +614,7 @@ p, .normal {
     background-color: #2e2e2e;
     border-radius: 2px;
     color: #cdcdcd; }
-  #control .waves-basic-controllers.title {
+  #service\:control .waves-basic-controllers.title {
     border: none !important;
     margin-bottom: 0;
     margin-top: 8px;
@@ -622,7 +622,7 @@ p, .normal {
     padding-bottom: 0;
     background-color: transparent !important;
     height: 30px !important; }
-    #control .waves-basic-controllers.title .legend {
+    #service\:control .waves-basic-controllers.title .legend {
       font: normal bold 15px Quicksand, arial, sans-serif;
       height: 100%;
       overflow: hidden;
@@ -632,24 +632,24 @@ p, .normal {
       box-sizing: border-box;
       -webkit-flex-grow: 1;
       flex-grow: 1; }
-  #control .waves-basic-controllers.slider .range {
+  #service\:control .waves-basic-controllers.slider .range {
     height: 28px;
     display: inline-block;
     margin: 0;
     -webkit-flex-grow: 4;
     flex-grow: 4; }
-  #control .waves-basic-controllers.slider .number-wrapper {
+  #service\:control .waves-basic-controllers.slider .number-wrapper {
     display: inline;
     height: 28px;
     text-align: right;
     -webkit-flex-grow: 3;
     flex-grow: 3; }
-    #control .waves-basic-controllers.slider .number-wrapper .number {
+    #service\:control .waves-basic-controllers.slider .number-wrapper .number {
       left: 5px;
       width: 54px;
       text-align: right;
       font: normal normal 10px Quicksand, arial, sans-serif; }
-    #control .waves-basic-controllers.slider .number-wrapper .unit {
+    #service\:control .waves-basic-controllers.slider .number-wrapper .unit {
       font: italic normal 14px Quicksand, arial, sans-serif;
       line-height: 28px;
       height: 28px;
@@ -659,31 +659,31 @@ p, .normal {
       padding-left: 5px;
       padding-right: 5px;
       color: #cdcdcd; }
-      #control .waves-basic-controllers.slider .number-wrapper .unit sup {
+      #service\:control .waves-basic-controllers.slider .number-wrapper .unit sup {
         line-height: 7px; }
-  #control .waves-basic-controllers.slider.slider-large .range {
+  #service\:control .waves-basic-controllers.slider.slider-large .range {
     -webkit-flex-grow: 50;
     flex-grow: 50; }
-  #control .waves-basic-controllers.slider.slider-large .number-wrapper {
+  #service\:control .waves-basic-controllers.slider.slider-large .number-wrapper {
     -webkit-flex-grow: 1;
     flex-grow: 1; }
-  #control .waves-basic-controllers.slider.slider-small .range {
+  #service\:control .waves-basic-controllers.slider.slider-small .range {
     -webkit-flex-grow: 1;
     flex-grow: 1; }
-  #control .waves-basic-controllers.slider.slider-small .number-wrapper {
+  #service\:control .waves-basic-controllers.slider.slider-small .number-wrapper {
     -webkit-flex-grow: 7;
     flex-grow: 7; }
-  #control .waves-basic-controllers.number-box .number {
+  #service\:control .waves-basic-controllers.number-box .number {
     width: 120px;
     margin: 0 10px;
     vertical-align: top; }
-  #control .waves-basic-controllers.select-list select {
+  #service\:control .waves-basic-controllers.select-list select {
     margin: 0 10px;
     width: 120px;
     font: normal normal 14px Quicksand, arial, sans-serif;
     color: #ffffff; }
-  #control .waves-basic-controllers.select-buttons .btn:first-of-type {
+  #service\:control .waves-basic-controllers.select-buttons .btn:first-of-type {
     margin-left: 4px; }
-  #control .waves-basic-controllers.info input[type=text] {
+  #service\:control .waves-basic-controllers.info input[type=text] {
     font: normal normal 14px Quicksand, arial, sans-serif;
     color: #ffffff; }

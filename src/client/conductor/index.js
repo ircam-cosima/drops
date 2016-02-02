@@ -1,17 +1,21 @@
 import soundworks from 'soundworks/client';
 
 const client = soundworks.client;
-const Control = soundworks.ClientControl;
+const serviceManager = soundworks.serviceManager;
 
-window.addEventListener('load', () => {
+const init = () => {
+  const socketIO = window.CONFIG && window.CONFIG.SOCKET_CONFIG;
+  const appName = window.CONFIG && window.CONFIG.APP_NAME;
 
-  client.init('conductor');
-  const control = new Control({ hasGui: true });
+  client.init('conductor', { socketIO, appName });
 
+  const control = serviceManager.getInstance('control', { hasGui: true });
   control.setGuiOptions('state', { type: 'buttons' });
   control.setGuiOptions('loopAttenuation', { type: 'slider', size: 'large' });
   control.setGuiOptions('minGain', { type: 'slider', size: 'large' });
   control.setGuiOptions('clear');
 
-  client.start(control);
-});
+  client.start();
+}
+
+window.addEventListener('load', init);

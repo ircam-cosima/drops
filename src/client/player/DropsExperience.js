@@ -37,14 +37,16 @@ const template = `
   </div>
 `;
 
-export default class Performance extends soundworks.ClientPerformance {
-  constructor(loader, control, sync, checkin) {
+export default class DropsExperience extends soundworks.Experience {
+  constructor(audioFiles) {
     super();
 
-    this.loader = loader;
-    this.sync = sync;
-    this.checkin = checkin;
-    this.control = control;
+    this.welcome = this.require('welcome');
+    this.loader = this.require('loader', { files: audioFiles });
+    this.checkin = this.require('checkin');
+    this.sync = this.require('sync');
+    this.control = this.require('control');
+
     this.synth = new SampleSynth(null);
 
     this.numTriggers = 6;
@@ -66,8 +68,6 @@ export default class Performance extends soundworks.ClientPerformance {
     this.looper = new Looper(this.synth, this.renderer, () => {
       this.updateCount();
     });
-
-    this.init();
   }
 
   init() {
@@ -180,6 +180,11 @@ export default class Performance extends soundworks.ClientPerformance {
 
   start() {
     super.start();
+
+    if (!this.hasStarted)
+      this.init();
+
+    this.show();
 
     const control = this.control;
     control.addUnitListener('state', (state) => this.setState(state));

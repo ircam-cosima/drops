@@ -19,6 +19,7 @@ export default class SampleSynth {
 
       const index = Math.floor((1 - y) * 12);
       const b1 = audioBuffers[2 * index];
+
       duration += (1 - x) * b1.duration;
 
       const g1 = audioContext.createGain();
