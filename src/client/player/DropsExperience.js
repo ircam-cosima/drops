@@ -198,7 +198,7 @@ export default class DropsExperience extends soundworks.Experience {
     control.addUnitListener('autoPlay', (autoPlay) => this.setAutoPlay(autoPlay));
     control.addUnitListener('clear', () => this.looper.removeAll());
 
-    if (this.motionInput.isValid('accelerationIncludingGravity')) {
+    if (this.motionInput.isAvailable('accelerationIncludingGravity')) {
       this.motionInput.addListener('accelerationIncludingGravity', (data) => {
         const accX = data[0];
         const accY = data[1];
