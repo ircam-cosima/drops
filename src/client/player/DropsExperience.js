@@ -43,7 +43,7 @@ export default class DropsExperience extends soundworks.Experience {
     this.loader = this.require('loader', { files: audioFiles });
     this.checkin = this.require('checkin');
     this.sync = this.require('sync');
-    this.control = this.require('control');
+    this.control = this.require('shared-params');
     this.motionInput = this.require('motion-input', {
       descriptors: ['accelerationIncludingGravity']
     });

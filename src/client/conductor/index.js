@@ -1,7 +1,8 @@
 import soundworks from 'soundworks/client';
 
+console.log(soundworks);
+
 const client = soundworks.client;
-const serviceManager = soundworks.serviceManager;
 
 const init = () => {
   const socketIO = window.CONFIG && window.CONFIG.SOCKET_CONFIG;
@@ -9,11 +10,11 @@ const init = () => {
 
   client.init('conductor', { socketIO, appName });
 
-  const control = serviceManager.getInstance('control', { hasGui: true });
+  const control = client.require('shared-params', { hasGui: true });
+  control.setGuiOptions('numPlayers', { readOnly: true });
   control.setGuiOptions('state', { type: 'buttons' });
   control.setGuiOptions('loopAttenuation', { type: 'slider', size: 'large' });
   control.setGuiOptions('minGain', { type: 'slider', size: 'large' });
-  control.setGuiOptions('clear');
 
   client.start();
 }

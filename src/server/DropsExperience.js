@@ -8,19 +8,19 @@ export default class DropsExperience extends ServerExperience {
     // define services dependencies
     this.sync = this.require('sync', { clientType: 'player' });
     this.checkin = this.require('checkin', { clientType: 'player' });
-    this.control = this.require('control', { clientType: ['player', 'conductor'] });
+    this.control = this.require('shared-params', { clientType: ['player', 'conductor'] });
     this.addClientType('player');
 
     // configure control
-    this.control.addInfo('numPlayers', 'num players', 0, ['conductor']);
-    this.control.addEnum('state', 'state', ['reset', 'running', 'end'], 'reset');
-    this.control.addNumber('maxDrops', 'max drops', 0, 100, 1, 1);
-    this.control.addNumber('loopDiv', 'loop div', 1, 100, 1, 3);
-    this.control.addNumber('loopPeriod', 'loop period', 1, 30, 0.1, 7.5);
-    this.control.addNumber('loopAttenuation', 'loop atten', 0, 1, 0.01, 0.71);
-    this.control.addNumber('minGain', 'min gain', 0, 1, 0.01, 0.1);
-    this.control.addEnum('autoPlay', 'auto play', ['off', 'on'], 'off');
-    this.control.addCommand('clear', 'clear', ['conductor', 'player']);
+    this.control.addItem('text', 'numPlayers', 'num players', 0, ['conductor']);
+    this.control.addItem('enum', 'state', 'state', ['reset', 'running', 'end'], 'reset');
+    this.control.addItem('number', 'maxDrops', 'max drops', 0, 100, 1, 1);
+    this.control.addItem('number', 'loopDiv', 'loop div', 1, 100, 1, 3);
+    this.control.addItem('number', 'loopPeriod', 'loop period', 1, 30, 0.1, 7.5);
+    this.control.addItem('number', 'loopAttenuation', 'loop atten', 0, 1, 0.01, 0.71);
+    this.control.addItem('number', 'minGain', 'min gain', 0, 1, 0.01, 0.1);
+    this.control.addItem('enum', 'autoPlay', 'auto play', ['off', 'on'], 'off');
+    this.control.addItem('trigger', 'clear', 'clear', ['conductor', 'player']);
   }
 
   enter(client) {
