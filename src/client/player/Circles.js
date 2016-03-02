@@ -1,11 +1,5 @@
 import soundworks from 'soundworks/client';
-import { scale } from 'soundworks/utils/math';
-
-function scale(minIn, maxIn, minOut, maxOut) {
-  const a = (maxOut - minOut) / (maxIn - minIn);
-  const b = minOut - a * minIn;
-  return x => a * x + b;
-}
+import { getScaler } from 'soundworks/utils/math';
 
 function getRandomColor() {
   const letters = '56789ABCDEF'.split('');
@@ -45,11 +39,7 @@ class Circle {
   setDuration(time) {
     this.lifeTime = time;
 
-    this.opacityScale = scale(this.lifeTime, 0, this.opacity, 0);
-
-    // this.opacityScale = d3.scale.linear()
-    //   .domain([this.lifeTime, 0])
-    //   .range([this.opacity, 0]);
+    this.opacityScale = getScaler(this.lifeTime, 0, this.opacity, 0);
   }
 
   update(dt, w, h) {
@@ -87,7 +77,7 @@ class Circle {
   }
 }
 
-export class Circles extends soundworks.display.Renderer {
+export default class Circles extends soundworks.display.Renderer {
   constructor() {
     super();
 

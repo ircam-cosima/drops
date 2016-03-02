@@ -64,7 +64,7 @@ export default class PlayerExperience extends soundworks.Experience {
     this.quantize = 0;
     this.numLocalLoops = 0;
 
-    this.renderer = new Cirles();
+    this.renderer = new Circles();
 
     this.looper = new Looper(this.synth, this.renderer, () => {
       this.updateCount();
