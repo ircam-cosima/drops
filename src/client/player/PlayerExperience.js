@@ -1,7 +1,7 @@
 import soundworks from 'soundworks/client';
 import SampleSynth from './SampleSynth';
 import Looper from './Looper';
-import Renderer from './visual/Renderer';
+import Circles from './Circles';
 
 const client = soundworks.client;
 const TouchSurface = soundworks.display.TouchSurface;
@@ -35,7 +35,7 @@ const template = `
   </div>
 `;
 
-export default class DropsExperience extends soundworks.Experience {
+export default class PlayerExperience extends soundworks.Experience {
   constructor(audioFiles) {
     super();
 
@@ -64,7 +64,7 @@ export default class DropsExperience extends soundworks.Experience {
     this.quantize = 0;
     this.numLocalLoops = 0;
 
-    this.renderer = new Renderer();
+    this.renderer = new Cirles();
 
     this.looper = new Looper(this.synth, this.renderer, () => {
       this.updateCount();

@@ -1,7 +1,6 @@
 import { ServerExperience } from 'soundworks/server';
 
-
-export default class DropsExperience extends ServerExperience {
+export default class PlayerExperience extends ServerExperience {
   constructor(clientType) {
     super(clientType);
 
