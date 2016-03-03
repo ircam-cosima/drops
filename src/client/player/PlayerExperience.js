@@ -2,6 +2,7 @@ import soundworks from 'soundworks/client';
 import SampleSynth from './SampleSynth';
 import Looper from './Looper';
 import Circles from './Circles';
+import audioFiles from './audioFiles';
 
 const client = soundworks.client;
 const TouchSurface = soundworks.display.TouchSurface;
@@ -36,7 +37,7 @@ const template = `
 `;
 
 export default class PlayerExperience extends soundworks.Experience {
-  constructor(audioFiles) {
+  constructor() {
     super();
 
     this.welcome = this.require('welcome');
