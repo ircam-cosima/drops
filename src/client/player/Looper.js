@@ -1,16 +1,5 @@
 import soundworks from 'soundworks/client';
 
-function arrayRemove(array, value) {
-  const index = array.indexOf(value);
-
-  if (index >= 0) {
-    array.splice(index, 1);
-    return true;
-  }
-
-  return false;
-}
-
 class Loop extends soundworks.audio.TimeEngine {
   constructor(looper, soundParams, local = false) {
     super();
