@@ -43,10 +43,13 @@ export default class PlayerExperience extends soundworks.Experience {
     this.loader = this.require('loader', { files: audioFiles });
     this.checkin = this.require('checkin');
     this.sync = this.require('sync');
-    this.control = this.require('shared-params');
+    this.params = this.require('shared-params');
     this.motionInput = this.require('motion-input', {
       descriptors: ['accelerationIncludingGravity']
     });
+    this.scheduler = this.require('scheduler', {
+      lookahead: 0.050
+    })
 
     this.synth = new SampleSynth(null);
 
@@ -55,18 +58,20 @@ export default class PlayerExperience extends soundworks.Experience {
     // control parameters
     this.state = 'reset';
     this.maxDrops = 0;
-    this.loopDiv = 3;
-    this.loopPeriod = 7.5;
-    this.loopAttenuation = 0.70710678118655;
-    this.minGain = 0.1;
-    this.autoPlay = 'off';
 
+    this.loopParams = {};
+    this.loopParams.div = 3;
+    this.loopParams.period = 7.5;
+    this.loopParams.attenuation = 0.70710678118655;
+    this.loopParams.minGain = 0.1;
+
+    this.autoPlay = 'off';
     this.quantize = 0;
     this.numLocalLoops = 0;
 
     this.renderer = new Circles();
 
-    this.looper = new Looper(this.synth, this.renderer, () => {
+    this.looper = new Looper(this.synth, this.renderer, this.scheduler, this.loopParams, () => {
       this.updateCount();
     });
   }
@@ -85,32 +90,25 @@ export default class PlayerExperience extends soundworks.Experience {
 
   trigger(x, y) {
     const soundParams = {
-      index: client.uid,
+      index: client.index,
       gain: 1,
       x: x,
       y: y,
-      loopDiv: this.loopDiv,
-      loopPeriod: this.loopPeriod,
-      loopAttenuation: this.loopAttenuation,
-      minGain: this.minGain
     };
 
-    let time = this.looper.scheduler.currentTime;
-    let serverTime = this.sync.getSyncTime(time);
+    let time = this.scheduler.syncTime;
 
     // quantize
-    if (this.quantize > 0) {
-      serverTime = Math.ceil(serverTime / this.quantize) * this.quantize;
-      time = this.sync.getLocalTime(serverTime);
-    }
+    if (this.quantize > 0)
+      serverTime = Math.ceil(time / this.quantize) * this.quantize;
 
     this.looper.start(time, soundParams, true);
-    this.send('sound', serverTime, soundParams);
+    this.send('sound', time, soundParams);
   }
 
   clear() {
     // remove at own looper
-    this.looper.remove(client.uid, true);
+    this.looper.remove(client.index, true);
 
     // remove at other players
     this.send('clear');
@@ -187,16 +185,15 @@ export default class PlayerExperience extends soundworks.Experience {
 
     this.show();
 
-    const control = this.control;
-    control.addUnitListener('state', (state) => this.setState(state));
-    control.addUnitListener('maxDrops', (maxDrops) => this.setMaxDrops(maxDrops));
-    control.addUnitListener('loopDiv', (loopDiv) => this.loopDiv = loopDiv);
-    control.addUnitListener('loopPeriod', (loopPeriod) => this.loopPeriod = loopPeriod);
-    control.addUnitListener('loopAttenuation', (loopAttenuation) => this.loopAttenuation = loopAttenuation);
-    control.addUnitListener('minGain', (minGain) => this.minGain = minGain);
-    control.addUnitListener('loopPeriod', (loopPeriod) => this.loopPeriod = loopPeriod);
-    control.addUnitListener('autoPlay', (autoPlay) => this.setAutoPlay(autoPlay));
-    control.addUnitListener('clear', () => this.looper.removeAll());
+    const params = this.params;
+    params.addItemListener('state', (state) => this.setState(state));
+    params.addItemListener('maxDrops', (value) => this.setMaxDrops(value));
+    params.addItemListener('loopDiv', (value) => this.loopParams.div = value);
+    params.addItemListener('loopPeriod', (value) => this.loopParams.period = value);
+    params.addItemListener('loopAttenuation', (value) => this.loopParams.attenuation = value);
+    params.addItemListener('minGain', (value) => this.loopParams.minGain = value);
+    params.addItemListener('autoPlay', (value) => this.setAutoPlay(value));
+    params.addItemListener('clear', () => this.looper.removeAll());
 
     if (this.motionInput.isAvailable('accelerationIncludingGravity')) {
       this.motionInput.addListener('accelerationIncludingGravity', (data) => {
@@ -222,10 +219,7 @@ export default class PlayerExperience extends soundworks.Experience {
     });
 
     // setup performance control listeners
-    this.receive('echo', (serverTime, soundParams) => {
-      const time = this.sync.getLocalTime(serverTime);
-      this.looper.start(time, soundParams);
-    });
+    this.receive('echo', (time, soundParams) => this.looper.start(time, soundParams));
 
     this.receive('clear', (index) => {
       this.looper.remove(index);

@@ -1,13 +1,23 @@
 import { ServerExperience } from 'soundworks/server';
 
 export default class PlayerExperience extends ServerExperience {
-  constructor(clientType) {
-    super(clientType);
+  constructor() {
+    super('player');
 
     // define services dependencies
     this.sync = this.require('sync');
     this.checkin = this.require('checkin');
-    this.sharedParams = this.require('shared-params');
+    this.params = this.require('shared-params');
+
+    this.loopParams = {
+      div: 3,
+      period: 7.5,
+      attenuation: 0.70710678118655,
+    };
+
+    this.params.addItemListener('loopDiv', (value) => this.loopParams.div = value);
+    this.params.addItemListener('loopPeriod', (value) => this.loopParams.period = value);
+    this.params.addItemListener('loopAttenuation', (value) => this.loopParams.attenuation = value);
   }
 
   enter(client) {
@@ -18,7 +28,8 @@ export default class PlayerExperience extends ServerExperience {
     this.receive(client, 'sound', (time, soundParams) => {
       const playerList = this.clients;
       const playerListLength = playerList.length;
-      let numEchoPlayers = soundParams.loopDiv - 1;
+      const loopParams = this.loopParams;
+      let numEchoPlayers = loopParams.div - 1;
 
       if (numEchoPlayers > playerListLength - 1)
         numEchoPlayers = playerListLength - 1;
@@ -26,8 +37,7 @@ export default class PlayerExperience extends ServerExperience {
       if (numEchoPlayers > 0) {
         const index = this.clients.indexOf(client);
         const echoPlayers = client.modules[this.id].echoPlayers;
-        const echoPeriod = soundParams.loopPeriod / soundParams.loopDiv;
-        const echoAttenuation = Math.pow(soundParams.loopAttenuation, 1 / soundParams.loopDiv);
+        const echoPeriod = loopParams.period / loopParams.div;
         let echoDelay = 0;
 
         for (let i = 1; i <= numEchoPlayers; i++) {
@@ -36,6 +46,7 @@ export default class PlayerExperience extends ServerExperience {
 
           echoPlayers.push(echoPlayer);
           echoDelay += echoPeriod;
+          const echoAttenuation = Math.pow(loopParams.attenuation, 1 / loopParams.div);
           soundParams.gain *= echoAttenuation;
 
           this.send(echoPlayer, 'echo', time + echoDelay, soundParams);
@@ -47,21 +58,21 @@ export default class PlayerExperience extends ServerExperience {
       this._clearEchoes(client);
     });
 
-    this.sharedParams.update('numPlayers', this.clients.length);
+    this.params.update('numPlayers', this.clients.length);
   }
 
   exit(client) {
     super.exit(client);
 
     this._clearEchoes(client);
-    this.sharedParams.update('numPlayers', this.clients.length);
+    this.params.update('numPlayers', this.clients.length);
   }
 
   _clearEchoes(client) {
     const echoPlayers = client.modules[this.id].echoPlayers;
 
     for (let i = 0; i < echoPlayers.length; i++)
-      this.send(echoPlayers[i], 'clear', client.uid);
+      this.send(echoPlayers[i], 'clear', client.index);
 
     client.modules[this.id].echoPlayers = [];
   }

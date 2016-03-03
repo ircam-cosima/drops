@@ -1,8 +1,5 @@
 import soundworks from 'soundworks/client';
 
-const scheduler = soundworks.audio.getScheduler();
-scheduler.lookahead = 0.050;
-
 function arrayRemove(array, value) {
   const index = array.indexOf(value);
 
@@ -29,20 +26,22 @@ class Loop extends soundworks.audio.TimeEngine {
 }
 
 export default class Looper {
-  constructor(synth, renderer, updateCount) {
+  constructor(synth, renderer, scheduler, loopParams, updateCount) {
     this.synth = synth;
     this.renderer = renderer;
     this.updateCount = updateCount;
     this.scheduler = scheduler;
+    this.loopParams = loopParams;
 
-    this.loops = [];
+    this.loops = new Set();
     this.numLocalLoops = 0;
   }
 
   start(time, soundParams, local = false) {
     const loop = new Loop(this, soundParams, local);
+
+    this.loops.add(loop);
     this.scheduler.add(loop, time);
-    this.loops.push(loop);
 
     if (local)
       this.numLocalLoops++;
@@ -52,9 +51,10 @@ export default class Looper {
 
   advance(time, loop) {
     const soundParams = loop.soundParams;
+    const loopParams = this.loopParams;
 
-    if (soundParams.gain < soundParams.minGain) {
-      arrayRemove(this.loops, loop);
+    if (soundParams.gain < loopParams.minGain) {
+      this.loops.delete(loop);
 
       if (loop.local)
         this.numLocalLoops--;
@@ -64,7 +64,7 @@ export default class Looper {
       return null;
     }
 
-    const duration = this.synth.trigger(time, soundParams, !loop.local);
+    const duration = this.synth.trigger(this.scheduler.audioTime, soundParams, !loop.local);
 
     this.renderer.createCircle(soundParams.index, soundParams.x, soundParams.y, {
       color: soundParams.index,
@@ -73,29 +73,25 @@ export default class Looper {
       velocity: 40 + soundParams.gain * 80,
     });
 
-    soundParams.gain *= soundParams.loopAttenuation;
+    soundParams.gain *= loopParams.attenuation;
 
-    return time + soundParams.loopPeriod;
+    return time + loopParams.period;
   }
 
   remove(index) {
     const loops = this.loops;
-    let i = 0;
+    let loop = null;
 
-    while (i < loops.length) {
-      const loop = loops[i];
-
+    for (loop of loops) {
       if (loop.soundParams.index === index) {
-        loops.splice(i, 1);
-
         this.scheduler.remove(loop);
 
         if (loop.local) {
           this.numLocalLoops--;
           this.renderer.remove(index);
         }
-      } else {
-        i++;
+
+        loops.delete(loop);
       }
     }
 
@@ -106,7 +102,7 @@ export default class Looper {
     for (let loop of this.loops)
       this.scheduler.remove(loop);
 
-    this.loops = [];
+    this.loops.clear();
     this.numLocalLoops = 0;
 
     this.updateCount();
