@@ -7,7 +7,7 @@
   ],
   "description": "Drops - collective mobile performance based on the Soundworks framework.",
   "version": "1.0.0",
-  "license": "BSD 3-Clause",
+  "license": "BSD-3-Clause",
   "scripts": {
     "bundle": "node ./bin/scripts --bundle",
     "start": "node dist/server/index.js",

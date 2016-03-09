@@ -3,7 +3,7 @@ import soundworks from 'soundworks/server';
 import PlayerExperience from './PlayerExperience';
 const server = soundworks.server;
 
-class ConductorExperience extends soundworks.ServerExperience {
+class ConductorExperience extends soundworks.Experience {
   constructor() {
     super('conductor');
 

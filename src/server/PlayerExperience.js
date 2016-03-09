@@ -1,6 +1,6 @@
-import { ServerExperience } from 'soundworks/server';
+import { Experience } from 'soundworks/server';
 
-export default class PlayerExperience extends ServerExperience {
+export default class PlayerExperience extends Experience {
   constructor() {
     super('player');
 
@@ -23,7 +23,7 @@ export default class PlayerExperience extends ServerExperience {
   enter(client) {
     super.enter(client);
 
-    client.modules[this.id].echoPlayers = [];
+    client.activities[this.id].echoPlayers = [];
 
     this.receive(client, 'sound', (time, soundParams) => {
       const playerList = this.clients;
@@ -36,7 +36,7 @@ export default class PlayerExperience extends ServerExperience {
 
       if (numEchoPlayers > 0) {
         const index = this.clients.indexOf(client);
-        const echoPlayers = client.modules[this.id].echoPlayers;
+        const echoPlayers = client.activities[this.id].echoPlayers;
         const echoPeriod = loopParams.period / loopParams.div;
         let echoDelay = 0;
 
@@ -69,11 +69,11 @@ export default class PlayerExperience extends ServerExperience {
   }
 
   _clearEchoes(client) {
-    const echoPlayers = client.modules[this.id].echoPlayers;
+    const echoPlayers = client.activities[this.id].echoPlayers;
 
     for (let i = 0; i < echoPlayers.length; i++)
       this.send(echoPlayers[i], 'clear', client.index);
 
-    client.modules[this.id].echoPlayers = [];
+    client.activities[this.id].echoPlayers = [];
   }
 }

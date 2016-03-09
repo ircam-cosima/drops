@@ -7,7 +7,7 @@ import audioFiles from './audioFiles';
 const client = soundworks.client;
 const TouchSurface = soundworks.display.TouchSurface;
 
-const template = `
+const viewTemplate = `
   <canvas class="background"></canvas>
   <div class="foreground">
     <div class="section-top flex-middle"></div>
@@ -76,9 +76,9 @@ export default class PlayerExperience extends soundworks.Experience {
   }
 
   init() {
-    this.template = template;
+    this.viewTemplate = viewTemplate;
     this.viewCtor = soundworks.display.CanvasView;
-    this.content = {
+    this.viewContent = {
       state: this.state,
       maxDrop: 0,
       numAvailable: 0,
@@ -114,16 +114,16 @@ export default class PlayerExperience extends soundworks.Experience {
   }
 
   updateCount() {
-    this.content.maxDrops = this.maxDrops;
-    this.content.message = undefined;
+    this.viewContent.maxDrops = this.maxDrops;
+    this.viewContent.message = undefined;
 
     if (this.state === 'reset') {
-      this.content.state = 'reset';
+      this.viewContent.state = 'reset';
     } else if (this.state === 'end' && this.looper.loops.length === 0) {
-      this.content.state = 'end';
+      this.viewContent.state = 'end';
     } else {
-      this.content.state = this.state;
-      this.content.numAvailable = Math.max(0, this.maxDrops - this.looper.numLocalLoops);
+      this.viewContent.state = this.state;
+      this.viewContent.numAvailable = Math.max(0, this.maxDrops - this.looper.numLocalLoops);
     }
 
     this.view.render('.section-center');
