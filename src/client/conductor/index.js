@@ -2,7 +2,7 @@ import soundworks from 'soundworks/client';
 const client = soundworks.client;
 
 window.addEventListener('load', () => {
-  // configuration shared by the server (see `views/default.ejs`)
+  // configuration shared by the server (see `html/default.ejs`)
   const socketIO = window.CONFIG && window.CONFIG.SOCKET_CONFIG;
   const appName = window.CONFIG && window.CONFIG.APP_NAME;
 

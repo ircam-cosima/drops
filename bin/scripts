@@ -20,7 +20,7 @@ var watchify = require('watchify');
 var jsSrcDir = 'src';
 var jsDistDir = '.';
 var styleSrcDir = 'sass';
-var viewsDir = 'views';
+var htmlDir = 'html';
 
 var serverSrcDir = path.join(jsSrcDir, 'server');
 var clientSrcDir = path.join(jsSrcDir, 'client');
@@ -123,7 +123,7 @@ function killServer() {
 // -----------------------------------------------
 
 function watch() {
-  var toMonitor = [serverSrcDir, viewsDir, clientSrcDir, styleSrcDir];
+  var toMonitor = [serverSrcDir, htmlDir, clientSrcDir, styleSrcDir];
 
   nodeWatch(toMonitor, function(filename) {
     // if server file - transpile file and restart server
@@ -132,7 +132,7 @@ function watch() {
       transpile(filename, [], runServer);
 
     // if a view - restart the server
-    } else if (filename.match(viewsDir)) {
+    } else if (filename.match(htmlDir)) {
       killServer();
       runServer();
 
