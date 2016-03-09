@@ -7,7 +7,7 @@ class ConductorExperience extends soundworks.ServerExperience {
   constructor() {
     super('conductor');
 
-    // configure sharedParams
+    // configure shared params
     this.params = this.require('shared-params');
     this.params.addItem('text', 'numPlayers', 'num players', 0, ['conductor']);
     this.params.addItem('enum', 'state', 'state', ['reset', 'running', 'end'], 'reset');

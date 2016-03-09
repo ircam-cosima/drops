@@ -1,8 +1,9 @@
 {
   "name": "drops",
   "authors": [
+    "Benjamin Matuszewski",
+    "Sébastien Robaszkiewicz",
     "Norbert Schnell",
-    "Sébastien Robaszkiewicz"
   ],
   "description": "Drops is a collective performance based on Soundworks that enables players to create drops that are echoed by a few other smartphones.",
   "version": "0.2.2",

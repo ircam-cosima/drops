@@ -10,11 +10,11 @@ window.addEventListener('load', () => {
   client.init('conductor', { socketIO, appName });
 
   // configure appearance of shared parameters
-  const sharedParams = client.require('shared-params', { hasGui: true });
-  sharedParams.setGuiOptions('numPlayers', { readOnly: true });
-  sharedParams.setGuiOptions('state', { type: 'buttons' });
-  sharedParams.setGuiOptions('loopAttenuation', { type: 'slider', size: 'large' });
-  sharedParams.setGuiOptions('minGain', { type: 'slider', size: 'large' });
+  const params = client.require('shared-params', { hasGui: true });
+  params.setGuiOptions('numPlayers', { readOnly: true });
+  params.setGuiOptions('state', { type: 'buttons' });
+  params.setGuiOptions('loopAttenuation', { type: 'slider', size: 'large' });
+  params.setGuiOptions('minGain', { type: 'slider', size: 'large' });
 
   // start client
   client.start();

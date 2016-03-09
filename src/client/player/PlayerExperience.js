@@ -50,11 +50,9 @@ export default class PlayerExperience extends soundworks.Experience {
     });
     this.scheduler = this.require('scheduler', {
       lookahead: 0.050
-    })
+    });
 
     this.synth = new SampleSynth(null);
-
-    this.numTriggers = 6;
 
     // control parameters
     this.state = 'reset';
