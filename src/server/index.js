@@ -1,5 +1,7 @@
-import 'source-map-support/register'; // add source map support to nodejs
-import soundworks from 'soundworks/server';
+// add source map support to nodejs
+import 'source-map-support/register';
+
+import * as soundworks from 'soundworks/server';
 import PlayerExperience from './PlayerExperience';
 const server = soundworks.server;
 

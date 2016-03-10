@@ -1,5 +1,5 @@
-import clientSide from 'soundworks/client';
-const audioContext = clientSide.audioContext;
+import * as soundworks from 'soundworks/client';
+const audioContext = soundworks.audioContext;
 
 export default class SampleSynth {
   constructor(audioBuffers) {

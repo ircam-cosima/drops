@@ -1,11 +1,11 @@
-import soundworks from 'soundworks/client';
+import * as soundworks from 'soundworks/client';
 import SampleSynth from './SampleSynth';
 import Looper from './Looper';
 import Circles from './Circles';
 import audioFiles from './audioFiles';
 
 const client = soundworks.client;
-const TouchSurface = soundworks.display.TouchSurface;
+const TouchSurface = soundworks.TouchSurface;
 
 const viewTemplate = `
   <canvas class="background"></canvas>
@@ -77,7 +77,7 @@ export default class PlayerExperience extends soundworks.Experience {
 
   init() {
     this.viewTemplate = viewTemplate;
-    this.viewCtor = soundworks.display.CanvasView;
+    this.viewCtor = soundworks.CanvasView;
     this.viewContent = {
       state: this.state,
       maxDrop: 0,

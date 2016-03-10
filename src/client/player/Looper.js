@@ -1,4 +1,4 @@
-import soundworks from 'soundworks/client';
+import * as soundworks from 'soundworks/client';
 
 class Loop extends soundworks.audio.TimeEngine {
   constructor(looper, soundParams, local = false) {

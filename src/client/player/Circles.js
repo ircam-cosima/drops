@@ -1,4 +1,4 @@
-import soundworks from 'soundworks/client';
+import * as soundworks from 'soundworks/client';
 import { getScaler } from 'soundworks/utils/math';
 
 function getRandomColor() {
@@ -77,7 +77,7 @@ class Circle {
   }
 }
 
-export default class Circles extends soundworks.display.Renderer {
+export default class Circles extends soundworks.Renderer {
   constructor() {
     super();
 

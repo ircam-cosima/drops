@@ -4,25 +4,32 @@ export default class PlayerExperience extends Experience {
   constructor() {
     super('player');
 
-    // define services dependencies
+    // define service dependencies
     this.sync = this.require('sync');
     this.checkin = this.require('checkin');
     this.params = this.require('shared-params');
 
+    // set default loop parameters
     this.loopParams = {
       div: 3,
       period: 7.5,
       attenuation: 0.70710678118655,
     };
 
+    // listen to shared parameter changes
     this.params.addItemListener('loopDiv', (value) => this.loopParams.div = value);
     this.params.addItemListener('loopPeriod', (value) => this.loopParams.period = value);
     this.params.addItemListener('loopAttenuation', (value) => this.loopParams.attenuation = value);
   }
 
+  /**
+   * 
+   *
+   */
   enter(client) {
     super.enter(client);
 
+    // create empty
     client.activities[this.id].echoPlayers = [];
 
     this.receive(client, 'sound', (time, soundParams) => {

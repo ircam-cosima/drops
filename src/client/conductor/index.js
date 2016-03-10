@@ -1,4 +1,4 @@
-import soundworks from 'soundworks/client';
+import * as soundworks from 'soundworks/client';
 const client = soundworks.client;
 
 window.addEventListener('load', () => {
