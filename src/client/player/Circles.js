@@ -1,15 +1,6 @@
 import * as soundworks from 'soundworks/client';
 import { getScaler } from 'soundworks/utils/math';
 
-function getRandomColor() {
-  const letters = '56789ABCDEF'.split('');
-  let color = '#';
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * letters.length)];
-  }
-  return color;
-}
-
 const colorMap = [
   '#44C7F1', '#37C000', '#F5D900', '#F39300',
   '#EC5D57', '#B36AE2', '#00FDFF', '#FF80BE',
@@ -38,7 +29,6 @@ class Circle {
 
   setDuration(time) {
     this.lifeTime = time;
-
     this.opacityScale = getScaler(this.lifeTime, 0, this.opacity, 0);
   }
 
@@ -85,13 +75,13 @@ export default class Circles extends soundworks.Renderer {
   }
 
   update(dt) {
-    // update and remove dead circles - avoid skipping next element when removing element
-    // http://stackoverflow.com/questions/16352546/how-to-iterate-over-an-array-and-remove-elements-in-javascript
+    // update and remove dead circles
     for (let i = this.circles.length - 1; i >= 0; i--) {
       const circle = this.circles[i];
       circle.update(dt, this.canvasWidth, this.canvasHeight);
 
-      if (circle.isDead) { this.circles.splice(i, 1); }
+      if (circle.isDead)
+        this.circles.splice(i, 1);
     }
   }
 
@@ -101,7 +91,7 @@ export default class Circles extends soundworks.Renderer {
     }
   }
 
-  createCircle(id, x, y, options) {
+  trigger(id, x, y, options) {
     const circle = new Circle(id, x, y, options);
     this.circles.push(circle);
   }

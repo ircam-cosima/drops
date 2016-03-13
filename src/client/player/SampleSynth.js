@@ -2,8 +2,8 @@ import * as soundworks from 'soundworks/client';
 const audioContext = soundworks.audioContext;
 
 export default class SampleSynth {
-  constructor(audioBuffers) {
-    this.audioBuffers = audioBuffers;
+  constructor() {
+    this.audioBuffers = null;
     this.output = audioContext.createGain();
     this.output.connect(audioContext.destination);
     this.output.gain.value = 1;
