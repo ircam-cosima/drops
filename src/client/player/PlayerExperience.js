@@ -99,8 +99,8 @@ export default class PlayerExperience extends soundworks.Experience {
     let time = this.scheduler.syncTime;
 
     // quantize
-    if (this.quantize > 0)
-      serverTime = Math.ceil(time / this.quantize) * this.quantize;
+    // if (this.quantize > 0)
+    //   serverTime = Math.ceil(time / this.quantize) * this.quantize;
 
     this.looper.start(time, soundParams, true);
     this.send('sound', time, soundParams);

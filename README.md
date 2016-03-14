@@ -16,4 +16,4 @@ npm install
 npm run start
 ```
 
-You can refer to the [*Soundworks Template*](https://github.com/collective-soundworks/soundworks-template/) project to learn more about the structure of this project.
+You can refer to the [*Soundworks Template*](https://github.com/collective-soundworks/soundworks-template/) repository to learn more about the structure of this project.

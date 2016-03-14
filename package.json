@@ -15,8 +15,9 @@
     "watch": "node ./bin/runner --watch"
   },
   "dependencies": {
-    "babel-runtime": "^5.8.34",
-    "soundworks": "collective-soundworks/soundworks#0.5.0",
+    "babel-runtime": "^6.6.1",
+    "debug": "^2.1.2",
+    "soundworks": "collective-soundworks/soundworks.git#1.0.0",
     "source-map-support": "^0.4.0"
   },
   "devDependencies": {
