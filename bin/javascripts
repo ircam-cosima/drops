@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 var babel = require('babel-core');
 var browserify = require('browserify');
-var colors = require('colors');
 var fse = require('fs-extra');
+var log = require('./log');
 var path = require('path');
 var watchify = require('watchify');
 
@@ -80,19 +80,17 @@ function getTranspiler(srcDirectory, distDirectory, isAllowed, babelOptions, bro
         return next();
 
       var outFilename = getTarget(filename);
+      var startTime = new Date().getTime();
 
       babel.transformFile(filename, babelOptions, function(err, result) {
-        if (err) {
-          console.log(('=> %s').red, err.message);
-          console.log(err.codeFrame);
-          return;
-        }
+        if (err)
+          return log.transpileError(err);
 
         fse.outputFile(outFilename, result.code, function(err) {
           if (err)
             return console.error(err.message);
 
-          console.log('=> "%s" successfully transpiled to "%s"'.green, filename, outFilename);
+          log.transpileSuccess(filename, outFilename, startTime);
           next();
         });
       });
@@ -121,19 +119,18 @@ function getTranspiler(srcDirectory, distDirectory, isAllowed, babelOptions, bro
         var bundler = browserify(entryPoint, browserifyOptions);
 
         function rebundle() {
-          console.log('=> Start bundling "%s"'.yellow, outFilename);
-          var start = new Date().getTime();
-          // ensure file exists or is created
-          fse.ensureFileSync(outFilename);
+          var startTime = new Date().getTime();
+
+          log.bundleStart(outFilename);
+          fse.ensureFileSync(outFilename); // ensure file exists
 
           bundler
             .bundle()
             .on('error', function(err) {
-              console.error(('=> ' + err.message).red);
+              log.bundleError(outFilename, err);
             })
             .on('end', function() {
-              var dt = (new Date().getTime() - start);
-              console.log('=> "%s" successfully created (compiled in: %sms)'.green, outFilename, dt);
+              log.bundleSuccess(outFilename, startTime);
 
               if (stopWhenDone)
                 bundler.close();
@@ -159,7 +156,7 @@ function getTranspiler(srcDirectory, distDirectory, isAllowed, babelOptions, bro
           if (err)
             return console.log(err.message);
 
-          console.log('=> "%s" successfully removed'.yellow, outFilename);
+          log.deleteFile(outFilename);
 
           if (callback)
             callback();

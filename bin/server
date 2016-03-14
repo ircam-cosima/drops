@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 var colors = require('colors');
 var fse = require('fs-extra');
+var log = require('./log');
 var path = require('path');
 var childProcess = require('child_process');
 
@@ -24,11 +25,11 @@ var server = null;
 function start() {
   try {
     if (fse.statSync(serverIndex).isFile()) {
-      console.log('=> START SERVER'.cyan);
+      log.serverStart();
       server = childProcess.fork(serverIndex);
     }
   } catch(err) {
-    console.log('=> No "%s" found, run `npm run transpile`'.red);
+    log.serverError(serverIndex);
   }
 }
 
@@ -37,7 +38,7 @@ function start() {
  */
 function stop() {
   if (server) {
-    console.log('=> STOP SERVER'.cyan);
+    log.serverStop();
     server.kill();
     server = null;
   }

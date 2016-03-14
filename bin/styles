@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 var fse = require('fs-extra');
+var log = require('./log');
 var path = require('path');
 var sass = require('node-sass');
 
@@ -17,27 +18,24 @@ function processSass(srcDirectory, distDirectory, isAllowed, sassOptions) {
       var basename = path.basename(filename);
 
       if (isAllowed(filename) && !/^_/.test(basename)) {
-        var outFile = filename
+        var outFilename = filename
           .replace(new RegExp('^' + srcDirectory), distDirectory)
           .replace(/\.scss$/, '.css');
 
         Object.assign(sassOptions, {
           file: filename,
-          outFile: outFile
+          outFilename: outFilename
         });
 
         sass.render(sassOptions, function(err, result) {
-          if (err) {
-            console.log(('%s:%s').red, err.file, err.line);
-            console.log(('=> Error: %s').red, err.message);
-            return;
-          }
+          if (err)
+            return log.sassError(err);
 
-          fse.outputFile(outFile, result.css, function(err) {
+          fse.outputFile(outFilename, result.css, function(err) {
             if (err)
-              return console.error((err.message).red);
+              return console.error(err.message);
 
-            console.log('=> "%s" successfully written'.green, outFile);
+            log.sassSuccess(outFilename);
           });
         });
       }

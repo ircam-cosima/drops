@@ -5,6 +5,7 @@ var path = require('path');
 var util = require('util');
 
 var javascripts = require('./javascripts');
+var log = require('./log');
 var server = require('./server');
 var styles = require('./styles');
 var cwd = process.cwd();
@@ -71,7 +72,7 @@ var watchOptions = {
   ignoreUnreadableDir: true,
   ignoreNotPermitted: true,
   interval: 2000,
-}
+};
 
 /**
  * Watched directories
@@ -276,7 +277,7 @@ function watchCommonJavascriptFiles(srcDirectories, distDirectories) {
   srcDirectories.forEach(function(srcDirectory, index) {
     fse.stat(srcDirectory, function(err, stats) {
       if (err || !stats.isDirectory)
-        return console.log('=> "%s" is not a directory, restart the script to watch it'.red, srcDirectory);
+        return log.watchWarning(srcDirectory);
 
       var distDirectory = distDirectories[index];
 
