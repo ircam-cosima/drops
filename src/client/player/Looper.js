@@ -86,7 +86,7 @@ export default class Looper {
           this.renderer.remove(index); // remove circle from renderer
         }
 
-        loops.delete(loop); // delete loop from set
+        this.loops.delete(loop); // delete loop from set
       }
     }
 
