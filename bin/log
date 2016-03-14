@@ -19,14 +19,14 @@ function getDeltaTime(time) {
 var spinners = {};
 
 var log = {
-  transpileSuccess(src, dest, startTime) {
+  transpileSuccess: function(src, dest, startTime) {
     var time = getDeltaTime(startTime);
     var msg = prefix + '%s: successfully transpiled to "%s" (%sms)'.green;
 
     console.log(msg, toRel(src), toRel(dest), time);
   },
 
-  transpileError(err) {
+  transpileError: function(err) {
     var parts = err.message.split(':');
     var msg = prefix + '%s'.red;
 
@@ -34,7 +34,7 @@ var log = {
     console.log(err.codeFrame);
   },
 
-  bundleStart(dest) {
+  bundleStart: function(dest) {
     var msg = prefix + (toRel(dest) + ': bundle start').yellow;
     var spinner = ora({ color: 'white', text: msg });
     spinner.start();
@@ -42,7 +42,7 @@ var log = {
     spinners[dest] = spinner;
   },
 
-  bundleSuccess(dest, startTime) {
+  bundleSuccess: function(dest, startTime) {
     var spinner = spinners[dest];
     var time = getDeltaTime(startTime);
     var msg = prefix + '%s: successfully created (%sms)'.green;
@@ -51,7 +51,7 @@ var log = {
     console.log(msg, toRel(dest), time);
   },
 
-  bundleError(dest, err) {
+  bundleError: function(dest, err) {
     var spinner = spinners[dest];
     var msg = prefix + '%s: bundle error'.red;
 
@@ -60,37 +60,37 @@ var log = {
     console.log('> ' + err.message);
   },
 
-  deleteFile(filename) {
+  deleteFile: function(filename) {
     var msg = prefix + '%s: successfully removed'.yellow;
     console.log(msg, toRel(filename));
   },
 
-  sassSuccess(dest) {
+  sassSuccess: function(dest) {
     var msg = prefix + '%s: successfully written'.green
     console.log(msg, toRel(dest));
   },
 
-  sassError(err) {
+  sassError: function(err) {
     // console.log(err);
     var msg = prefix + ('%s (%s:%s): sass error').red;
     console.log(msg, toRel(err.file), err.line, err.column);
     console.log('> ' + err.message);
   },
 
-  serverStart() {
+  serverStart: function() {
     console.log(prefix + 'server start'.cyan);
   },
 
-  serverStop() {
+  serverStop: function() {
     console.log(prefix + 'server stop'.cyan);
   },
 
-  serverError(serverIndex) {
+  serverError: function(serverIndex) {
     var msg = prefix + '%s: not found, run `npm run transpile`'.red;
     console.log(msg, toRel(serverIndex));
   },
 
-  watchWarning(directory) {
+  watchWarning: function(directory) {
     var msg = prefix + '%s: is not a directory, restart the script to watch it'.yellow;
     console.log(msg, toRel(directory));
   }
