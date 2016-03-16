@@ -18,9 +18,9 @@ function processSass(srcDirectory, distDirectory, isAllowed, sassOptions) {
       var basename = path.basename(filename);
 
       if (isAllowed(filename) && !/^_/.test(basename)) {
-        var outFilename = filename
-          .replace(new RegExp('^' + srcDirectory), distDirectory)
-          .replace(/\.scss$/, '.css');
+        var relFilename = path.relative(srcDirectory, filename);
+        var outFilename = path.join(distDirectory, relFilename);
+        outFilename = outFilename.replace(/\.scss$/, '.css');
 
         Object.assign(sassOptions, {
           file: filename,

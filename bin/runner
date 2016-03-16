@@ -141,7 +141,7 @@ function _getFileList(folder, callback) {
     });
 }
 
-const commands = {
+var commands = {
   /**
    * Watch the file system and reinit the application accordingly
    */
@@ -363,7 +363,7 @@ function transpile() {
   // 4. rebundle client files
   function rebundleClientFiles() {
     // find all first level directories in clientDistDirectory
-    const clientIndexes = fse.readdirSync(clientSrcDirectory).filter(function(filename) {
+    var clientIndexes = fse.readdirSync(clientSrcDirectory).filter(function(filename) {
       return fse.statSync(path.join(clientSrcDirectory, filename)).isDirectory();
     }).map(function(dirname) {
       return path.join(clientSrcDirectory, dirname, 'index.js');

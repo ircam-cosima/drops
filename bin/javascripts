@@ -32,7 +32,9 @@ function getTranspiler(srcDirectory, distDirectory, isAllowed, babelOptions, bro
    * Returns the name of the target transpiled file
    */
   function getTarget(filename) {
-    return filename.replace(new RegExp('^' + srcDirectory), distDirectory);
+    var relFilename = path.relative(srcDirectory, filename);
+    var outFilename = path.join(distDirectory, relFilename);
+    return outFilename;
   }
 
   /**
@@ -40,8 +42,8 @@ function getTranspiler(srcDirectory, distDirectory, isAllowed, babelOptions, bro
    * the given `filename`
    */
   function getClientEntryPoint(filename) {
-    const folderName = getClientFolderName(filename);
-    const entryPoint = path.join(distDirectory, folderName, 'index.js');
+    var folderName = getClientFolderName(filename);
+    var entryPoint = path.join(distDirectory, folderName, 'index.js');
     return entryPoint;
   }
 
@@ -50,8 +52,8 @@ function getTranspiler(srcDirectory, distDirectory, isAllowed, babelOptions, bro
    * client side javascript file resides.
    */
   function getClientFolderName(filename) {
-    const relFilename = filename.replace(new RegExp('^' + srcDirectory), '');
-    const folderName = relFilename.split(path.sep)[1];
+    var relFilename = path.relative(srcDirectory, filename);
+    var folderName = relFilename.split(path.sep)[0];
     return folderName;
   }
 
@@ -111,9 +113,9 @@ function getTranspiler(srcDirectory, distDirectory, isAllowed, babelOptions, bro
         return;
 
       // get the entry point of the client (`index.js`)
-      const entryPoint = getClientEntryPoint(filename);
-      const outBasename = getClientFolderName(filename) + '.js';
-      const outFilename = path.join(bundleDistDirectory, outBasename);
+      var entryPoint = getClientEntryPoint(filename);
+      var outBasename = getClientFolderName(filename) + '.js';
+      var outFilename = path.join(bundleDistDirectory, outBasename);
 
       if (!this._bundlers[entryPoint]) {
         var bundler = browserify(entryPoint, browserifyOptions);
