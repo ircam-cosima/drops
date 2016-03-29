@@ -1,107 +1,3 @@
-// ------------------------------------------------------------
-// VIEW COMPONENTS
-// ------------------------------------------------------------
-
-.space {
-  svg {
-    overflow: hidden;
-  }
-
-  .point {
-    fill: $foregroundColor;
-
-    &.selected {
-      fill: steelblue
-    }
-  }
-
-  .line {
-    stroke: $foregroundColor;
-    stroke-width: 1px;
-
-    &.arrow {
-      marker-mid: url(#marker-arrow);
-    }
-  }
-
-  // .marker-circle {
-  //   stroke: none;
-  //   fill: $foregroundColor;
-  // }
-
-  .marker-arrow {
-    fill: $foregroundColor;
-  }
-}
-
-
-.buttons {
-  .btn {
-    width: 90%;
-    margin: 5%;
-  }
-}
-
-.select {
-  color: $backgroundColor;
-  background-color: $foregroundColor;
-  font-size: 1.3rem;
-  line-height: 3rem;
-  height: 3rem;
-}
-
-// ------------------------------------------------------------
-// CHECKIN
-// ------------------------------------------------------------
-
-#checkin {
-  .checkin-label {
-    margin: 0 auto;
-    background-color: $belize-hole;
-    border-radius: 50%;
-  }
-
-  $portraitBoxSize: 160px;
-  $landscapeBoxSize: 120px;
-
-  &.portrait .checkin-label {
-    flex-basis: $portraitBoxSize;
-    height: $portraitBoxSize;
-
-    p {
-      line-height: $portraitBoxSize;
-    }
-  }
-
-  &.landscape .checkin-label {
-    flex-basis: $landscapeBoxSize;
-    height: $landscapeBoxSize;
-
-    p {
-      line-height: $landscapeBoxSize;
-    }
-  }
-}
-
-// ------------------------------------------------------------
-// LOADER
-// ------------------------------------------------------------
-
-#loader {
-  .progress-wrap {
-    margin: 12px auto 0;
-    border: solid 1px white;
-    border-radius: 5px;
-    height: $loaderProgressBarHeight;
-    overflow: hidden;
-    flex-basis: 80%;
-  }
-  .progress-bar {
-    background-color: white;
-    height: $loaderProgressBarHeight;
-    width: 0; // is updated from javascript
-  }
-}
 
 // ------------------------------------------------------------
 // SURVEY
@@ -263,6 +159,7 @@
   .textarea {
     color: $backgroundColor;
     padding: 10px;
+    box-sizing: border-box;
   }
 
   .feedback {
@@ -298,4 +195,3 @@
     }
   }
 }
-

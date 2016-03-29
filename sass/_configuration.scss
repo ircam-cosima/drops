@@ -1,68 +1,25 @@
 // -----------------------------------------------------------------
-// MIXINS
+// GLOBALS
 // -----------------------------------------------------------------
 
-@mixin font-face($family, $weight, $file) {
-  $filepath: "../fonts/" + $file;
-  @font-face {
-    font-family: "#{$family}";
-    font-weight: $weight;
-    src: url($filepath + ".ttf") format('truetype');
-  }
-}
-
-@mixin keyframes($animation-name) {   // ?
-  @-webkit-keyframes $animation-name {
-    @content;
-  }
-  @-moz-keyframes $animation-name {
-    @content;
-  }
-  @-ms-keyframes $animation-name {
-    @content;
-  }
-  @-o-keyframes $animation-name {
-    @content;
-  }
-  @keyframes $animation-name {
-    @content;
-  }
-}
-
-@mixin prefix($name, $value) {
-  @each $vendor in ('-webkit-', '-moz-', '-ms-', '-o-', '') {
-    #{$vendor}#{$name}: #{$value};
-  }
-}
-
-@mixin transition($str) {
-  -webkit-transition: $str;
-     -moz-transition: $str;
-      -ms-transition: $str;
-       -o-transition: $str;
-          transition: $str;
-}
-
-@mixin animation($str) {
-  -webkit-animation: #{$str};
-     -moz-animation: #{$str};
-      -ms-animation: #{$str};
-       -o-animation: #{$str};
-          animation: #{$str};
-}
-
-// KEYFRAMES
-// ------------------------------------------------------------
-// create the soft blink animation from keyframe mixin
-
-@include keyframes(soft-blink) {
-  0% { opacity: 1.0; }
-  50% { opacity: 0.3; }
-  100% { opacity: 1.0; }
-}
+$backgroundColor: #080808;
+$foregroundColor: #ffffff;
+$textColor: rgba(255, 255, 255, 0.9);
+$borderRadius: 2px;
+$mainFont: Quicksand, arial, sans-serif;
+$loaderProgressBarHeight: 10px;
 
 // -----------------------------------------------------------------
-// COLORS
+// IMPORTS FONTS
+// -----------------------------------------------------------------
+
+@include font-face('Quicksand', 100, 'Quicksand-Light');
+@include font-face('Quicksand', 400, 'Quicksand-Regular');
+@include font-face('Quicksand', 700, 'Quicksand-Bold');
+
+
+// -----------------------------------------------------------------
+// COLOR LIST
 // -----------------------------------------------------------------
 
 /**

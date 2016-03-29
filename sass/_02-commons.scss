@@ -1,23 +1,4 @@
 // -----------------------------------------------------------------
-// GLOBALS
-// -----------------------------------------------------------------
-
-$backgroundColor: #080808;
-$foregroundColor: $white;
-$textColor: rgba(255, 255, 255, 0.9);
-$borderRadius: 2px;
-$mainFont: Quicksand, arial, sans-serif;
-$loaderProgressBarHeight: 10px;
-
-// -----------------------------------------------------------------
-// IMPORTS FONTS
-// -----------------------------------------------------------------
-
-@include font-face('Quicksand', 100, 'Quicksand-Light');
-@include font-face('Quicksand', 400, 'Quicksand-Regular');
-@include font-face('Quicksand', 700, 'Quicksand-Bold');
-
-// -----------------------------------------------------------------
 // RESET - GENERAL LAYOUT
 // -----------------------------------------------------------------
 
@@ -86,6 +67,12 @@ p {
   left: 0;
 }
 
+.fit-container {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 // center horizontally
 .flex-center {
   box-sizing: border-box;
@@ -106,6 +93,13 @@ p {
   @extend .flex-center;
   align-items: center;
   -webkit-align-items: center;
+}
+
+// create the soft blink animation from keyframe mixin
+@include keyframes(soft-blink) {
+  0% { opacity: 1.0; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1.0; }
 }
 
 // -----------------------------------------------------------------
