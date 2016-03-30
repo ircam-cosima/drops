@@ -40,16 +40,15 @@ export default class PlayerExperience extends soundworks.Experience {
     super();
 
     // configure required services
-    this.welcome = this.require('welcome');
     this.loader = this.require('loader', { files: audioFiles });
     this.checkin = this.require('checkin');
-    this.sync = this.require('sync');
+    // this.sync = this.require('sync');
     this.params = this.require('shared-params');
     this.motionInput = this.require('motion-input', { descriptors: ['accelerationIncludingGravity'] });
     this.scheduler = this.require('scheduler', { lookahead: 0.050 });
 
-    // requires mobile device
-    this.require('platform', { features: 'mobile-device' });
+    // requires mobile device and web audio
+    this.require('platform', { features: ['mobile-device', 'web-audio'] });
 
     // a simple sample player with a list of samples
     this.synth = new SampleSynth();
