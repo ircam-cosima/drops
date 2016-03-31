@@ -40,7 +40,6 @@ export default class PlayerExperience extends soundworks.Experience {
     super();
 
     // configure required services
-    this.welcome = this.require('welcome');
     this.loader = this.require('loader', { files: audioFiles });
     this.checkin = this.require('checkin');
     this.sync = this.require('sync');
@@ -189,14 +188,14 @@ export default class PlayerExperience extends soundworks.Experience {
 
     // setup shared parameter (conductor) listeners
     const params = this.params;
-    params.addItemListener('state', (state) => this.setState(state));
-    params.addItemListener('maxDrops', (value) => this.setMaxDrops(value));
-    params.addItemListener('loopDiv', (value) => this.loopParams.div = value);
-    params.addItemListener('loopPeriod', (value) => this.loopParams.period = value);
-    params.addItemListener('loopAttenuation', (value) => this.loopParams.attenuation = value);
-    params.addItemListener('minGain', (value) => this.loopParams.minGain = value);
-    params.addItemListener('autoPlay', (value) => this.setAutoPlay(value));
-    params.addItemListener('clear', () => this.looper.removeAll());
+    params.addParamListener('state', (state) => this.setState(state));
+    params.addParamListener('maxDrops', (value) => this.setMaxDrops(value));
+    params.addParamListener('loopDiv', (value) => this.loopParams.div = value);
+    params.addParamListener('loopPeriod', (value) => this.loopParams.period = value);
+    params.addParamListener('loopAttenuation', (value) => this.loopParams.attenuation = value);
+    params.addParamListener('minGain', (value) => this.loopParams.minGain = value);
+    params.addParamListener('autoPlay', (value) => this.setAutoPlay(value));
+    params.addParamListener('clear', () => this.looper.removeAll());
 
     // setup motion input listeners
     if (this.motionInput.isAvailable('accelerationIncludingGravity')) {

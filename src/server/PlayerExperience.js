@@ -17,13 +17,13 @@ export default class PlayerExperience extends Experience {
     };
 
     // listen to shared parameter changes
-    this.params.addItemListener('loopDiv', (value) => this.loopParams.div = value);
-    this.params.addItemListener('loopPeriod', (value) => this.loopParams.period = value);
-    this.params.addItemListener('loopAttenuation', (value) => this.loopParams.attenuation = value);
+    this.params.addParamListener('loopDiv', (value) => this.loopParams.div = value);
+    this.params.addParamListener('loopPeriod', (value) => this.loopParams.period = value);
+    this.params.addParamListener('loopAttenuation', (value) => this.loopParams.attenuation = value);
   }
 
   /**
-   * 
+   *
    *
    */
   enter(client) {
