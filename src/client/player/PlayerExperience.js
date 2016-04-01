@@ -42,7 +42,6 @@ export default class PlayerExperience extends soundworks.Experience {
     // configure required services
     this.loader = this.require('loader', { files: audioFiles });
     this.checkin = this.require('checkin');
-    // this.sync = this.require('sync');
     this.params = this.require('shared-params');
     this.motionInput = this.require('motion-input', { descriptors: ['accelerationIncludingGravity'] });
     this.scheduler = this.require('scheduler', { lookahead: 0.050 });
