@@ -5,6 +5,7 @@
 /server
 /client
 /common
+/config/cosima-apps-*
 
 # Application instance specific
 /logs
