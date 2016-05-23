@@ -9,9 +9,9 @@
   "version": "1.0.1",
   "license": "BSD-3-Clause",
   "scripts": {
-    "postinstall": "npm run transpile",
     "start": "node ./bin/runner --start",
     "transpile": "node ./bin/runner --transpile",
+    "prewatch": "npm run transpile",
     "watch": "node ./bin/runner --watch"
   },
   "repository": {
