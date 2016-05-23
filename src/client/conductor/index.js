@@ -10,11 +10,11 @@ window.addEventListener('load', () => {
   client.init('conductor', { socketIO, appName });
 
   // configure appearance of shared parameters
-  const params = client.require('shared-params', { hasGui: true });
-  params.setGuiOptions('numPlayers', { readOnly: true });
-  params.setGuiOptions('state', { type: 'buttons' });
-  params.setGuiOptions('loopAttenuation', { type: 'slider', size: 'large' });
-  params.setGuiOptions('minGain', { type: 'slider', size: 'large' });
+  const conductor = new soundworks.Conductor();
+  conductor.setGuiOptions('numPlayers', { readOnly: true });
+  conductor.setGuiOptions('state', { type: 'buttons' });
+  conductor.setGuiOptions('loopAttenuation', { type: 'slider', size: 'large' });
+  conductor.setGuiOptions('minGain', { type: 'slider', size: 'large' });
 
   // start client
   client.start();
