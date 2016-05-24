@@ -9,9 +9,10 @@
   "version": "1.0.1",
   "license": "BSD-3-Clause",
   "scripts": {
+    "minify": "node ./bin/runner --minify",
+    "prewatch": "npm run transpile",
     "start": "node ./bin/runner --start",
     "transpile": "node ./bin/runner --transpile",
-    "prewatch": "npm run transpile",
     "watch": "node ./bin/runner --watch"
   },
   "repository": {
@@ -34,6 +35,7 @@
     "fs-extra": "^0.26.2",
     "node-sass": "^3.4.1",
     "ora": "^0.2.0",
+    "uglifyjs": "^2.4.10",
     "watch": "^0.17.1",
     "watchify": "^3.7.0"
   }

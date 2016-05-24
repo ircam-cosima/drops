@@ -2,6 +2,7 @@
 var fse = require('fs-extra');
 var watch = require('watch');
 var path = require('path');
+var uglifyJS = require('uglifyjs');
 var util = require('util');
 
 var javascripts = require('./javascripts');
@@ -172,6 +173,13 @@ var commands = {
    */
   start: function() {
     server.start();
+  },
+
+  /**
+   * Minify all files in `clientPublicDirectory`
+   */
+  minify: function() {
+    minify();
   },
 };
 
@@ -383,6 +391,35 @@ function transpile() {
   styles.process(cssSrcDirectory, cssPublicDirectory, isAllowed, sassOptions);
 }
 
+function minify() {
+  _getFileList(clientPublicDirectory, function(files) {
+    for (var i = files.length - 1; i >= 0; i--) {
+      var filename = files[i];
+
+      if (/\.min\.js$/.test(filename)) {
+        fse.removeSync(filename);
+        log.deleteFile(filename);
+
+        files.splice(i, 1);
+      }
+    }
+
+    files.forEach(function(filename) {
+      log.minifyStart(filename);
+
+      var outFilename = filename.replace(/\.js$/, '.min.js');
+      var startTime = new Date().getTime();
+      var result = uglifyJS.minify(filename);
+      // console.log(result.code); // minified output
+      fse.outputFile(outFilename, result.code, function(err) {
+        if (err)
+          return console.error(err.message);
+
+        log.minifySuccess(filename, outFilename, startTime);
+      });
+    });
+  });
+}
 
 /* --------------------------------------------------------------------------
  * Process and execute the given command.
@@ -404,6 +441,9 @@ switch (command) {
     break;
   case '--start':
     commands.start();
+    break;
+  case '--minify':
+    commands.minify();
     break;
 }
 
