@@ -1,4 +1,4 @@
-import * as soundworks from 'soundworks/client';
+import { Renderer } from 'soundworks/client';
 import { getScaler } from 'soundworks/utils/math';
 
 const colorMap = [
@@ -40,21 +40,18 @@ class Circle {
     this.lifeTime -= dt;
     this.opacity = this.opacityScale(this.lifeTime);
 
-    if (this.growthVelocity > this.minVelocity) {
+    if (this.growthVelocity > this.minVelocity)
       this.growthVelocity += (this.friction * dt);
-    }
 
     this.radius += this.growthVelocity * dt;
 
-    if (this.lifeTime < 0) {
+    if (this.lifeTime < 0)
       this.isDead = true;
-    }
   }
 
   draw(ctx) {
-    if (this.isDead) {
+    if (this.isDead)
       return;
-    }
 
     ctx.save();
     ctx.beginPath();
@@ -67,7 +64,7 @@ class Circle {
   }
 }
 
-export default class Circles extends soundworks.Renderer {
+export default class Circles extends Renderer {
   constructor() {
     super();
 
@@ -86,9 +83,8 @@ export default class Circles extends soundworks.Renderer {
   }
 
   render(ctx) {
-    for (var i = 0; i < this.circles.length; i++) {
+    for (var i = 0; i < this.circles.length; i++)
       this.circles[i].draw(ctx);
-    }
   }
 
   trigger(id, x, y, options) {
