@@ -66,6 +66,23 @@ var log = {
     console.log(msg, toRel(filename));
   },
 
+  minifyStart: function(filename) {
+    var msg = prefix + (toRel(filename) + ': minify start').yellow;
+    var spinner = ora({ color: 'white', text: msg });
+    spinner.start();
+
+    spinners[filename] = spinner;
+  },
+
+  minifySuccess: function(filename, outFilename, startTime) {
+    var spinner = spinners[filename];
+    var msg = prefix + '%s: minified version successfully created (%sms)'.green;
+    var time = getDeltaTime(startTime);
+
+    spinner.stop();
+    console.log(msg, toRel(outFilename), time);
+  },
+
   sassSuccess: function(dest) {
     var msg = prefix + '%s: successfully written'.green
     console.log(msg, toRel(dest));
