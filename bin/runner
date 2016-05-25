@@ -405,7 +405,6 @@ function minify() {
     }
 
     files.forEach(function(filename) {
-      console.log(filename);
       log.minifyStart(filename);
 
       var outFilename = filename.replace(/\.js$/, '.min.js');
