@@ -82,6 +82,7 @@ export default class PlayerExperience extends soundworks.Experience {
       numAvailable: 0,
     }
 
+    this.viewOptions = { preservePixelRatio: true };
     // create view with the creator, template and content given above
     this.view = this.createView();
   }

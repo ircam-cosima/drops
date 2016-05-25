@@ -2,12 +2,12 @@ import * as soundworks from 'soundworks/client';
 const client = soundworks.client;
 
 window.addEventListener('load', () => {
-  // configuration shared by the server (see `html/default.ejs`)
-  const socketIO = window.CONFIG && window.CONFIG.SOCKET_CONFIG;
-  const appName = window.CONFIG && window.CONFIG.APP_NAME;
-
-  // init client
-  client.init('conductor', { socketIO, appName });
+  // configuration received from the server through the `index.html`
+  // @see {~/src/server/index.js}
+  // @see {~/html/default.ejs}
+  const { appName, clientType, socketIO }  = window.soundworksConfig;
+  // initialize the 'player' client
+  soundworks.client.init(clientType, { socketIO, appName });
 
   // configure appearance of shared parameters
   const conductor = new soundworks.Conductor();

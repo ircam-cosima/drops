@@ -7,12 +7,14 @@
 
     <!-- title -->
     <title>
-      <%= appName %>
-      <% if (clientType !== defaultType) { %>| <%= clientType %><% } %>
+      <%= data.appName %>
+      <% if (data.clientType !== data.defaultType) { %>
+        | <%= data.clientType %>
+      <% } %>
     </title>
 
     <!-- stylesheets -->
-    <link rel="stylesheet" href="<%= assetsDomain %>css/main.css?<%= version %>">
+    <link rel="stylesheet" href="<%= data.assetsDomain %>css/main.css?<%= data.version %>">
   </head>
 
   <body>
@@ -20,12 +22,9 @@
 
     <!-- pass configuration to the client -->
     <script>
-    window.CONFIG = {};
-    window.CONFIG.SOCKET_CONFIG = JSON.parse('<%- socketIO %>');
-    window.CONFIG.APP_NAME = '<%- appName %>';
-    window.CONFIG.VERSION = '<%- version %>';
+      window.soundworksConfig = JSON.parse('<%- JSON.stringify(data) %>');
     </script>
 
-    <script src="<%= assetsDomain %>js/<%= clientType %>.js?<%= version %>"></script>
+    <script src="<%= data.assetsDomain %>js/<%= data.clientType %>.js?<%= data.version %>"></script>
   </body>
 </html>
