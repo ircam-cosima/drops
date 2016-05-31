@@ -13,6 +13,7 @@ The parameters of the application (i.e. the period of the echoes, the number of 
 git clone https://github.com/collective-soundworks/soundworks-drops.git
 cd soundworks-drops
 npm install
+npm run transpile
 npm run start
 ```
 
