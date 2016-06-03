@@ -231,7 +231,7 @@ export default class PlayerExperience extends soundworks.Experience {
     // rederer starts with black screen
     this.view.setPreRender((ctx) => {
       ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, ctx.width, ctx.height);
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     });
 
     // add renderer to view
