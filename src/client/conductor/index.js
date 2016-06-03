@@ -17,6 +17,8 @@ window.addEventListener('load', () => {
     minGain: { type: 'slider', size: 'large' },
   });
 
+  conductor.require('auth');
+
   // start client
   client.start();
 });
