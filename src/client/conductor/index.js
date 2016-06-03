@@ -10,12 +10,12 @@ window.addEventListener('load', () => {
   soundworks.client.init(clientType, { socketIO, appName });
 
   // configure appearance of shared parameters
-  const conductor = new soundworks.BasicSharedController(
-  conductor.require('auth');
-  conductor.setGuiOptions('numPlayers', { readOnly: true });
-  conductor.setGuiOptions('state', { type: 'buttons' });
-  conductor.setGuiOptions('loopAttenuation', { type: 'slider', size: 'large' });
-  conductor.setGuiOptions('minGain', { type: 'slider', size: 'large' });
+  const conductor = new soundworks.BasicSharedController({
+    numPlayers: { readOnly: true },
+    state: { type: 'buttons' },
+    loopAttenuation: { type: 'slider', size: 'large' },
+    minGain: { type: 'slider', size: 'large' },
+  });
 
   // start client
   client.start();

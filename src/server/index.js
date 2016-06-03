@@ -10,8 +10,6 @@ const config = {
   // name of the environement,
   // use NODE_ENV=production to configure express at the same time.
   env: (process.env.NODE_ENV || 'development'),
-  // id of the google analytics account, is used only if env='production'
-  gaId: null,
 };
 
 server.init(config);
@@ -31,7 +29,7 @@ sharedParams.addTrigger('clear', 'clear');
 
 // create server side conductor experience
 const conductor = new soundworks.BasicSharedController('conductor');
-conductor.require('auth', { password: 'test' });
+// conductor.require('auth', { password: 'test' });
 
 // create server side player experience
 const experience = new PlayerExperience();
@@ -45,9 +43,7 @@ soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) =>
     version: config.version,
     defaultType: config.defaultClient,
     assetsDomain: config.assetsDomain,
-    // environment
     env: config.env,
-    gaId: config.gaId,
   };
 });
 
