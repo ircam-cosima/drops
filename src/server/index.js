@@ -10,8 +10,6 @@ const config = {
   // name of the environement,
   // use NODE_ENV=production to configure express at the same time.
   env: (process.env.NODE_ENV || 'development'),
-
-  password: {'conductor': 'test'},
 };
 
 server.init(config);
@@ -31,7 +29,6 @@ sharedParams.addTrigger('clear', 'clear');
 
 // create server side conductor experience
 const conductor = new soundworks.BasicSharedController('conductor');
-conductor.require('auth');
 
 // create server side player experience
 const experience = new PlayerExperience();
@@ -40,12 +37,12 @@ const experience = new PlayerExperience();
 soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) => {
   return {
     clientType: clientType,
+    env: config.env,
     socketIO: config.socketIO,
     appName: config.appName,
     version: config.version,
     defaultType: config.defaultClient,
     assetsDomain: config.assetsDomain,
-    env: config.env,
   };
 });
 
