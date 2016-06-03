@@ -5,6 +5,14 @@ import * as soundworks from 'soundworks/server';
 import PlayerExperience from './PlayerExperience';
 const server = soundworks.server;
 
+const envConfig = {
+  // name of the environement,
+  // use NODE_ENV=production to configure express at the same time.
+  env: (process.env.NODE_ENV || 'development'),
+  // id of the google analytics account, is used only if env='production'
+  gaId: '',
+};
+
 // configure shared params
 class ConductorExperience extends soundworks.Experience {
   constructor() {
@@ -24,7 +32,7 @@ class ConductorExperience extends soundworks.Experience {
   }
 }
 
-server.init({ appName: 'Drops' });
+server.init({ appName: 'Drops' }, envConfig);
 
 // create server side player and conductor experience
 const conductor = new ConductorExperience();
@@ -39,6 +47,9 @@ soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) =>
     version: config.version,
     defaultType: config.defaultClient,
     assetsDomain: config.assetsDomain,
+    // environment
+    env: config.env,
+    gaId: config.gaId,
   };
 });
 
