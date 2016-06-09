@@ -3,19 +3,23 @@ import 'source-map-support/register';
 
 import * as soundworks from 'soundworks/server';
 import PlayerExperience from './PlayerExperience';
-const server = soundworks.server;
+import defaultConfig from './config/default';
 
-const config = {
-  appName: 'Drops',
-  // name of the environement,
-  // use NODE_ENV=production to configure express at the same time.
-  env: (process.env.NODE_ENV || 'development'),
-};
+let config = null;
 
-server.init(config);
+switch(process.env.ENV) {
+  default:
+    config = defaultConfig;
+    break;
+}
+
+// configure express environment ('production' enable cache systems)
+process.env.NODE_ENV = config.env;
+// initialize application with configuration options
+soundworks.server.init(config);
 
 // define parameters shared by different clients
-const sharedParams = server.require('shared-params');
+const sharedParams = soundworks.server.require('shared-params');
 sharedParams.addText('numPlayers', 'num players', 0, ['conductor']);
 sharedParams.addEnum('state', 'state', ['reset', 'running', 'end'], 'reset');
 sharedParams.addNumber('maxDrops', 'max drops', 0, 24, 1, 6);
@@ -46,4 +50,4 @@ soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) =>
   };
 });
 
-server.start();
+soundworks.server.start();

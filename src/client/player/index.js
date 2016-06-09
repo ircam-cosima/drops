@@ -1,8 +1,8 @@
-// import soundworks client side
+// import client side soundworks and player experience
 import * as soundworks from 'soundworks/client';
-
-// import player experience
 import PlayerExperience from './PlayerExperience.js';
+import viewTemplates from '../shared/viewTemplates';
+import viewContent from '../shared/viewContent';
 
 // launch application when document is fully loaded
 window.addEventListener('load', () => {
@@ -12,6 +12,8 @@ window.addEventListener('load', () => {
   const { appName, clientType, socketIO }  = window.soundworksConfig;
   // initialize the 'player' client
   soundworks.client.init(clientType, { socketIO, appName });
+  soundworks.client.setViewContentDefinitions(viewContent);
+  soundworks.client.setViewTemplateDefinitions(viewTemplates);
 
   // create client side (player) experience
   const experience = new PlayerExperience();
