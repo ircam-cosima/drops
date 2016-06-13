@@ -13,7 +13,7 @@ switch(process.env.ENV) {
     break;
 }
 
-// configure express environment ('production' enable cache systems)
+// configure express environment ('production' enables cache systems)
 process.env.NODE_ENV = config.env;
 // initialize application with configuration options
 soundworks.server.init(config);
