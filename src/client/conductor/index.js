@@ -1,5 +1,6 @@
 import * as soundworks from 'soundworks/client';
-const client = soundworks.client;
+import viewTemplates from '../shared/viewTemplates';
+import viewContent from '../shared/viewContent';
 
 window.addEventListener('load', () => {
   // configuration received from the server through the `index.html`
@@ -8,14 +9,17 @@ window.addEventListener('load', () => {
   const { appName, clientType, socketIO }  = window.soundworksConfig;
   // initialize the 'player' client
   soundworks.client.init(clientType, { socketIO, appName });
+  soundworks.client.setViewContentDefinitions(viewContent);
+  soundworks.client.setViewTemplateDefinitions(viewTemplates);
 
   // configure appearance of shared parameters
-  const conductor = new soundworks.Conductor();
-  conductor.setGuiOptions('numPlayers', { readOnly: true });
-  conductor.setGuiOptions('state', { type: 'buttons' });
-  conductor.setGuiOptions('loopAttenuation', { type: 'slider', size: 'large' });
-  conductor.setGuiOptions('minGain', { type: 'slider', size: 'large' });
+  const conductor = new soundworks.BasicSharedController({
+    numPlayers: { readOnly: true },
+    state: { type: 'buttons' },
+    loopAttenuation: { type: 'slider', size: 'large' },
+    minGain: { type: 'slider', size: 'large' },
+  });
 
   // start client
-  client.start();
+  soundworks.client.start();
 });

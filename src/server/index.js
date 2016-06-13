@@ -3,37 +3,45 @@ import 'source-map-support/register';
 
 import * as soundworks from 'soundworks/server';
 import PlayerExperience from './PlayerExperience';
-const server = soundworks.server;
+import defaultConfig from './config/default';
 
-// configure shared params
-class ConductorExperience extends soundworks.Experience {
-  constructor() {
-    super('conductor');
+let config = null;
 
-    this.sharedParams = this.require('shared-params');
-    this.sharedParams.addText('numPlayers', 'num players', 0, ['conductor']);
-    this.sharedParams.addEnum('state', 'state', ['reset', 'running', 'end'], 'reset');
-    this.sharedParams.addNumber('maxDrops', 'max drops', 0, 24, 1, 6);
-    this.sharedParams.addNumber('loopDiv', 'loop div', 1, 24, 1, 3);
-    this.sharedParams.addNumber('loopPeriod', 'loop period', 1, 24, 0.1, 7.5);
-    this.sharedParams.addNumber('loopAttenuation', 'loop atten', 0, 1, 0.01, 0.707);
-    this.sharedParams.addNumber('minGain', 'min gain', 0, 1, 0.01, 0.1);
-    this.sharedParams.addNumber('quantize', 'quantize', 0, 1, 0.001, 0);
-    this.sharedParams.addEnum('autoPlay', 'auto play', ['off', 'on'], 'off');
-    this.sharedParams.addTrigger('clear', 'clear');
-  }
+switch(process.env.ENV) {
+  default:
+    config = defaultConfig;
+    break;
 }
 
-server.init({ appName: 'Drops' });
+// configure express environment ('production' enables cache systems)
+process.env.NODE_ENV = config.env;
+// initialize application with configuration options
+soundworks.server.init(config);
 
-// create server side player and conductor experience
-const conductor = new ConductorExperience();
+// define parameters shared by different clients
+const sharedParams = soundworks.server.require('shared-params');
+sharedParams.addText('numPlayers', 'num players', 0, ['conductor']);
+sharedParams.addEnum('state', 'state', ['reset', 'running', 'end'], 'reset');
+sharedParams.addNumber('maxDrops', 'max drops', 0, 24, 1, 6);
+sharedParams.addNumber('loopDiv', 'loop div', 1, 24, 1, 3);
+sharedParams.addNumber('loopPeriod', 'loop period', 1, 24, 0.1, 7.5);
+sharedParams.addNumber('loopAttenuation', 'loop atten', 0, 1, 0.01, 0.707);
+sharedParams.addNumber('minGain', 'min gain', 0, 1, 0.01, 0.1);
+sharedParams.addNumber('quantize', 'quantize', 0, 1, 0.001, 0);
+sharedParams.addEnum('autoPlay', 'auto play', ['off', 'on'], 'off');
+sharedParams.addTrigger('clear', 'clear');
+
+// create server side conductor experience
+const conductor = new soundworks.BasicSharedController('conductor');
+
+// create server side player experience
 const experience = new PlayerExperience();
 
 // define the configuration object to be passed to the `.ejs` template
 soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) => {
   return {
     clientType: clientType,
+    env: config.env,
     socketIO: config.socketIO,
     appName: config.appName,
     version: config.version,
@@ -42,4 +50,4 @@ soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) =>
   };
 });
 
-server.start();
+soundworks.server.start();

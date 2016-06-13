@@ -36,14 +36,19 @@ const viewTemplate = `
 `;
 
 export default class PlayerExperience extends soundworks.Experience {
-  constructor() {
+  constructor(assetsDomain) {
     super();
 
     // configure required services
-    this.loader = this.require('loader', { files: audioFiles });
+    this.loader = this.require('loader', {
+      files: audioFiles,
+      assetsDomain: assetsDomain
+    });
     this.checkin = this.require('checkin');
     this.params = this.require('shared-params');
-    this.motionInput = this.require('motion-input', { descriptors: ['accelerationIncludingGravity'] });
+    this.motionInput = this.require('motion-input', {
+      descriptors: ['accelerationIncludingGravity']
+    });
     this.scheduler = this.require('scheduler', { lookahead: 0.050 });
 
     // requires mobile device and web audio
@@ -231,7 +236,7 @@ export default class PlayerExperience extends soundworks.Experience {
     // rederer starts with black screen
     this.view.setPreRender((ctx) => {
       ctx.fillStyle = '#000';
-      ctx.fillRect(0, 0, ctx.width, ctx.height);
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     });
 
     // add renderer to view
