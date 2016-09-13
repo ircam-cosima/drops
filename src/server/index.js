@@ -1,8 +1,8 @@
 // add source map support to nodejs
 import 'source-map-support/register';
-
 import * as soundworks from 'soundworks/server';
 import PlayerExperience from './PlayerExperience';
+import ControllerExperience from './ControllerExperience';
 import defaultConfig from './config/default';
 
 let config = null;
@@ -31,12 +31,6 @@ sharedParams.addNumber('quantize', 'quantize', 0, 1, 0.001, 0);
 sharedParams.addEnum('autoPlay', 'auto play', ['off', 'on'], 'off');
 sharedParams.addTrigger('clear', 'clear');
 
-// create server side conductor experience
-const conductor = new soundworks.BasicSharedController('conductor');
-
-// create server side player experience
-const experience = new PlayerExperience();
-
 // define the configuration object to be passed to the `.ejs` template
 soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) => {
   return {
@@ -49,5 +43,10 @@ soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) =>
     assetsDomain: config.assetsDomain,
   };
 });
+
+// create server side conductor experience
+const conductor = new ControllerExperience('controller');
+// create server side player experience
+const experience = new PlayerExperience('player');
 
 soundworks.server.start();

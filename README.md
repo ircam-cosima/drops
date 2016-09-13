@@ -6,7 +6,7 @@ The application is strongly inspired by the mobile application *Bloom* by Brian 
 
 Each *player* can play sounds of different pitch and timbre depending on the touch position. As in *Bloom*, each sound is visualized by a circle growing from the tapping position and fading with the sound. However, in *Drops* the sounds played by one player are sequentially repeated two other players in a period of a few seconds before coming back to the original player. The sounds are repeated in a fading loop until they vanish. Players can clear the loop by shaking their smartphones.
 
-The parameters of the application (i.e. the period of the echoes, the number of echo players, the echo attenuation, etc) can be controlled via a *conductor* client (accessible at the `http://127.0.0.1:8000/conductor/` url).
+The parameters of the application (i.e. the period of the echoes, the number of echo players, the echo attenuation, etc) can be controlled via a *controller* client with a basic authentication accessible at the url `http://127.0.0.1:8000/controller/` (password: "password").
 
 ```sh
 # to start the application

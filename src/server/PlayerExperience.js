@@ -1,8 +1,8 @@
 import { Experience } from 'soundworks/server';
 
 export default class PlayerExperience extends Experience {
-  constructor() {
-    super('player');
+  constructor(clientType) {
+    super(clientType);
 
     // define service dependencies
     this.sync = this.require('sync');
