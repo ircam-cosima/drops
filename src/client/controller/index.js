@@ -14,7 +14,7 @@ window.addEventListener('load', () => {
   soundworks.client.setViewTemplateDefinitions(viewTemplates);
 
   // configure appearance of shared parameters
-  const conductor = new ControllerExperience({
+  const controller = new ControllerExperience({
     numPlayers: { readOnly: true },
     state: { type: 'buttons' },
     loopAttenuation: { type: 'slider', size: 'large' },

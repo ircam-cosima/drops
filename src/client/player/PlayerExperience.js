@@ -191,7 +191,7 @@ export default class PlayerExperience extends soundworks.Experience {
     // show view
     this.show();
 
-    // setup shared parameter (conductor) listeners
+    // setup shared parameter (controller) listeners
     const params = this.params;
     params.addParamListener('state', (state) => this.setState(state));
     params.addParamListener('maxDrops', (value) => this.setMaxDrops(value));

@@ -93,7 +93,7 @@ export default class Looper {
     this.updateCount(); // update drop counter display
   }
 
-  // remove all loops (for clear in conductor)
+  // remove all loops (for clear in controller)
   removeAll() {
     // remove all loops from scheduler
     for (let loop of this.loops)
