@@ -5,7 +5,10 @@
 /server
 /client
 /common
-/config/cosima-apps-*
+
+# config files
+src/server/config/*
+!src/server/config/default.js
 
 # Application instance specific
 /logs

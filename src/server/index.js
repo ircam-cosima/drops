@@ -20,7 +20,7 @@ soundworks.server.init(config);
 
 // define parameters shared by different clients
 const sharedParams = soundworks.server.require('shared-params');
-sharedParams.addText('numPlayers', 'num players', 0, ['conductor']);
+sharedParams.addText('numPlayers', 'num players', 0, ['controller']);
 sharedParams.addEnum('state', 'state', ['reset', 'running', 'end'], 'reset');
 sharedParams.addNumber('maxDrops', 'max drops', 0, 24, 1, 6);
 sharedParams.addNumber('loopDiv', 'loop div', 1, 24, 1, 3);
@@ -44,8 +44,9 @@ soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) =>
   };
 });
 
-// create server side conductor experience
-const conductor = new ControllerExperience('controller');
+// create server side controller experience
+const controller = new ControllerExperience('controller');
+
 // create server side player experience
 const experience = new PlayerExperience('player');
 
