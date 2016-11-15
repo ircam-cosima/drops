@@ -45,7 +45,13 @@ class Circle {
 
     this.radius += this.growthVelocity * dt;
 
-    if (this.lifeTime < 0)
+    // hopefully fix:
+    // Uncaught IndexSizeError: Failed to execute 'arc' on 'CanvasRenderingContext2D': The radius provided (-2) is negative.
+    // and
+    // IndexSizeError: DOM Exception 1: Index or size was negative, or greater than the allowed value.
+    this.radius = Math.max(0, this.radius);
+
+    if (this.lifeTime < 0 || this.radius === 0)
       this.isDead = true;
   }
 

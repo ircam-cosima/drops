@@ -13,6 +13,12 @@ export default class SampleSynth {
     const audioBuffers = this.audioBuffers;
     let duration = 0;
 
+    // hopefully fix:
+    // Uncaught InvalidAccessError: Failed to execute 'start' on 'AudioBufferSourceNode': The start time provided (-7.64354) is less than the minimum bound (0).
+    // and
+    // InvalidStateError (DOM Exception 11): The object is in an invalid state.
+    time = Math.max(time, audioContext.currentTime);
+
     if (audioBuffers && audioBuffers.length > 0) {
       const x = params.x || 0.5;
       const y = params.y || 0.5;
