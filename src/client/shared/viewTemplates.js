@@ -22,13 +22,17 @@ export default {
           <button class="btn" id="send"><%= send %></button>
         </div>
       </div>
-      <div class="section-bottom"></div>
+      <div class="section-bottom flex-middle">
+        <button id="reset" class="btn"><%= reset %></button>
+      </div>
     <% } else { %>
       <div class="section-top"></div>
       <div class="section-center flex-center">
         <p><%= rejectMessage %></p>
       </div>
-      <div class="section-bottom"></div>
+      <div class="section-bottom flex-middle">
+        <button id="reset" class="btn"><%= reset %></button>
+      </div>
     <% } %>
   `,
 

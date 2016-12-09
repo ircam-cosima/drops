@@ -53,7 +53,7 @@ export default {
   },
 
   // socket.io configuration
-  socketIO: {
+  websockets: {
     url: '',
     transports: ['websocket'],
     // @note: EngineIO defaults

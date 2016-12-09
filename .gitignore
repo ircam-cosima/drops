@@ -2,9 +2,7 @@
 /node_modules
 /public/js
 /public/css
-/server
-/client
-/common
+/dist
 
 # config files
 src/server/config/*

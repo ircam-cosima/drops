@@ -40,7 +40,7 @@ export default class PlayerExperience extends soundworks.Experience {
     super();
 
     // configure required services
-    this.loader = this.require('loader', {
+    this.audioBufferManager = this.require('audio-buffer-manager', {
       files: audioFiles,
       assetsDomain: assetsDomain
     });
@@ -243,7 +243,7 @@ export default class PlayerExperience extends soundworks.Experience {
     this.view.addRenderer(this.renderer);
 
     // set synth audio buffers
-    this.synth.audioBuffers = this.loader.buffers;
+    this.synth.audioBuffers = this.audioBufferManager.getAudioBufferArray();
 
     // launch autoplay (for testing)
     if (this.autoPlay) {

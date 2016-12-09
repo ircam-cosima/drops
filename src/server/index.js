@@ -36,7 +36,7 @@ soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) =>
   return {
     clientType: clientType,
     env: config.env,
-    socketIO: config.socketIO,
+    websockets: config.websockets,
     appName: config.appName,
     version: config.version,
     defaultType: config.defaultClient,
