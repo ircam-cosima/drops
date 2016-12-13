@@ -1,8 +1,9 @@
-// add source map support to nodejs
 import 'source-map-support/register';
 import * as soundworks from 'soundworks/server';
-import PlayerExperience from './PlayerExperience';
 import ControllerExperience from './ControllerExperience';
+import PlanetExperience from './PlanetExperience';
+import PlayerExperience from './PlayerExperience';
+
 import defaultConfig from './config/default';
 
 let config = null;
@@ -13,11 +14,10 @@ switch(process.env.ENV) {
     break;
 }
 
-// configure express environment ('production' enables cache systems)
 process.env.NODE_ENV = config.env;
-// initialize application with configuration options
-soundworks.server.init(config);
 
+soundworks.server.init(config);
+// @todo - move to a config object
 // define parameters shared by different clients
 const sharedParams = soundworks.server.require('shared-params');
 sharedParams.addText('numPlayers', 'num players', 0, ['controller']);
@@ -31,7 +31,7 @@ sharedParams.addNumber('quantize', 'quantize', 0, 1, 0.001, 0);
 sharedParams.addEnum('autoPlay', 'auto play', ['off', 'on'], 'off');
 sharedParams.addTrigger('clear', 'clear');
 
-// define the configuration object to be passed to the `.ejs` template
+
 soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) => {
   return {
     clientType: clientType,
@@ -44,10 +44,8 @@ soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) =>
   };
 });
 
-// create server side controller experience
-const controller = new ControllerExperience('controller');
-
-// create server side player experience
-const experience = new PlayerExperience('player');
+const controllerExperience = new ControllerExperience('controller');
+const playerExperience = new PlayerExperience('player');
+const planetExperience = new PlanetExperience('planet');
 
 soundworks.server.start();

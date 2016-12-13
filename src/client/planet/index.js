@@ -1,5 +1,5 @@
 import * as soundworks from 'soundworks/client';
-import PlayerExperience from './PlayerExperience';
+import PlanetExperience from './PlanetExperience';
 import viewTemplates from '../shared/viewTemplates';
 import viewContent from '../shared/viewContent';
 
@@ -12,6 +12,6 @@ window.addEventListener('load', () => {
   soundworks.client.setViewContentDefinitions(viewContent);
   soundworks.client.setViewTemplateDefinitions(viewTemplates);
 
-  const experience = new PlayerExperience(config.assetsDomain);
+  const experience = new PlanetExperience(config.assetsDomain);
   soundworks.client.start();
 });
