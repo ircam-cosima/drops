@@ -4,66 +4,27 @@ export default class PlayerExperience extends Experience {
   constructor(clientType) {
     super(clientType);
 
-    // define service dependencies
     this.sync = this.require('sync');
     this.checkin = this.require('checkin');
     this.params = this.require('shared-params');
+    // this.geolocation = this.require('geolocation');
 
-    // set default loop parameters
-    this.loopParams = {
-      div: 3,
-      period: 7.5,
-      attenuation: 0.70710678118655,
-    };
+    // model for loop parameters
+    this.loopParams = {};
 
     // listen to shared parameter changes
-    this.params.addParamListener('loopDiv', (value) => this.loopParams.div = value);
     this.params.addParamListener('loopPeriod', (value) => this.loopParams.period = value);
     this.params.addParamListener('loopAttenuation', (value) => this.loopParams.attenuation = value);
   }
 
-  /**
-   *
-   *
-   */
   enter(client) {
     super.enter(client);
 
-    // create empty
-    client.activities[this.id].echoPlayers = [];
+    // store all clients that are echoing
+    client.activities[this.id].echoPlayers = new Set();
 
-    this.receive(client, 'sound', (time, soundParams) => {
-      const playerList = this.clients;
-      const playerListLength = playerList.length;
-      const loopParams = this.loopParams;
-      let numEchoPlayers = loopParams.div - 1;
-
-      if (numEchoPlayers > playerListLength - 1)
-        numEchoPlayers = playerListLength - 1;
-
-      if (numEchoPlayers > 0) {
-        const index = this.clients.indexOf(client);
-        const echoPlayers = client.activities[this.id].echoPlayers;
-        const echoPeriod = loopParams.period / loopParams.div;
-        let echoDelay = 0;
-
-        for (let i = 1; i <= numEchoPlayers; i++) {
-          const echoPlayerIndex = (index + i) % playerListLength;
-          const echoPlayer = playerList[echoPlayerIndex];
-
-          echoPlayers.push(echoPlayer);
-          echoDelay += echoPeriod;
-          const echoAttenuation = Math.pow(loopParams.attenuation, 1 / loopParams.div);
-          soundParams.gain *= echoAttenuation;
-
-          this.send(echoPlayer, 'echo', time + echoDelay, soundParams);
-        }
-      }
-    });
-
-    this.receive(client, 'clear', () => {
-      this._clearEchoes(client);
-    });
+    this.receive(client, 'sound', this._onSoundMessage(client));
+    this.receive(client, 'clear', this._onClearMessage(client));
 
     this.params.update('numPlayers', this.clients.length);
   }
@@ -71,16 +32,53 @@ export default class PlayerExperience extends Experience {
   exit(client) {
     super.exit(client);
 
-    this._clearEchoes(client);
+    // this._clearEchoes(client); // do we really want that ?
     this.params.update('numPlayers', this.clients.length);
   }
 
-  _clearEchoes(client) {
+  _onSoundMessage(client) {
+    return (time, soundParams) => {
+      const clients = this.clients;
+      const clientsLength = clients.length;
+      const loopParams = this.loopParams;
+      const echoPlayersIndexes = [-1, 1];
+
+      // if only 1 or 2 clients
+      if (echoPlayersIndexes.length > clientsLength - 1)
+        echoPlayersIndexes.length = clientsLength - 1;
+
+      if (echoPlayersIndexes.length > 0) {
+        const playerIndex = this.clients.indexOf(client);
+        const echoPeriod = loopParams.period / 3;
+        let echoDelay = 0;
+
+        echoPlayersIndexes.forEach((offset) => {
+          let echoPlayerIndex = (playerIndex + offset) % clientsLength;
+
+          if (echoPlayerIndex < 0)
+            echoPlayerIndex = clientsLength - 1;
+
+          const echoPlayer = clients[echoPlayerIndex];
+          const echoAttenuation = Math.pow(loopParams.attenuation, 1 / 3);
+          echoDelay += echoPeriod;
+          soundParams.gain *= echoAttenuation;
+
+          this.send(echoPlayer, 'echo', time + echoDelay, soundParams);
+          // keep track of the players that are echoing this one
+          client.activities[this.id].echoPlayers.add(echoPlayer);
+        });
+      }
+    }
+  }
+
+  _onClearMessage(client) {
+    return () => this._clearEchos(client);
+  }
+
+  _clearEchos(client) {
     const echoPlayers = client.activities[this.id].echoPlayers;
+    echoPlayers.forEach((echoPlayer) => this.send(echoPlayer, 'clear', client.index));
 
-    for (let i = 0; i < echoPlayers.length; i++)
-      this.send(echoPlayers[i], 'clear', client.index);
-
-    client.activities[this.id].echoPlayers = [];
+    client.activities[this.id].echoPlayers.clear();
   }
 }

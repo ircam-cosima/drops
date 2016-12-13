@@ -51,6 +51,8 @@ export default class PlayerExperience extends soundworks.Experience {
     });
     this.scheduler = this.require('scheduler', { lookahead: 0.050 });
 
+    // this.geolocation = this.require('geolocation', { refreshRate: 3000 });
+
     // requires mobile device and web audio
     this.require('platform', { features: ['mobile-device', 'web-audio'] });
 
@@ -62,10 +64,10 @@ export default class PlayerExperience extends soundworks.Experience {
     this.maxDrops = 0;
 
     this.loopParams = {};
-    this.loopParams.div = 3;
-    this.loopParams.period = 7.5;
-    this.loopParams.attenuation = 0.70710678118655;
-    this.loopParams.minGain = 0.1;
+    // this.loopParams.div = 3;
+    // this.loopParams.period = 7.5;
+    // this.loopParams.attenuation = 0.70710678118655;
+    // this.loopParams.minGain = 0.1;
 
     this.autoPlay = 'off'; // automatic (random) playing: 'disable', 'off', 'on'
     this.quantize = 0; // quantization step in
@@ -195,7 +197,7 @@ export default class PlayerExperience extends soundworks.Experience {
     const params = this.params;
     params.addParamListener('state', (state) => this.setState(state));
     params.addParamListener('maxDrops', (value) => this.setMaxDrops(value));
-    params.addParamListener('loopDiv', (value) => this.loopParams.div = value);
+    // params.addParamListener('loopDiv', (value) => this.loopParams.div = value);
     params.addParamListener('loopPeriod', (value) => this.loopParams.period = value);
     params.addParamListener('loopAttenuation', (value) => this.loopParams.attenuation = value);
     params.addParamListener('minGain', (value) => this.loopParams.minGain = value);
