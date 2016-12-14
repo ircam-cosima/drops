@@ -110,7 +110,7 @@ export default {
 
   // template of the `platform` service
   'service:platform': `
-    <% if (!isCompatible) { %>
+    <% if (isCompatible === false || resolvedHooks === false) { %>
       <div class="section-top"></div>
       <div class="section-center flex-center">
         <p><%= errorMessage %></p>
@@ -126,7 +126,11 @@ export default {
           </p>
       </div>
       <div class="section-bottom flex-middle">
+        <% if (checking === true) { %>
+        <p class="small soft-blink"><%= checkingMessage %></p>
+        <% } else if (resolvedHooks === true) { %>
         <p class="small soft-blink"><%= instructions %></p>
+        <% } %>
       </div>
     <% } %>
   `,

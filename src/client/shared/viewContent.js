@@ -54,9 +54,12 @@ export default {
   // content of the `platform` service
   'service:platform': {
     isCompatible: null,
-    errorMessage: 'Sorry,<br />Your device is not compatible with the application.',
+    resolvedHooks: null,
+    checking: false,
     intro: 'Welcome to',
-    instructions: 'Touch the screen to join !',
+    instructions: 'Touch the screen to join!',
+    checkingMessage: 'Please wait while checking compatiblity',
+    errorMessage: 'Sorry,<br />Your device is not compatible with the application.',
   },
 
   // content of the `sync` service
