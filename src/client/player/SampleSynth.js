@@ -9,7 +9,7 @@ export default class SampleSynth {
     this.output.gain.value = 1;
   }
 
-  trigger(time, params, echo = false) {
+  trigger(time, params) {
     const audioBuffers = this.audioBuffers;
     let duration = 0;
 

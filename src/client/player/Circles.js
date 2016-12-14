@@ -100,10 +100,10 @@ export default class Circles extends Renderer {
     this.circles.push(circle);
   }
 
-  remove(id) {
-    this.circles.forEach((circle) => {
-      if (circle.id === id)
-        circle.isDead = true;
-    });
-  }
+  // remove(id) {
+  //   this.circles.forEach((circle) => {
+  //     if (circle.id === id)
+  //       circle.isDead = true;
+  //   });
+  // }
 }

@@ -67,7 +67,7 @@ class PlanetExperience extends soundworks.Experience {
         this.dx *= 0.92;
         this.dy *= 0.92;
 
-        if (Math.abs(this.dx) < 1e-10 && Math.abs(this.dy) < 1e-10)
+        if (Math.abs(this.dx) < 1e-6 && Math.abs(this.dy) < 1e-6)
           return false;
         else
           return true;
