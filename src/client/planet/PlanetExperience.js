@@ -1,6 +1,7 @@
 import * as soundworks from 'soundworks/client';
 import * as d3 from 'd3';
 import PlanetRenderer from './PlanetRenderer';
+import Looper from '../shared/Looper';
 
 const viewTemplate = `
   <canvas class="background"></canvas>
@@ -16,9 +17,15 @@ class PlanetExperience extends soundworks.Experience {
     super(1 / 30);
 
     this.sharedParams = this.require('shared-params');
+
     this.audioBufferManager = this.require('audio-buffer-manager', {
       files: { topology: 'data/world-110m-withlakes.json' },
     });
+
+    this.scheduler = this.require('scheduler', { lookahead: 0.050 });
+
+    this.triggerLoop = this.triggerLoop.bind(this);
+    this.triggerDrop = this.triggerDrop.bind(this);
   }
 
   init() {
@@ -115,6 +122,34 @@ class PlanetExperience extends soundworks.Experience {
 
     this.renderer = new PlanetRenderer(this.view.ctx, topology, dragProxy, zoomProxy);
     this.view.addRenderer(this.renderer);
+
+    this.looper = new Looper(this.scheduler, () => {}, this.triggerDrop);
+
+    this.sharedParams.addParamListener('maxDrops', (value) => this.looper.setMaxLocalLoops(value));
+    this.sharedParams.addParamListener('loopPeriod', (value) => this.looper.params.period = value);
+    this.sharedParams.addParamListener('loopAttenuation', (value) => this.looper.params.attenuation = value);
+    this.sharedParams.addParamListener('minGain', (value) => this.looper.params.minGain = value);
+
+    this.receive('drop', (syncTime, coordinates, soundParams) => {
+      // console.log('drop', coordinates);
+      this.triggerLoop(syncTime, coordinates, soundParams);
+    });
+
+    this.receive('echo', (syncTime, coordinates, soundParams) => {
+      // console.log('echo', coordinates);
+      // this.triggerLoop(syncTime, coordinates, soundParams);
+    });
+  }
+
+  triggerLoop(syncTime, coordinates, soundParams) {
+    soundParams.coordinates = coordinates;
+    this.looper.createLoop(syncTime, soundParams);
+  }
+
+  triggerDrop(audioTime, soundParams) {
+    // console.log(audioTime, soundParams);
+    // console.log(soundParams.index);
+    this.renderer.addPing(soundParams);
   }
 }
 

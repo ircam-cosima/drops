@@ -1,6 +1,7 @@
 import * as soundworks from 'soundworks/client';
 import * as d3 from 'd3';
 import * as topojson from 'topojson';
+import colorMap from '../shared/colorMap';
 
 class PlanetRenderer extends soundworks.Renderer {
   constructor(ctx, topology, dragProxy, zoomProxy) {
@@ -17,6 +18,8 @@ class PlanetRenderer extends soundworks.Renderer {
     this.path = d3.geoPath()
       .projection(this.projection)
       .context(ctx);
+
+    this.pings = new Set();
   }
 
   init() {
@@ -35,20 +38,49 @@ class PlanetRenderer extends soundworks.Renderer {
     this.projection.translate([canvasWidth / 2, canvasHeight / 2]);
   }
 
+  addPing(soundParams) {
+    const coords = soundParams.echoCoordinates || soundParams.coordinates;
+    const ping = {
+      color: d3.rgb(colorMap[soundParams.index % colorMap.length]),
+      duration: 2, // seconds
+      maxRadius: 5,
+      lat: coords[0],
+      lng: coords[1],
+      aliveSince: 0,
+      radius: 0,
+      alpha: 1,
+    };
+
+    this.pings.add(ping);
+  }
+
   update(dt) {
 
+    // update pings
+    this.pings.forEach((ping) => {
+      ping.aliveSince += dt;
+
+      if (ping.aliveSince > ping.duration)
+        return this.pings.delete(ping);
+
+      const normAliveRatio = ping.aliveSince / ping.duration;
+      ping.radius = normAliveRatio * ping.maxRadius;
+      ping.alpha = 1 - normAliveRatio;
+    });
   }
 
   render(ctx) {
     const sphere = { type: 'Sphere' };
     const { dragProxy, projection, path } = this;
 
-    // render only when something changed (let's see if it make sens...)
+    // render only when something changed (let's see if it make sens later...)
+    // ok makes no sens since we need to render pings...
+    // possible solution: having 3 different canvas / renderers
     const dragChanged = this.dragProxy.execute(projection);
     const zoomChanged = this.zoomProxy.execute(projection);
 
-    if (!dragChanged && !zoomChanged)
-      return;
+    // if (!dragChanged && !zoomChanged)
+    //   return;
 
     ctx.save();
     ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
@@ -56,7 +88,7 @@ class PlanetRenderer extends soundworks.Renderer {
     // background
     projection.clipAngle(180);
 
-    // drawPings();
+    this.renderPings(ctx);
     // oceans
     ctx.beginPath();
     path(sphere);
@@ -108,7 +140,24 @@ class PlanetRenderer extends soundworks.Renderer {
     ctx.stroke();
     ctx.restore();
 
-    // drawPings();
+    this.renderPings(ctx);
+  }
+
+  renderPings(ctx) {
+    this.pings.forEach((ping) => {
+      const { color, alpha, radius, lat, lng } = ping;
+
+      // console.log(`rgba(${color.r}, ${color.b}, ${color.g}, ${alpha})`);
+      ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`;
+      const circle = d3.geoCircle()
+        .center([ping.lng, ping.lat])
+        .radius(radius);
+
+      ctx.beginPath();
+      this.path(circle());
+      ctx.fill();
+      ctx.closePath();
+    });
   }
 }
 

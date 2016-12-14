@@ -6,6 +6,7 @@ class PlanetExperience extends soundworks.Experience {
     super(clientType);
 
     this.sharedParams = this.require('shared-params');
+    this.sync = this.require('sync');
   }
 
   start() {

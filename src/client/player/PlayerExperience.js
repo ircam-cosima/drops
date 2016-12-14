@@ -53,11 +53,14 @@ export default class PlayerExperience extends soundworks.Experience {
       descriptors: ['accelerationIncludingGravity']
     });
 
+    this.geolocation = this.require('geolocation', {
+      refreshRate: 'auto',
+      debug: true,
+    });
+
     this.checkin = this.require('checkin');
     this.params = this.require('shared-params');
     this.scheduler = this.require('scheduler', { lookahead: 0.050 });
-
-    // this.geolocation = this.require('geolocation', { refreshRate: 3000 });
 
     // control parameters
     this.state = 'reset';
@@ -209,7 +212,6 @@ export default class PlayerExperience extends soundworks.Experience {
 
   triggerDrop(audioTime, soundParams) {
     const duration = this.synth.trigger(audioTime, soundParams);
-
     // trigger circle
     this.canvasRenderer.trigger(soundParams.index, soundParams.x, soundParams.y, {
       color: soundParams.index,

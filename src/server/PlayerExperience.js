@@ -7,7 +7,7 @@ export default class PlayerExperience extends Experience {
     this.sync = this.require('sync');
     this.checkin = this.require('checkin');
     this.params = this.require('shared-params');
-    // this.geolocation = this.require('geolocation');
+    this.geolocation = this.require('geolocation');
 
     // model for loop parameters
     this.loopParams = {};
@@ -43,6 +43,8 @@ export default class PlayerExperience extends Experience {
       const loopParams = this.loopParams;
       const echoPlayersIndexes = [-1, 1];
 
+      // broadcast the drop to planets
+      this.broadcast('planet', null, 'drop', time, client.coordinates, soundParams);
       // if only 1 or 2 clients
       if (echoPlayersIndexes.length > clientsLength - 1)
         echoPlayersIndexes.length = clientsLength - 1;
@@ -64,6 +66,8 @@ export default class PlayerExperience extends Experience {
           soundParams.gain *= echoAttenuation;
 
           this.send(echoPlayer, 'echo', time + echoDelay, soundParams);
+          // broadcast drop echos to planets
+          this.broadcast('planet', null, 'echo', time + echoDelay, echoPlayer.coordinates, soundParams);
           // keep track of the players that are echoing this one
           client.activities[this.id].echoPlayers.add(echoPlayer);
         });
