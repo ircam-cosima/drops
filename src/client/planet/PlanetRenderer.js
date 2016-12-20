@@ -97,7 +97,7 @@ class PlanetRenderer extends soundworks.Renderer {
 
     ctx.beginPath();
     path(this.salesmanCoordinates);
-    ctx.strokeStyle = 'rgba(200, 200, 200, 0.4)';
+    ctx.strokeStyle = 'rgba(200, 200, 200, 0.1)';
     ctx.stroke();
 
     // land
@@ -111,7 +111,7 @@ class PlanetRenderer extends soundworks.Renderer {
 
     ctx.beginPath();
     path(this.land);
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
     ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
     ctx.fill();
     ctx.stroke();
@@ -119,7 +119,7 @@ class PlanetRenderer extends soundworks.Renderer {
 
     ctx.beginPath();
     path(this.salesmanCoordinates);
-    ctx.strokeStyle = 'rgba(200, 200, 200, 0.4)';
+    ctx.strokeStyle = 'rgba(200, 200, 200, 0.1)';
     ctx.stroke();
     // this.renderSalesman(ctx);
 
