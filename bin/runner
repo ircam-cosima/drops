@@ -151,6 +151,22 @@ function isAllowed(filename, ensureFile) {
   return isFile && hasAllowedExt && notExcludeFile;
 }
 
+// exclude shared files from this monitor
+var sharedRegExp = sharedSrcDirectories.map(function(dirname) {
+  dirname = dirname[dirname.length - 1] !== path.sep ? dirname + path.sep : dirname;
+  var pattern = '^' + escapeRegExp(dirname);
+  return new RegExp(pattern);
+});
+
+function isSharedFile(filename) {
+  for (var i = 0; i < sharedRegExp.length; i++) {
+    if (sharedRegExp[i].test(filename))
+      return true;
+  }
+
+  return false;
+}
+
 /**
  * Returns a list of the file in a given folder recursively.
  */
@@ -278,21 +294,21 @@ function watchServerJavascriptFiles(srcDirectory, distDirectory) {
     var transpiler = javascripts.getTranspiler(srcDirectory, distDirectory, isAllowed, babelOptions);
 
     monitor.on('created', function(filename) {
-      if (isAllowed(filename)) {
+      if (isAllowed(filename) && !isSharedFile(filename)) {
         server.stop();
         transpiler.transpile(filename, [], () => server.start(serverIndex));
       }
     });
 
     monitor.on('changed', function(filename) {
-      if (isAllowed(filename)) {
+      if (isAllowed(filename) && !isSharedFile(filename)) {
         server.stop();
         transpiler.transpile(filename, [], () => server.start(serverIndex));
       }
     });
 
     monitor.on('removed', function(filename) {
-      if (isAllowed(filename, false)) {
+      if (isAllowed(filename, false) && !isSharedFile(filename)) {
         server.stop();
         transpiler.delete(filename, () => server.start(serverIndex));
       }
@@ -306,22 +322,6 @@ function watchServerJavascriptFiles(srcDirectory, distDirectory) {
 function watchClientJavascriptFiles(srcDirectory, distDirectory, publicDirectory, sharedSrcDirectories) {
   watch.createMonitor(srcDirectory, getWatchOptions(), function(monitor) {
     var transpiler = javascripts.getTranspiler(srcDirectory, distDirectory, isAllowed, babelOptions, browserifyOptions);
-
-    // exclude shared files from this monitor
-    var sharedRegExp = sharedSrcDirectories.map(function(dirname) {
-      dirname = dirname[dirname.length - 1] !== path.sep ? dirname + path.sep : dirname;
-      var pattern = '^' + escapeRegExp(dirname);
-      return new RegExp(pattern);
-    });
-
-    function isSharedFile(filename) {
-      for (var i = 0; i < sharedRegExp.length; i++) {
-        if (sharedRegExp[i].test(filename))
-          return true;
-      }
-
-      return false;
-    }
 
     monitor.on('created', function(filename) {
       if (isAllowed(filename) && !isSharedFile(filename)) {
@@ -350,7 +350,7 @@ function watchClientJavascriptFiles(srcDirectory, distDirectory, publicDirectory
 }
 
 /**
- * Watch common javascript files. Restarts the server as these files can be used server-side.
+ * Watch shared javascript files. Restarts the server as these files could be used server-side.
  */
 function watchSharedJavascriptFiles(srcDirectories, distDirectories) {
   srcDirectories.forEach(function(srcDirectory, index) {

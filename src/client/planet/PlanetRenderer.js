@@ -12,7 +12,7 @@ class PlanetRenderer extends soundworks.Renderer {
     this.zoomProxy = zoomProxy;
     this.topology = topology;
     this.projection = d3.geoOrthographic();
-    this.graticule = d3.geoGraticule();
+    // this.graticule = d3.geoGraticule();
     this.land = topojson.feature(topology, topology.objects.land);
 
     this.path = d3.geoPath()
@@ -20,6 +20,7 @@ class PlanetRenderer extends soundworks.Renderer {
       .context(ctx);
 
     this.pings = new Set();
+    this.salesmanCoordinates = [];
   }
 
   init() {
@@ -40,21 +41,26 @@ class PlanetRenderer extends soundworks.Renderer {
 
   addPing(soundParams) {
     const coords = soundParams.echoCoordinates || soundParams.coordinates;
+    const gain = soundParams.gain;
     const ping = {
       color: d3.rgb(colorMap[soundParams.index % colorMap.length]),
       duration: 2, // seconds
       maxRadius: 5,
+      maxAlpha: gain,
       lat: coords[0],
       lng: coords[1],
       aliveSince: 0,
       radius: 0,
-      alpha: 1,
+      alpha: null,
     };
 
     this.pings.add(ping);
   }
 
   update(dt) {
+    // keep updating projection according to drag and zoom
+    this.dragProxy.execute(this.projection);
+    this.zoomProxy.execute(this.projection);
 
     // update pings
     this.pings.forEach((ping) => {
@@ -65,22 +71,21 @@ class PlanetRenderer extends soundworks.Renderer {
 
       const normAliveRatio = ping.aliveSince / ping.duration;
       ping.radius = normAliveRatio * ping.maxRadius;
-      ping.alpha = 1 - normAliveRatio;
+      ping.alpha = ping.maxAlpha - (normAliveRatio * ping.maxAlpha);
     });
   }
 
   render(ctx) {
+    // force 30 fps
+    if (this.renderFlag === false) {
+      this.renderFlag = true;
+      return;
+    }
+
+    this.renderFlag = false;
+
     const sphere = { type: 'Sphere' };
     const { dragProxy, projection, path } = this;
-
-    // render only when something changed (let's see if it make sens later...)
-    // ok makes no sens since we need to render pings...
-    // possible solution: having 3 different canvas / renderers
-    const dragChanged = this.dragProxy.execute(projection);
-    const zoomChanged = this.zoomProxy.execute(projection);
-
-    // if (!dragChanged && !zoomChanged)
-    //   return;
 
     ctx.save();
     ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
@@ -88,50 +93,22 @@ class PlanetRenderer extends soundworks.Renderer {
     // background
     projection.clipAngle(180);
 
-    this.renderPings(ctx);
-    // oceans
-    ctx.beginPath();
-    path(sphere);
-    ctx.lineWidth = 3;
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-    ctx.fill();
+    this.renderPings(ctx, 0.4);
 
-    // land background
+    ctx.beginPath();
+    path(this.salesmanCoordinates);
+    ctx.strokeStyle = 'rgba(200, 200, 200, 0.4)';
+    ctx.stroke();
+
+    // land
     ctx.beginPath();
     path(this.land);
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
     ctx.fill();
 
-    // meridiens
-    // ctx.beginPath();
-    // path(grid);
-    // ctx.lineWidth = .5;
-    // ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-    // ctx.stroke();
-
+    // foreground
     this.projection.clipAngle(90);
 
-    // oceans
-    ctx.beginPath();
-    path(sphere);
-    ctx.lineWidth = 1;
-    // ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
-
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-    ctx.fill();
-
-    // meridiens
-    // ctx.beginPath();
-    // path(grid);
-    // ctx.lineWidth = .5;
-    // ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-    // ctx.stroke();
-
-    // getPattern();
-    // const pattern = ctx.createPattern($pattern, 'repeat');
-
-    projection.clipAngle(90);
-    // land foreground
     ctx.beginPath();
     path(this.land);
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
@@ -140,24 +117,53 @@ class PlanetRenderer extends soundworks.Renderer {
     ctx.stroke();
     ctx.restore();
 
+    ctx.beginPath();
+    path(this.salesmanCoordinates);
+    ctx.strokeStyle = 'rgba(200, 200, 200, 0.4)';
+    ctx.stroke();
+    // this.renderSalesman(ctx);
+
     this.renderPings(ctx);
   }
 
-  renderPings(ctx) {
+  renderPings(ctx, globalAlpha = 1) {
+    ctx.save();
+    ctx.globalAlpha = globalAlpha;
+
     this.pings.forEach((ping) => {
       const { color, alpha, radius, lat, lng } = ping;
 
-      // console.log(`rgba(${color.r}, ${color.b}, ${color.g}, ${alpha})`);
-      ctx.fillStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`;
+      ctx.strokeStyle = `rgba(${color.r}, ${color.g}, ${color.b}, ${alpha})`;
+
       const circle = d3.geoCircle()
         .center([ping.lng, ping.lat])
         .radius(radius);
 
       ctx.beginPath();
       this.path(circle());
-      ctx.fill();
+      ctx.stroke();
       ctx.closePath();
     });
+
+    ctx.restore();
+  }
+
+  setSalesmanCoordinates(coordinates) {
+    coordinates = coordinates.map((coords) => {
+      const s = coords[0];
+      coords[0] = coords[1];
+      coords[1] = s;
+      return coords;
+    });
+
+    // copy first at the end to close the path
+    if (coordinates.length > 1)
+      coordinates[coordinates.length] = coordinates[0];
+
+    this.salesmanCoordinates = {
+      type: 'LineString',
+      coordinates: coordinates,
+    };
   }
 }
 

@@ -4,6 +4,8 @@ import Looper from '../shared/Looper';
 import Circles from './Circles';
 import audioFiles from './audioFiles';
 
+import Salesman from '../shared/services/Salesman';
+
 const client = soundworks.client;
 
 const viewTemplate = `
@@ -54,13 +56,14 @@ export default class PlayerExperience extends soundworks.Experience {
     });
 
     this.geolocation = this.require('geolocation', {
-      refreshRate: 'auto',
       debug: true,
     });
 
     this.checkin = this.require('checkin');
     this.params = this.require('shared-params');
     this.scheduler = this.require('scheduler', { lookahead: 0.050 });
+
+    this.salesman = this.require('salesman');
 
     // control parameters
     this.state = 'reset';

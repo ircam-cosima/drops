@@ -53,14 +53,15 @@ export default {
 
   // content of the `platform` service
   'service:platform': {
-    isCompatible: null,
-    resolvedHooks: null,
-    checking: false,
-    intro: 'Welcome to',
-    instructions: 'Touch the screen to join!',
-    checkingMessage: 'Please wait while checking compatiblity',
-    errorMessage: 'Sorry,<br />Your device is not compatible with the application.',
-  },
+  isCompatible: null,
+  resolvedHooks: null,
+  checking: false,
+  intro: 'Welcome to',
+  instructions: 'Touch the screen to join!',
+  checkingMessage: 'Please wait while checking compatiblity',
+  errorCompatibleMessage: 'Sorry,<br />Your device is not compatible with the application.',
+  errorHooksMessage: `Sorry,<br />The application didn't obtain the necessary authorizations.`,
+},
 
   // content of the `sync` service
   'service:sync': {

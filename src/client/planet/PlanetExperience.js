@@ -14,7 +14,7 @@ const viewTemplate = `
 
 class PlanetExperience extends soundworks.Experience {
   constructor() {
-    super(1 / 30);
+    super();
 
     this.sharedParams = this.require('shared-params');
 
@@ -32,7 +32,7 @@ class PlanetExperience extends soundworks.Experience {
     this.viewTemplate = viewTemplate;
     this.viewContent = {};
     this.viewCtor = soundworks.CanvasView;
-    // this.viewOptions = { preservePixelRatio: true };
+    this.viewOptions = { preservePixelRatio: true };
     this.view = this.createView();
   }
 
@@ -58,6 +58,9 @@ class PlanetExperience extends soundworks.Experience {
       },
       scale: d3.scaleLinear().range([-90, 90]),
       execute(projection) {
+        if (this.dx === 0 && this.dy === 0)
+          return;
+
         const rotation = projection.rotate();
         const radius = projection.scale();
 
@@ -74,10 +77,10 @@ class PlanetExperience extends soundworks.Experience {
         this.dx *= 0.92;
         this.dy *= 0.92;
 
-        if (Math.abs(this.dx) < 1e-6 && Math.abs(this.dy) < 1e-6)
-          return false;
-        else
-          return true;
+        if (Math.abs(this.dx) < 1e-6 && Math.abs(this.dy) < 1e-6) {
+          this.dx = 0;
+          this.dy = 0;
+        }
       },
     };
 
@@ -107,13 +110,9 @@ class PlanetExperience extends soundworks.Experience {
       execute(projection) {
         if (this.k === null) {
           zoom.scaleTo($container, projection.scale());
-          return true;
         } else if (this.lastK !== this.k) {
           projection.scale(this.k, this.k);
           this.lastK = this.k;
-          return true;
-        } else {
-          return false;
         }
       },
     };
@@ -131,13 +130,15 @@ class PlanetExperience extends soundworks.Experience {
     this.sharedParams.addParamListener('minGain', (value) => this.looper.params.minGain = value);
 
     this.receive('drop', (syncTime, coordinates, soundParams) => {
-      // console.log('drop', coordinates);
       this.triggerLoop(syncTime, coordinates, soundParams);
     });
 
     this.receive('echo', (syncTime, coordinates, soundParams) => {
-      // console.log('echo', coordinates);
-      // this.triggerLoop(syncTime, coordinates, soundParams);
+      this.triggerLoop(syncTime, coordinates, soundParams);
+    });
+
+    this.receive('path', (path, coordinates) => {
+      this.renderer.setSalesmanCoordinates(coordinates);
     });
   }
 
@@ -146,9 +147,8 @@ class PlanetExperience extends soundworks.Experience {
     this.looper.createLoop(syncTime, soundParams);
   }
 
+  // looper callback
   triggerDrop(audioTime, soundParams) {
-    // console.log(audioTime, soundParams);
-    // console.log(soundParams.index);
     this.renderer.addPing(soundParams);
   }
 }

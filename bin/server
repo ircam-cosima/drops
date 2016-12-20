@@ -20,6 +20,9 @@ var server = null;
 function start(serverIndex) {
   try {
     if (fse.statSync(serverIndex).isFile()) {
+      if (server)
+        stop();
+
       log.serverStart();
       server = childProcess.fork(serverIndex);
     }

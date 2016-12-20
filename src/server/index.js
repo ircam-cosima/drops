@@ -3,6 +3,8 @@ import * as soundworks from 'soundworks/server';
 import ControllerExperience from './ControllerExperience';
 import PlanetExperience from './PlanetExperience';
 import PlayerExperience from './PlayerExperience';
+// application services
+import Salesman from './shared/services/Salesman';
 
 import defaultConfig from './config/default';
 
