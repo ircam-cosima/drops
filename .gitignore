@@ -5,6 +5,7 @@
 /server
 /client
 /common
+/dist
 
 # config files
 src/server/config/*
@@ -18,3 +19,5 @@ src/server/config/*
 npm-debug.log
 .DS_Store
 Thumbs.db
+TODO.md
+
