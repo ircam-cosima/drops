@@ -7,6 +7,31 @@ export default class SampleSynth {
     this.output = audioContext.createGain();
     this.output.connect(audioContext.destination);
     this.output.gain.value = 1;
+
+    // feedback loop
+    this.delay = audioContext.createDelay(3.0);
+    this.delay.connect(this.output);
+
+    this.feedback = audioContext.createGain();
+    this.feedback.connect(this.delay);
+    this.delay.connect(this.feedback);
+    this.feedback.gain.value = 0.8;
+
+    this.bus = audioContext.createGain();
+    this.bus.connect(this.delay);
+    this.bus.gain.value = 0.1;
+  }
+
+  set delayTime(delay) {
+    this.delay.delayTime.value = delay;
+  }
+
+  set feedbackLevel(value) {
+    this.bus.gain.value = value;
+  }
+
+  mute() {
+    this.output.gain.value = 0;
   }
 
   trigger(time, params) {
@@ -30,6 +55,7 @@ export default class SampleSynth {
 
       const g1 = audioContext.createGain();
       g1.connect(this.output);
+      g1.connect(this.bus);
       g1.gain.value = (1 - x) * params.gain;
 
       const s1 = audioContext.createBufferSource();
@@ -42,6 +68,7 @@ export default class SampleSynth {
 
       const g2 = audioContext.createGain();
       g2.connect(this.output);
+      g2.connect(this.bus);
       g2.gain.value = x * params.gain;
 
       const s2 = audioContext.createBufferSource();

@@ -77,6 +77,22 @@ export default class PlayerExperience extends Experience {
           echoDelay += echoPeriod;
           soundParams.gain *= echoAttenuation;
 
+// can crash here (probably if some client disconnect, but not sure...)
+//       /Users/matuszewski/dev/js/cosima/lib/soundworks/server/core/sockets.js:44
+//     client.socket.emit(channel, ...args);
+//     ^
+// TypeError: Cannot read property 'socket' of undefined
+//     at Object.send (/Users/matuszewski/dev/js/cosima/lib/soundworks/server/core/sockets.js:44:5)
+//     at PlayerExperience.send (/Users/matuszewski/dev/js/cosima/lib/soundworks/server/core/Activity.js:164:5)
+//     at /Users/matuszewski/dev/js/cosima/lib/soundworks-drops/dist/server/PlayerExperience.js:80:16
+//     at Array.forEach (native)
+//     at /Users/matuszewski/dev/js/cosima/lib/soundworks-drops/dist/server/PlayerExperience.js:68:28
+//     at Socket.<anonymous> (/Users/matuszewski/dev/js/cosima/lib/soundworks-drops/dist/server/PlayerExperience.js:63:42)
+//     at emitTwo (events.js:87:13)
+//     at Socket.emit (events.js:172:7)
+//     at /Users/matuszewski/dev/js/cosima/lib/soundworks/node_modules/socket.io/lib/socket.js:503:12
+//     at nextTickCallbackWith0Args (node.js:420:9)
+
           this.send(echoPlayer, 'echo', time + echoDelay, soundParams);
           // broadcast echos to planets
           this.broadcast('planet', null, 'echo', time + echoDelay, echoPlayer.coordinates, soundParams);

@@ -111,9 +111,17 @@ export default class PlayerExperience extends soundworks.Experience {
     params.addParamListener('state', (state) => this.setState(state));
     // looper related parameters
     params.addParamListener('maxDrops', (value) => this.looper.setMaxLocalLoops(value));
-    params.addParamListener('loopPeriod', (value) => this.looper.params.period = value);
+
+    params.addParamListener('loopPeriod', (value) => {
+      this.looper.params.period = value
+      this.synth.delayTime = value / 3;
+    });
+
     params.addParamListener('loopAttenuation', (value) => this.looper.params.attenuation = value);
     params.addParamListener('minGain', (value) => this.looper.params.minGain = value);
+
+    params.addParamListener('feedbackLevel', (value) => this.synth.feedbackLevel = value)
+
     params.addParamListener('clear', () => this.clear());
     // must be initialized after all loops params
     params.addParamListener('autoPlay', (value) => this.setAutoPlay(value));
@@ -167,6 +175,9 @@ export default class PlayerExperience extends soundworks.Experience {
       this.autoTrigger();
       this.autoClear();
     }
+
+    if (client.urlParams && client.urlParams.indexOf('mute') !== -1)
+      this.synth.mute();
   }
 
   setState(state) {

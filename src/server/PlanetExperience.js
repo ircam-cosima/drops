@@ -9,7 +9,6 @@ class PlanetExperience extends soundworks.Experience {
     this.sync = this.require('sync');
 
     this.salesman = this.require('salesman');
-    this.currentPath
   }
 
   start() {

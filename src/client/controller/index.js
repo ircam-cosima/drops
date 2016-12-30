@@ -18,6 +18,7 @@ window.addEventListener('load', () => {
     state: { type: 'buttons' },
     loopAttenuation: { type: 'slider', size: 'large' },
     minGain: { type: 'slider', size: 'large' },
+    feedbackLevel: { type: 'slider', size: 'large' },
   });
 
   // start client
