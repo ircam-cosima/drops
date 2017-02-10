@@ -2,3 +2,36 @@
 #experience.planet {
   background-color: #000000;
 }
+
+#service-color-picker {
+  .color-wrapper {
+    display: flex;
+    display: -webkit-flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .color, .color-change {
+    flex-basis: auto;
+    border-radius: 50%;
+    border: 2px solid #000000;
+    box-sizing: border-box;
+  }
+
+  .color-change {
+    background: url(../images/reload-icon.png) 50% 50% no-repeat;
+    background-size: contain;
+    opacity: 0.9;
+
+    // &.active, &:focue {
+    //   // background-color: yellow;
+    //   -webkit-animation: spin 0.4s linear;
+    //   -moz-animation: spin 0.4s linear;
+    //   animation: spin 0.4s linear;
+    // }
+  }
+
+  // @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+  // @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+}

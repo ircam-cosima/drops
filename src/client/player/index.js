@@ -3,6 +3,10 @@ import PlayerExperience from './PlayerExperience';
 import viewTemplates from '../shared/viewTemplates';
 import viewContent from '../shared/viewContent';
 
+// application specific services
+import Salesman from '../shared/services/Salesman';
+import ColorPicker from '../shared/services/ColorPicker';
+
 window.addEventListener('load', () => {
   // configuration received from the server through the `index.html`
   // @see {~/src/server/index.js}
