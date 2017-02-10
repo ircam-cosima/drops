@@ -4,9 +4,11 @@ import Looper from '../shared/Looper';
 import Circles from './Circles';
 import audioFiles from './audioFiles';
 
-import Salesman from '../shared/services/Salesman';
-
 const client = soundworks.client;
+
+function dbToLin(val) {
+  return Math.exp(0.11512925464970229 * val); // pow(10, val / 20)
+};
 
 const viewTemplate = `
   <canvas class="background"></canvas>
@@ -62,8 +64,8 @@ export default class PlayerExperience extends soundworks.Experience {
     this.checkin = this.require('checkin');
     this.params = this.require('shared-params');
     this.scheduler = this.require('scheduler', { lookahead: 0.050 });
-
     this.salesman = this.require('salesman');
+    this.colorPicker = this.require('color-picker');
 
     // control parameters
     this.state = 'reset';
@@ -113,16 +115,15 @@ export default class PlayerExperience extends soundworks.Experience {
     params.addParamListener('maxDrops', (value) => this.looper.setMaxLocalLoops(value));
 
     params.addParamListener('loopPeriod', (value) => {
-      this.looper.params.period = value
-      this.synth.delayTime = value / 3;
+      this.looper.params.period = value;
+      this.synth.delayTime = value;
     });
 
     params.addParamListener('loopAttenuation', (value) => this.looper.params.attenuation = value);
-    params.addParamListener('minGain', (value) => this.looper.params.minGain = value);
-
-    params.addParamListener('feedbackLevel', (value) => this.synth.feedbackLevel = value)
-
+    params.addParamListener('minGain', (value) => this.looper.params.minGain = dbToLin(value));
+    params.addParamListener('localEchoGain', (value) => this.synth.localEchoGain = dbToLin(value));
     params.addParamListener('clear', () => this.clear());
+
     // must be initialized after all loops params
     params.addParamListener('autoPlay', (value) => this.setAutoPlay(value));
 
@@ -208,6 +209,7 @@ export default class PlayerExperience extends soundworks.Experience {
     if (this.looper.numLocalLoops < this.looper.maxLocalLoops) {
       const soundParams = {
         index: client.index,
+        color: client.color,
         gain: 1,
         x: x,
         y: y,
@@ -224,14 +226,15 @@ export default class PlayerExperience extends soundworks.Experience {
     }
   }
 
-  triggerDrop(audioTime, soundParams) {
-    const duration = this.synth.trigger(audioTime, soundParams);
+  triggerDrop(audioTime, soundParams, counter) {
+    const duration = this.synth.trigger(audioTime, soundParams, counter);
     // trigger circle
     this.canvasRenderer.trigger(soundParams.index, soundParams.x, soundParams.y, {
-      color: soundParams.index,
+      color: soundParams.color,
       opacity: Math.sqrt(soundParams.gain),
       duration: duration,
       velocity: 40 + soundParams.gain * 80,
+      fill: (counter === 0),
     });
   }
 

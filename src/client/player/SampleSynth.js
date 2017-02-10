@@ -4,37 +4,19 @@ const audioContext = soundworks.audioContext;
 export default class SampleSynth {
   constructor() {
     this.audioBuffers = null;
+
     this.output = audioContext.createGain();
     this.output.connect(audioContext.destination);
     this.output.gain.value = 1;
 
-    // feedback loop
-    this.delay = audioContext.createDelay(3.0);
-    this.delay.connect(this.output);
-
-    this.feedback = audioContext.createGain();
-    this.feedback.connect(this.delay);
-    this.delay.connect(this.feedback);
-    this.feedback.gain.value = 0.8;
-
-    this.bus = audioContext.createGain();
-    this.bus.connect(this.delay);
-    this.bus.gain.value = 0.1;
-  }
-
-  set delayTime(delay) {
-    this.delay.delayTime.value = delay;
-  }
-
-  set feedbackLevel(value) {
-    this.bus.gain.value = value;
+    this.localEchoGain = 0;
   }
 
   mute() {
     this.output.gain.value = 0;
   }
 
-  trigger(time, params) {
+  trigger(time, params, counter) {
     const audioBuffers = this.audioBuffers;
     let duration = 0;
 
@@ -45,6 +27,8 @@ export default class SampleSynth {
     time = Math.max(time, audioContext.currentTime);
 
     if (audioBuffers && audioBuffers.length > 0) {
+      const gain = counter === 0 ? params.gain : params.gain * this.localEchoGain;
+
       const x = params.x || 0.5;
       const y = params.y || 0.5;
 
@@ -55,8 +39,8 @@ export default class SampleSynth {
 
       const g1 = audioContext.createGain();
       g1.connect(this.output);
-      g1.connect(this.bus);
-      g1.gain.value = (1 - x) * params.gain;
+      // g1.connect(this.bus);
+      g1.gain.value = (1 - x) * gain;
 
       const s1 = audioContext.createBufferSource();
       s1.buffer = b1;
@@ -68,8 +52,8 @@ export default class SampleSynth {
 
       const g2 = audioContext.createGain();
       g2.connect(this.output);
-      g2.connect(this.bus);
-      g2.gain.value = x * params.gain;
+      // g2.connect(this.bus);
+      g2.gain.value = x * gain;
 
       const s2 = audioContext.createBufferSource();
       s2.buffer = b2;

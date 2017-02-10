@@ -1,6 +1,5 @@
 import { Renderer } from 'soundworks/client';
 import { getScaler } from 'soundworks/utils/math';
-import colorMap from '../shared/colorMap';
 
 class Circle {
   constructor(id, x, y, options) {
@@ -9,7 +8,8 @@ class Circle {
     this.y = y;
 
     this.opacity = options.opacity || 1;
-    this.color = colorMap[(options.color || 0) % colorMap.length];
+    this.color = options.color;
+    this.fill = options.fill;
 
     this.growthVelocity = options.velocity || 50; // pixels / sec
     this.minVelocity = 50; // if gain is < 0.25 => constant growth
@@ -59,9 +59,15 @@ class Circle {
     ctx.save();
     ctx.beginPath();
     ctx.fillStyle = this.color;
+    ctx.strokeStyle = this.color;
     ctx.globalAlpha = this.opacity;
     ctx.arc(this.coordinates.x, this.coordinates.y, Math.round(this.radius), 0, Math.PI * 2, false);
-    ctx.fill();
+
+    if (this.fill)
+      ctx.fill();
+    else
+      ctx.stroke();
+
     ctx.closePath();
     ctx.restore();
   }

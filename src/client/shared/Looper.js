@@ -8,10 +8,14 @@ class Loop extends soundworks.audio.TimeEngine {
     this.looper = looper;
     this.soundParams = soundParams; // drop parameters
     this.local = local; // drop is triggered localy and not an echo
+    this.counter = 0;
   }
 
   advanceTime(syncTime) {
-    return this.looper.advanceLoop(syncTime, this); // just call daddy
+    const nextTime = this.looper.advanceLoop(syncTime, this); // just call daddy
+    this.counter = (this.counter + 1) % 3;
+
+    return nextTime;
   }
 }
 
@@ -70,9 +74,10 @@ export default class Looper {
     }
 
     // trigger sound
-    this.triggerEvent(this.scheduler.audioTime, soundParams);
-    // apply attenuation
-    soundParams.gain *= params.attenuation;
+    this.triggerEvent(this.scheduler.audioTime, soundParams, loop.counter);
+    // apply attenuation only if "real" event and not a local echo
+    if (loop.counter === 0)
+      soundParams.gain *= params.attenuation;
     // return next time
     return syncTime + params.period;
   }

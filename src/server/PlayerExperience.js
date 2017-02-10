@@ -62,7 +62,7 @@ export default class PlayerExperience extends Experience {
 
       if (echoPlayersIndexes.length > 0) {
         const playerIndex = currentPath.indexOf(client.uuid);
-        const echoPeriod = loopParams.period / 3;
+        const echoPeriod = loopParams.period;
         let echoDelay = 0;
 
         echoPlayersIndexes.forEach((offset) => {
