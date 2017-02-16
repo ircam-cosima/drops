@@ -127,7 +127,6 @@ export default class PlayerExperience extends soundworks.Experience {
     // must be initialized after all loops params
     params.addParamListener('autoPlay', (value) => this.setAutoPlay(value));
 
-
     // setup motion input listeners
     if (this.motionInput.isAvailable('accelerationIncludingGravity')) {
       this.motionInput.addListener('accelerationIncludingGravity', (data) => {
@@ -226,15 +225,15 @@ export default class PlayerExperience extends soundworks.Experience {
     }
   }
 
-  triggerDrop(audioTime, soundParams, counter) {
-    const duration = this.synth.trigger(audioTime, soundParams, counter);
+  triggerDrop(audioTime, soundParams, loopCounter) {
+    const duration = this.synth.trigger(audioTime, soundParams, loopCounter);
     // trigger circle
     this.canvasRenderer.trigger(soundParams.index, soundParams.x, soundParams.y, {
       color: soundParams.color,
       opacity: Math.sqrt(soundParams.gain),
       duration: duration,
       velocity: 40 + soundParams.gain * 80,
-      fill: (counter === 0),
+      fill: (loopCounter === 0),
     });
   }
 

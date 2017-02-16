@@ -3,6 +3,12 @@ import * as d3 from 'd3';
 import PlanetRenderer from './PlanetRenderer';
 import Looper from '../shared/Looper';
 
+function dbToLin(val) {
+  return Math.exp(0.11512925464970229 * val); // pow(10, val / 20)
+};
+
+const audioContext = soundworks.audioContext;
+
 const viewTemplate = `
   <canvas class="background"></canvas>
   <div class="foreground">
@@ -22,8 +28,14 @@ class PlanetExperience extends soundworks.Experience {
       files: { topology: 'data/world-110m-withlakes.json' },
     });
 
+    this.geolocation = this.require('geolocation', {
+      debug: false,
+    });
+
     this.scheduler = this.require('scheduler', { lookahead: 0.050 });
 
+    // bindings
+    this.initView = this.initView.bind(this);
     this.triggerLoop = this.triggerLoop.bind(this);
     this.triggerDrop = this.triggerDrop.bind(this);
   }
@@ -44,102 +56,80 @@ class PlanetExperience extends soundworks.Experience {
 
     this.show();
 
-    // init rendering
+    // initialize view
+    setTimeout(() => {
+      this.initView();
+
+      // looper
+      this.looper = new Looper(this.scheduler, () => {}, this.triggerDrop);
+
+      // params
+      this.sharedParams.addParamListener('maxDrops', (value) => this.looper.setMaxLocalLoops(value));
+      this.sharedParams.addParamListener('loopPeriod', (value) => this.looper.params.period = value);
+      this.sharedParams.addParamListener('loopAttenuation', (value) => this.looper.params.attenuation = value);
+      this.sharedParams.addParamListener('minGain', (value) => this.looper.params.minGain = dbToLin(value));
+
+      // messages from the server
+      this.receive('drop', this.triggerLoop);
+      this.receive('echo', this.triggerLoop);
+
+      this.receive('path', (path, coordinates) => {
+        this.renderer.setSalesmanCoordinates(coordinates);
+      });
+
+      this.receive('proximity-player', (coords) => {
+        this.renderer.stateMachine.trigger('goto', coords.reverse());
+      });
+    }, 0);
+  }
+
+  initView() {
+    // init rendering - weird to store topology inside audioBufferManager
     const topology = this.audioBufferManager.get('topology');
     const $container = d3.select(this.view.$el);
-
-    // init drag control
-    const dragProxy = {
-      dx: 0,
-      dy: 0,
-      set(dx, dy) {
-        this.dx = dx;
-        this.dy = dy;
-      },
-      scale: d3.scaleLinear().range([-90, 90]),
-      execute(projection) {
-        if (this.dx === 0 && this.dy === 0)
-          return;
-
-        const rotation = projection.rotate();
-        const radius = projection.scale();
-
-        this.scale.domain([-radius, radius]);
-
-        const dDegX = this.scale(this.dx);
-        const dDegY = this.scale(this.dy);
-
-        rotation[0] += dDegX;
-        rotation[1] -= dDegY;
-
-        projection.rotate(rotation);
-
-        this.dx *= 0.92;
-        this.dy *= 0.92;
-
-        if (Math.abs(this.dx) < 1e-6 && Math.abs(this.dy) < 1e-6) {
-          this.dx = 0;
-          this.dy = 0;
-        }
-      },
-    };
-
-    const drag = d3.drag()
-      .on('drag', () => dragProxy.set(d3.event.dx, d3.event.dy));
-
-    $container.call(drag);
-
-    // init zoom control
     const screenWidth = window.screen.availWidth;
     const screenHeight = window.screen.availHeight;
-
-    const maxSize = Math.max(screenWidth, screenHeight) * 10;
-    const minSize = maxSize / 1000;
+    const size = Math.max(screenWidth, screenHeight);
+    const maxSize = size * 7;
+    const minSize = size / 10;
     const scaleExtent = [minSize, maxSize];
+
+    this.renderer = new PlanetRenderer(this.view.ctx, topology, scaleExtent);
+    this.view.addRenderer(this.renderer);
 
     const zoom = d3.zoom()
       .scaleExtent(scaleExtent)
-      .on('zoom', () => zoomProxy.set(d3.event.transform.k));
-
-    const zoomProxy = {
-      k: null,
-      lastK: null,
-      set(k) {
-        this.k = k;
-      },
-      execute(projection) {
-        if (this.k === null) {
-          zoom.scaleTo($container, projection.scale());
-        } else if (this.lastK !== this.k) {
-          projection.scale(this.k, this.k);
-          this.lastK = this.k;
+      .on('zoom', () => {
+        // weirdest hack ever... see below...
+        if (d3.event.sourceEvent instanceof WheelEvent &&
+            this.renderer.stateMachine.currentState !== null) {
+          this.renderer.stateMachine.suspend();
         }
-      },
-    };
 
+        this.renderer.stateMachine.lastInteractionTime = audioContext.currentTime;
+        this.renderer.zoomProxy.updateZoom(d3.event.transform.k);
+      });
+
+    const drag = d3.drag()
+      .on('drag', () => {
+        if (this.renderer.stateMachine.currentState !== null)
+          this.renderer.stateMachine.suspend();
+
+        this.renderer.stateMachine.lastInteractionTime = audioContext.currentTime;
+        this.renderer.dragProxy.updateDrag(d3.event.dx, d3.event.dy)
+      });
+
+    zoom.scaleTo($container, this.renderer.projection.scale());
+
+    // use zoom to maintain projection and zoom in sync as
+    // any other way to reinit the zoom with current projection values failed
+    // (aka `$container.call(zoom.transform, zoomTransformValues)`)
+    for (let id in this.renderer.stateMachine.states)
+      this.renderer.stateMachine.states[id].scaleTo = (value) => zoom.scaleTo($container, value);
+
+    // apply to $container
+    $container.call(drag);
     $container.call(zoom);
-
-    this.renderer = new PlanetRenderer(this.view.ctx, topology, dragProxy, zoomProxy);
-    this.view.addRenderer(this.renderer);
-
-    this.looper = new Looper(this.scheduler, () => {}, this.triggerDrop);
-
-    this.sharedParams.addParamListener('maxDrops', (value) => this.looper.setMaxLocalLoops(value));
-    this.sharedParams.addParamListener('loopPeriod', (value) => this.looper.params.period = value);
-    this.sharedParams.addParamListener('loopAttenuation', (value) => this.looper.params.attenuation = value);
-    this.sharedParams.addParamListener('minGain', (value) => this.looper.params.minGain = value);
-
-    this.receive('drop', (syncTime, coordinates, soundParams) => {
-      this.triggerLoop(syncTime, coordinates, soundParams);
-    });
-
-    this.receive('echo', (syncTime, coordinates, soundParams) => {
-      this.triggerLoop(syncTime, coordinates, soundParams);
-    });
-
-    this.receive('path', (path, coordinates) => {
-      this.renderer.setSalesmanCoordinates(coordinates);
-    });
   }
 
   triggerLoop(syncTime, coordinates, soundParams) {
@@ -148,8 +138,9 @@ class PlanetExperience extends soundworks.Experience {
   }
 
   // looper callback
-  triggerDrop(audioTime, soundParams) {
-    this.renderer.addPing(soundParams);
+  triggerDrop(audioTime, soundParams, loopCounter) {
+    if (loopCounter === 0)
+      this.renderer.addPing(soundParams);
   }
 }
 
