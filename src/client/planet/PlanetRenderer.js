@@ -174,7 +174,7 @@ class PlanetRenderer extends soundworks.Renderer {
       const { color, alpha, circle } = ping;
 
       ctx.strokeStyle = `rgba(${color[0]}, ${color[1]}, ${color[2]}, ${alpha})`;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 4;
       ctx.beginPath();
       this.path(circle());
       ctx.stroke();
@@ -185,28 +185,28 @@ class PlanetRenderer extends soundworks.Renderer {
   }
 
   renderDebugCircles(ctx, globalAlpha = 1) {
-    ctx.save();
-    ctx.globalAlpha = globalAlpha;
-    // test
-    [
-      { coords: [-90, 0], color: 'rgba(255, 230, 230, 0.3)' },
-      { coords: [0, 0], color: 'rgba(230, 255, 230, 0.3)' },
-      { coords: [90, 0], color: 'rgba(230, 230, 255, 0.3)' },
-      { coords: [180, 0], color: 'rgba(230, 255, 255, 0.3)' },
-      { coords: [0, 90], color: 'rgba(255, 230, 255, 0.3)' },
-      { coords: [0, -90], color: 'rgba(255, 255, 230, 0.3)' },
-    ].forEach((ping) => {
-      const { coords, color } = ping;
-      const circle = d3.geoCircle().center([coords[0], coords[1]]).radius(20);
+    // ctx.save();
+    // ctx.globalAlpha = globalAlpha;
+    // // test
+    // [
+    //   { coords: [-90, 0], color: 'rgba(255, 230, 230, 0.3)' },
+    //   { coords: [0, 0], color: 'rgba(230, 255, 230, 0.3)' },
+    //   { coords: [90, 0], color: 'rgba(230, 230, 255, 0.3)' },
+    //   { coords: [180, 0], color: 'rgba(230, 255, 255, 0.3)' },
+    //   { coords: [0, 90], color: 'rgba(255, 230, 255, 0.3)' },
+    //   { coords: [0, -90], color: 'rgba(255, 255, 230, 0.3)' },
+    // ].forEach((ping) => {
+    //   const { coords, color } = ping;
+    //   const circle = d3.geoCircle().center([coords[0], coords[1]]).radius(20);
 
-      ctx.strokeStyle = color;
-      ctx.beginPath();
-      this.path(circle());
-      ctx.stroke();
-      ctx.closePath();
-    });
+    //   ctx.strokeStyle = color;
+    //   ctx.beginPath();
+    //   this.path(circle());
+    //   ctx.stroke();
+    //   ctx.closePath();
+    // });
 
-    ctx.restore();
+    // ctx.restore();
   }
 
   setSalesmanCoordinates(coordinates) {
