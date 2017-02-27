@@ -1,7 +1,9 @@
 import * as soundworks from 'soundworks/client';
 import * as d3 from 'd3';
 import PlanetRenderer from './PlanetRenderer';
+import SampleSynth from './SampleSynth';
 import Looper from '../shared/Looper';
+import audioFiles from '../shared/audio-files';
 
 function dbToLin(val) {
   return Math.exp(0.11512925464970229 * val); // pow(10, val / 20)
@@ -25,19 +27,23 @@ class PlanetExperience extends soundworks.Experience {
     this.sharedParams = this.require('shared-params');
 
     this.audioBufferManager = this.require('audio-buffer-manager', {
-      files: { topology: 'data/world-110m-withlakes.json' },
+      files: {
+        topology: 'data/world-110m-withlakes.json',
+        audio: audioFiles,
+      },
     });
 
     this.geolocation = this.require('geolocation', {
       debug: false,
     });
 
-    this.scheduler = this.require('scheduler', { lookahead: 0.050 });
+    this.scheduler = this.require('sync-scheduler', { lookahead: 0.050 });
 
-    // bindings
-    this.initView = this.initView.bind(this);
     this.triggerLoop = this.triggerLoop.bind(this);
+    this.triggerEcho = this.triggerEcho.bind(this);
     this.triggerDrop = this.triggerDrop.bind(this);
+    this.clear = this.clear.bind(this);
+    this.clearAll = this.clearAll.bind(this);
   }
 
   init() {
@@ -58,20 +64,26 @@ class PlanetExperience extends soundworks.Experience {
 
     // initialize view
     setTimeout(() => {
-      this.initView();
+      this._initView();
+      this._initAudioOutput();
 
       // looper
       this.looper = new Looper(this.scheduler, () => {}, this.triggerDrop);
+      this.synth = new SampleSynth(this.audioBufferManager.data.audio);
+      this.synth.connect(this.getDestination());
 
       // params
       this.sharedParams.addParamListener('maxDrops', (value) => this.looper.setMaxLocalLoops(value));
       this.sharedParams.addParamListener('loopPeriod', (value) => this.looper.params.period = value);
       this.sharedParams.addParamListener('loopAttenuation', (value) => this.looper.params.attenuation = value);
       this.sharedParams.addParamListener('minGain', (value) => this.looper.params.minGain = dbToLin(value));
+      this.sharedParams.addParamListener('mutePlanets', (value) => this.mute(value));
+      this.sharedParams.addParamListener('clear', this.clearAll);
 
       // messages from the server
       this.receive('drop', this.triggerLoop);
-      this.receive('echo', this.triggerLoop);
+      this.receive('echo', this.triggerEcho);
+      this.receive('clear', this.clear);
 
       this.receive('path', (path, coordinates) => {
         this.renderer.setSalesmanCoordinates(coordinates);
@@ -83,9 +95,26 @@ class PlanetExperience extends soundworks.Experience {
     }, 0);
   }
 
-  initView() {
+  _initAudioOutput() {
+    this.master = audioContext.createGain();
+    this.master.connect(audioContext.destination);
+    this.master.gain.value = 1;
+  }
+
+  mute(value) {
+    if (value === 'on')
+      this.master.gain.value = 0;
+    else
+      this.master.gain.value = 1;
+  }
+
+  getDestination() {
+    return this.master;
+  }
+
+  _initView() {
     // init rendering - weird to store topology inside audioBufferManager
-    const topology = this.audioBufferManager.get('topology');
+    const topology = this.audioBufferManager.data.topology;
     const $container = d3.select(this.view.$el);
     const screenWidth = window.screen.availWidth;
     const screenHeight = window.screen.availHeight;
@@ -132,15 +161,39 @@ class PlanetExperience extends soundworks.Experience {
     $container.call(zoom);
   }
 
-  triggerLoop(syncTime, coordinates, soundParams) {
+  triggerLoop(syncTime, coordinates, soundParams, playSound = true) {
     soundParams.coordinates = coordinates;
     this.looper.createLoop(syncTime, soundParams);
+
+    if (playSound) {
+      const now = audioContext.currentTime;
+      this.synth.trigger(now, soundParams);
+    }
+
+  }
+
+  triggerEcho(syncTime, coordinates, soundParams) {
+    this.triggerLoop(syncTime, coordinates, soundParams, false);
   }
 
   // looper callback
   triggerDrop(audioTime, soundParams, loopCounter) {
-    if (loopCounter === 0)
+    if (loopCounter === 0) {
       this.renderer.addPing(soundParams);
+
+      const now = audioContext.currentTime;
+      this.synth.trigger(now, soundParams);
+    }
+  }
+
+  clear(index, coordinates) {
+    this.looper.removeLoopByIndex(index);
+    // remove loops sended by others on this index
+    this.looper.removeLoopByTargetIndex(index);
+  }
+
+  clearAll() {
+    this.looper.removeLoops();
   }
 }
 

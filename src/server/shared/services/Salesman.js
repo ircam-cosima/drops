@@ -81,17 +81,24 @@ class Salesman extends Service {
     this.receive(client, 'handshake', () => {
       // geolocation is done
       const { uuid, coordinates } = client;
-      const poi = { id: uuid, coordinates: coordinates };
 
-      this._worker.postMessage({ cmd: 'add', poi: poi });
-      this._uuidPoiMap.set(uuid, poi);
-
+      this.addPoi(uuid, coordinates);
       this.send(client, 'aknowledge');
     });
   }
 
   disconnect(client) {
-    const uuid = client.uuid;
+    this.deletePoi(client.uuid);
+  }
+
+  addPoi(uuid, coordinates) {
+    const poi = { id: uuid, coordinates: coordinates };
+
+    this._worker.postMessage({ cmd: 'add', poi: poi });
+    this._uuidPoiMap.set(uuid, poi);
+  }
+
+  deletePoi(uuid) {
     const poi = this._uuidPoiMap.get(uuid);
     // remove client from salesman
     this._worker.postMessage({ cmd: 'remove', poi: poi });

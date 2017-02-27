@@ -15,7 +15,7 @@ class Stop extends Automation {
   // returns the duration of the state
   enter() {
     this.targetScale = this.defaultScale;
-    this.ttl = Math.random() * 10 + 10;
+    this.ttl = Math.random() * 10 + 20;
   }
 
   exit() {

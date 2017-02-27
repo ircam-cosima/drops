@@ -41,13 +41,7 @@ class RandomPath extends Automation {
 
     const rotation = projection.rotate();
     let lng = -1 * rotation[0]; // -360..360
-
-    while (lng < -180) lng += 360;
-    while (lng > 180) lng -= 360;
-
-    let lat = -1 * rotation[1];
-    while (lat < -180) lng += 360;
-    while (lat > 180) lng -= 360;
+    let lat = -1 * rotation[1]; // -180..180
 
     // test if we need to move to next node
     if (getDistance([lng, lat],  this.currentTarget) < 4000 * 1000)

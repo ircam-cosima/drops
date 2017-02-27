@@ -30,10 +30,11 @@ export default class Looper {
       minGain: null, // set by shared params
     };
 
-    this.loops = new Set(); // set of current drop loops
+    // set of current drop loops
+    this.loops = new Set();
 
     this.maxLocalLoops = 0;
-    this.numLocalLoops = 0; // number of used drops
+    this.numLocalLoops = 0;
   }
 
   setMaxLocalLoops(value) {
@@ -47,11 +48,11 @@ export default class Looper {
   createLoop(syncTime, soundParams, local = false) {
     const loop = new Loop(this, soundParams, local); // create new loop
 
-    this.loops.add(loop); // add loop to set
-    this.scheduler.add(loop, syncTime); // add loop to scheduler
+    this.loops.add(loop);
+    this.scheduler.add(loop, syncTime);
 
     if (local)
-      this.numLocalLoops++; // increment used drops
+      this.numLocalLoops++;
 
     this.updateCounter(this.loops.length, this.numLocalLoops, this.maxLocalLoops);
   }
@@ -63,10 +64,10 @@ export default class Looper {
 
     // eliminate loop when vanished
     if (soundParams.gain < params.minGain) {
-      this.loops.delete(loop); // delete loop from set
+      this.loops.delete(loop);
 
       if (loop.local)
-        this.numLocalLoops--; // decrement used drops
+        this.numLocalLoops--;
 
       this.updateCounter(this.loops.length, this.numLocalLoops, this.maxLocalLoops);
 
@@ -83,17 +84,30 @@ export default class Looper {
   }
 
   // remove loop by index
-  removeLoop(index) {
+  removeLoopByIndex(index) {
     for (let loop of this.loops) {
       if (loop.soundParams.index === index) {
-        this.scheduler.remove(loop); // remove loop from scheduler
+        this.scheduler.remove(loop);
 
-        if (loop.local) {
-          this.numLocalLoops--; // decrement used drops
-          // this.renderer.remove(index); // remove circle from renderer
-        }
+        if (loop.local)
+          this.numLocalLoops--;
 
-        this.loops.delete(loop); // delete loop from set
+        this.loops.delete(loop);
+      }
+    }
+
+    this.updateCounter(this.loops.length, this.numLocalLoops, this.maxLocalLoops);
+  }
+
+  removeLoopByTargetIndex(targetIndex) {
+    for (let loop of this.loops) {
+      if (loop.soundParams.targetIndex && loop.soundParams.targetIndex === targetIndex) {
+        this.scheduler.remove(loop);
+
+        if (loop.local)
+          this.numLocalLoops--;
+
+        this.loops.delete(loop);
       }
     }
 

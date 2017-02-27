@@ -19,7 +19,9 @@ window.addEventListener('load', () => {
     loopAttenuation: { type: 'slider', size: 'large' },
     minGain: { type: 'slider', size: 'large' },
     localEchoGain: { type: 'slider', size: 'large' },
-    feedbackLevel: { type: 'slider', size: 'large' },
+    mutePlayers: { type: 'buttons' },
+    mutePlanets: { type: 'buttons' },
+    enableBots: { type: 'buttons' },
   });
 
   // start client

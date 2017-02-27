@@ -1,7 +1,6 @@
 import * as soundworks from 'soundworks/client';
 import * as d3 from 'd3';
 import * as topojson from 'topojson';
-import colorMap from '../shared/colorMap';
 // proxies for user input (drag and zoom)
 import DragProxy from './control-proxies/DragProxy';
 import ZoomProxy from './control-proxies/ZoomProxy';

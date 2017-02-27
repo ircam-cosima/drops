@@ -31,9 +31,13 @@ sharedParams.addNumber('loopPeriod', 'loop period', 0.5, 24, 0.01, 2.14);
 sharedParams.addNumber('loopAttenuation', 'loop atten', 0, 1, 0.001, 0.707);
 sharedParams.addNumber('minGain', 'min gain', -80, 0, 0.1, -20);
 sharedParams.addNumber('localEchoGain', 'local echo gain', -80, 0, 0.1, -18);
-
-sharedParams.addNumber('feedbackLevel', 'feedback level', 0, 1, 0.001, 0.09);
 sharedParams.addEnum('autoPlay', 'auto play', ['off', 'on'], 'off');
+
+sharedParams.addEnum('forcePattern', 'force pattern index', ['off', 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 'off');
+sharedParams.addEnum('mutePlayers', 'mute players', ['on', 'off'], 'off');
+sharedParams.addEnum('mutePlanets', 'mute planets', ['on', 'off'], 'off');
+sharedParams.addEnum('enableBots', 'enable bots', ['on', 'off'], 'on');
+
 sharedParams.addTrigger('clear', 'clear');
 
 

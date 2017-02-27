@@ -8,7 +8,8 @@ class PlanetExperience extends soundworks.Experience {
     this.messaging = messaging;
 
     this.sharedParams = this.require('shared-params');
-    this.sync = this.require('sync');
+    this.scheduler = this.require('sync-scheduler');
+    this.audioBufferManager = this.require('audio-buffer-manager');
 
     this.salesman = this.require('salesman');
 

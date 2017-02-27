@@ -1,13 +1,6 @@
 import { Service, serviceManager, SegmentedView, client } from 'soundworks/client';
-import colorMap from '../colorMap';
+import please from 'pleasejs';
 
-function getRandomColor() {
-  const c = 0;
-  const r = Math.floor(Math.random() * (256 - c)) + c;
-  const g = Math.floor(Math.random() * (256 - c)) + c;
-  const b = Math.floor(Math.random() * (256 - c)) + c;
-  return `rgb(${r}, ${g}, ${b})`;
-}
 
 const SERVICE_ID = 'service:color-picker';
 
@@ -69,23 +62,16 @@ class ColorPickerView extends SegmentedView {
 
   _updatePalette() {
     const $circles = this.$circles;
-
-    // (function update(index) {
-    //   if (index === 11)
-    //     return;
-
-    //   const color = getRandomColor();
-    //   const $circle = $circles[index];
-
-    //   $circle.style.backgroundColor = color;
-    //   $circle.setAttribute('data-rgb', color);
-
-    //   setTimeout(update, 50, ++index);
-    // }(0));
+    const colors = please.make_color({
+      colors_returned: 11,
+      format: 'rgb-string',
+      saturation: .75,
+      value: .75,
+    });
 
     for (let i = 0; i < 11; i++) {
       const $circle = $circles[i];
-      const color = getRandomColor();
+      const color = colors[i];
 
       $circle.style.backgroundColor = color;
       $circle.setAttribute('data-rgb', color);
@@ -103,7 +89,7 @@ class ColorPicker extends Service {
   init() {
     this.viewTemplate = template;
     this.viewCtor = ColorPickerView;
-    this.viewContent = { colors: colorMap };
+    this.viewContent = {};
     this.viewOptions = {
       priority: 7,
       ratios: {
