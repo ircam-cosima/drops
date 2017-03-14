@@ -25,7 +25,7 @@ export default class SampleSynth {
     // center note
     const s1Infos = bufferInfos[midiKey];
     const s1Buffer = s1Infos.file;
-    const s1Detune = s1Infos.detune;
+    const s1Rate = Math.pow(2, s1Infos.detune / 1200);
     const s1Gain = 2 * (0.5 - Math.abs(x - 0.5));
 
     const g1 = audioContext.createGain();
@@ -35,7 +35,7 @@ export default class SampleSynth {
     const s1 = audioContext.createBufferSource();
     s1.connect(g1);
     s1.buffer = s1Buffer;
-    s1.detune.value = s1Detune;
+    s1.playbackRate.value = s1Rate;
     s1.start(time);
 
     // octava source
@@ -43,7 +43,7 @@ export default class SampleSynth {
 
     const s2Infos = bufferInfos[midiKey + midiOffset];
     const s2Buffer = s2Infos.file;
-    const s2Detune = s2Infos.detune;
+    const s2Rate = Math.pow(2, s2Infos.detune / 1200);
     const s2Gain = 2 * Math.abs(x - 0.5);
 
     const g2 = audioContext.createGain();
@@ -53,7 +53,7 @@ export default class SampleSynth {
     const s2 = audioContext.createBufferSource();
     s2.connect(g2);
     s2.buffer = s2Buffer;
-    s2.detune.value = s2Detune;
+    s2.playbackRate.value = s2Rate;
     s2.start(time);
 
     let duration = 0;

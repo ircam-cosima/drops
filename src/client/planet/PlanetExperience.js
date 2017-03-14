@@ -21,12 +21,13 @@ const viewTemplate = `
 `;
 
 class PlanetExperience extends soundworks.Experience {
-  constructor() {
+  constructor(assetsDomain, geolocation) {
     super();
 
     this.sharedParams = this.require('shared-params');
 
     this.audioBufferManager = this.require('audio-buffer-manager', {
+      assetsDomain: assetsDomain,
       files: {
         topology: 'data/world-110m-withlakes.json',
         audio: audioFiles,
@@ -34,7 +35,7 @@ class PlanetExperience extends soundworks.Experience {
     });
 
     this.geolocation = this.require('geolocation', {
-      debug: false,
+      bypass: !geolocation,
     });
 
     this.scheduler = this.require('sync-scheduler', { lookahead: 0.050 });

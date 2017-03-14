@@ -10,7 +10,7 @@ const template = `
   </div>
   <div class="section-center flex-center">
     <div class="color-wrapper">
-      <% for (let i = 0; i < 11; i++) { %>
+      <% for (var i = 0; i < 11; i++) { %>
       <div class="circle color"></div>
       <% } %>
       <div class="circle color-change"></div>
@@ -20,14 +20,17 @@ const template = `
 `;
 
 class ColorPickerView extends SegmentedView {
-  constructor(...args) {
-    super(...args);
+  constructor(template, content, events, options) {
+    super(template, content, events, options);
 
     this._updatePalette = this._updatePalette.bind(this);
-    this.installEvents({ 'click .color-change': (e) => {
-      e.target.classList.add('active');
-      this._updatePalette();
-    }});
+
+    this.installEvents({
+      'click .color-change': (e) => {
+        e.target.classList.add('active');
+        this._updatePalette();
+      }
+    });
   }
 
   onRender() {
@@ -96,8 +99,9 @@ class ColorPicker extends Service {
         '.section-top': 0.12,
         '.section-center': 0.85,
         '.section-bottom': 0.03,
-      }
+      },
     };
+
     this.viewEvents = {
       'touchstart .color': this._onSelectColor,
       'mousedown .color': this._onSelectColor,

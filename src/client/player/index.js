@@ -16,6 +16,6 @@ window.addEventListener('load', () => {
   soundworks.client.setViewContentDefinitions(viewContent);
   soundworks.client.setViewTemplateDefinitions(viewTemplates);
 
-  const experience = new PlayerExperience(config.assetsDomain);
+  const experience = new PlayerExperience(config.assetsDomain, config.geolocation);
   soundworks.client.start();
 });

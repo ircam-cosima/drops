@@ -45,7 +45,7 @@ const viewTemplate = `
 const METRIC_PATTERN_UPDATE_PERIOD = 1; // every 1 minute
 
 export default class PlayerExperience extends soundworks.Experience {
-  constructor(assetsDomain) {
+  constructor(assetsDomain, geolocation) {
     super();
 
     // requires mobile device and web audio
@@ -63,7 +63,7 @@ export default class PlayerExperience extends soundworks.Experience {
     });
 
     this.geolocation = this.require('geolocation', {
-      debug: true,
+      bypass: !geolocation,
     });
 
     this.checkin = this.require('checkin');
