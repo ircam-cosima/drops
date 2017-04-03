@@ -1,5 +1,6 @@
 import 'source-map-support/register';
 import { EventEmitter } from 'events';
+import path from 'path';
 import * as soundworks from 'soundworks/server';
 import ControllerExperience from './ControllerExperience';
 import PlanetExperience from './PlanetExperience';
@@ -7,14 +8,16 @@ import PlayerExperience from './PlayerExperience';
 // application services
 import Salesman from './shared/services/Salesman';
 
-import defaultConfig from './config/default';
-
+const configName = process.env.ENV || 'default';
+const configPath = path.join(__dirname, 'config', configName);
 let config = null;
 
-switch(process.env.ENV) {
-  default:
-    config = defaultConfig;
-    break;
+// rely on node require because is synchronous
+try {
+  config = require(configPath).default;
+} catch(err) {
+  console.error(`Invalid ENV "${configName}", file "${configPath}.js" not found`);
+  process.exit(1);
 }
 
 process.env.NODE_ENV = config.env;
