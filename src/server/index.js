@@ -1,8 +1,12 @@
-// add source map support to nodejs
 import 'source-map-support/register';
+import { EventEmitter } from 'events';
 import * as soundworks from 'soundworks/server';
-import PlayerExperience from './PlayerExperience';
 import ControllerExperience from './ControllerExperience';
+import PlanetExperience from './PlanetExperience';
+import PlayerExperience from './PlayerExperience';
+// application services
+import Salesman from './shared/services/Salesman';
+
 import defaultConfig from './config/default';
 
 let config = null;
@@ -13,41 +17,47 @@ switch(process.env.ENV) {
     break;
 }
 
-// configure express environment ('production' enables cache systems)
 process.env.NODE_ENV = config.env;
-// initialize application with configuration options
-soundworks.server.init(config);
 
+soundworks.server.init(config);
+// @todo - move to a config object
 // define parameters shared by different clients
 const sharedParams = soundworks.server.require('shared-params');
 sharedParams.addText('numPlayers', 'num players', 0, ['controller']);
-sharedParams.addEnum('state', 'state', ['reset', 'running', 'end'], 'reset');
+sharedParams.addEnum('state', 'state', ['reset', 'running', 'end'], 'running');
 sharedParams.addNumber('maxDrops', 'max drops', 0, 24, 1, 6);
-sharedParams.addNumber('loopDiv', 'loop div', 1, 24, 1, 3);
-sharedParams.addNumber('loopPeriod', 'loop period', 1, 24, 0.1, 7.5);
-sharedParams.addNumber('loopAttenuation', 'loop atten', 0, 1, 0.01, 0.707);
-sharedParams.addNumber('minGain', 'min gain', 0, 1, 0.01, 0.1);
-sharedParams.addNumber('quantize', 'quantize', 0, 1, 0.001, 0);
+
+sharedParams.addNumber('loopPeriod', 'loop period', 0.5, 24, 0.01, 2.14);
+sharedParams.addNumber('loopAttenuation', 'loop atten', 0, 1, 0.001, 0.707);
+sharedParams.addNumber('minGain', 'min gain', -80, 0, 0.1, -20);
+sharedParams.addNumber('localEchoGain', 'local echo gain', -80, 0, 0.1, -18);
 sharedParams.addEnum('autoPlay', 'auto play', ['off', 'on'], 'off');
+
+sharedParams.addEnum('forcePattern', 'force pattern index', ['off', 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 'off');
+sharedParams.addEnum('mutePlayers', 'mute players', ['on', 'off'], 'off');
+sharedParams.addEnum('mutePlanets', 'mute planets', ['on', 'off'], 'off');
+sharedParams.addEnum('enableBots', 'enable bots', ['on', 'off'], 'on');
+
 sharedParams.addTrigger('clear', 'clear');
 
-// define the configuration object to be passed to the `.ejs` template
+
 soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) => {
   return {
     clientType: clientType,
     env: config.env,
-    socketIO: config.socketIO,
+    websockets: config.websockets,
     appName: config.appName,
     version: config.version,
     defaultType: config.defaultClient,
     assetsDomain: config.assetsDomain,
+    geolocation: config.geolocation,
   };
 });
 
-// create server side controller experience
-const controller = new ControllerExperience('controller');
+const messaging = new EventEmitter();
 
-// create server side player experience
-const experience = new PlayerExperience('player');
+const controllerExperience = new ControllerExperience('controller');
+const playerExperience = new PlayerExperience('player', messaging);
+const planetExperience = new PlanetExperience('planet', messaging);
 
 soundworks.server.start();

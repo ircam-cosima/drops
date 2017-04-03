@@ -23,6 +23,8 @@ export default {
   // application at its root URL
   defaultClient: 'player',
 
+  geolocation: false,
+
   // define from where the assets (static files) should be loaded, these value
   // could also refer to a separate server for scalability reasons. This value
   // should also be used client-side to configure the `loader` service.
@@ -53,7 +55,7 @@ export default {
   },
 
   // socket.io configuration
-  socketIO: {
+  websockets: {
     url: '',
     transports: ['websocket'],
     // @note: EngineIO defaults

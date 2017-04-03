@@ -22,13 +22,17 @@ export default {
           <button class="btn" id="send"><%= send %></button>
         </div>
       </div>
-      <div class="section-bottom"></div>
+      <div class="section-bottom flex-middle">
+        <button id="reset" class="btn"><%= reset %></button>
+      </div>
     <% } else { %>
       <div class="section-top"></div>
       <div class="section-center flex-center">
         <p><%= rejectMessage %></p>
       </div>
-      <div class="section-bottom"></div>
+      <div class="section-bottom flex-middle">
+        <button id="reset" class="btn"><%= reset %></button>
+      </div>
     <% } %>
   `,
 
@@ -106,10 +110,16 @@ export default {
 
   // template of the `platform` service
   'service:platform': `
-    <% if (!isCompatible) { %>
+    <% if (isCompatible === false) { %>
       <div class="section-top"></div>
       <div class="section-center flex-center">
-        <p><%= errorMessage %></p>
+        <p><%= errorCompatibleMessage %></p>
+      </div>
+      <div class="section-bottom"></div>
+    <% } else if (resolvedHooks === false) { %>
+      <div class="section-top"></div>
+      <div class="section-center flex-center">
+        <p><%= errorHooksMessage %></p>
       </div>
       <div class="section-bottom"></div>
     <% } else { %>
@@ -122,7 +132,11 @@ export default {
           </p>
       </div>
       <div class="section-bottom flex-middle">
+        <% if (checking === true) { %>
+        <p class="small soft-blink"><%= checkingMessage %></p>
+        <% } else if (resolvedHooks === true) { %>
         <p class="small soft-blink"><%= instructions %></p>
+        <% } %>
       </div>
     <% } %>
   `,

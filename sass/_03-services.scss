@@ -104,10 +104,10 @@
 }
 
 // ------------------------------------------------------------
-// LOADER
+// AUDIO BUFFER MANAGER
 // ------------------------------------------------------------
 
-#service-loader {
+#service-audio-buffer-manager {
   .progress-wrap {
     margin: 12px auto 0;
     border: solid 1px white;
@@ -125,4 +125,18 @@
   }
 }
 
+// ------------------------------------------------------------
+// BASIC SHARED CONTROLLERS
+// ------------------------------------------------------------
+
+#basic-shared-controller {
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 10px;
+  box-sizing: border-box;
+
+  h1 {
+    margin: 8px 0;
+  }
+}
 

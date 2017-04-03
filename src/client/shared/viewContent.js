@@ -11,10 +11,11 @@ export default {
   // variables shared among all templates through the global namespace
   'globals': {},
 
-   // content of the `auth` service
+  // content of the `auth` service
   'service:auth': {
     instructions: 'Login',
     send: 'Send',
+    reset: 'Reset',
     rejectMessage: `Sorry, you don't have access to this client`,
     rejected: false,
   },
@@ -52,11 +53,15 @@ export default {
 
   // content of the `platform` service
   'service:platform': {
-    isCompatible: null,
-    errorMessage: 'Sorry,<br />Your device is not compatible with the application.',
-    intro: 'Welcome to',
-    instructions: 'Touch the screen to join !',
-  },
+  isCompatible: null,
+  resolvedHooks: null,
+  checking: false,
+  intro: 'Welcome to',
+  instructions: 'Touch the screen to join!',
+  checkingMessage: 'Please wait while checking compatiblity',
+  errorCompatibleMessage: 'Sorry,<br />Your device is not compatible with the application.',
+  errorHooksMessage: `Sorry,<br />The application didn't obtain the necessary authorizations.`,
+},
 
   // content of the `sync` service
   'service:sync': {
