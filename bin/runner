@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 var fse = require('fs-extra');
+var klaw = require('klaw');
 var watch = require('watch');
 var path = require('path');
 var uglifyJS = require('uglifyjs');
@@ -187,7 +188,7 @@ function _getFileList(folder, excludeDirectories, callback) {
     return false;
   }
 
-  fse.walk(folder)
+  klaw(folder)
     .on('data', function(item) {
       // console.log(excludeDirectories, item.path, iExcluded(item.path));
       if (item.stats.isFile() &&
