@@ -10,7 +10,7 @@ The parameters of the application (i.e. the period of the echoes, the number of 
 
 ```sh
 # to start the application
-git clone https://github.com/collective-soundworks/soundworks-drops.git
+git clone https://github.com/ircam-cosima/drops.git
 cd soundworks-drops
 npm install
 npm run transpile
