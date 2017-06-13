@@ -131,7 +131,7 @@ function initialize(_pois = [], _populationSize = 100, _crossoverProbability = 0
 }
 
 function evolve(nbrGenerations = 100) {
-  let bestPath = null;
+  let bestPath = [];
 
   if (pois.size < 1)
     return bestPath;
@@ -142,6 +142,8 @@ function evolve(nbrGenerations = 100) {
     const offsprings = stack[generationCounter];
 
     // get the best path from the ancestors
+    // fitness is the more resource consuming part of the algorithm and
+    // is of size populationSize * pathLen
     bestPath = _fitness(ancestors);
 
     // apply elitism to the new population
@@ -161,9 +163,6 @@ function evolve(nbrGenerations = 100) {
       if (random() < mutationProbability)
         _mutate(offspring);
     }
-
-    // @note: for debug only
-    // copy(offsprings, currentGeneration);
   }
 
   return bestPath;
@@ -176,6 +175,7 @@ function add(poi) {
   // insert new position index randomly in each current population individuals
   const currentPopulation = stack[generationCounter];
 
+  // put new poi at random position in existing population
   for (let i = 0; i < populationSize; i++) {
     const path = currentPopulation[i];
     path.push(poiId);
@@ -186,10 +186,6 @@ function add(poi) {
     const store = path[otherIndex];
     path[otherIndex] = poiId;
     path[index] = store;
-
-    // apply mutations
-    // if (random() < mutationProbability)
-    //   _mutate(path);
   }
 
   // insert new position index at the end of next population individuals
@@ -205,6 +201,8 @@ function add(poi) {
 
 function update(poi) {
   pois[poi.id] = convertToRadians(poi);
+
+  // console.log('update', Object.keys(pois).length);
 }
 
 function remove(poi) {
@@ -226,6 +224,8 @@ function remove(poi) {
   // decrease fitness and pathLengths size
   fitnesses.length = fitnesses.length - 1;
   pathLengths.length = pathLengths.length - 1;
+
+  // console.log('remove', Object.keys(pois).length);
 }
 
 // ------------------------------------------------------
@@ -438,17 +438,27 @@ self.onmessage = (e) => {
       initialize([], populationSize);
       break;
     case 'evolve':
-      const best = evolve(data.generations);
-      self.postMessage({ cmd: 'result', path: best });
+      try {
+        const best = evolve(data.generations);
+        self.postMessage({ cmd: 'result', path: best });
+      } catch(err) { console.log('[error evolve]');  }
       break;
     case 'add':
-      add(data.poi);
+      try {
+        add(data.poi);
+      } catch(err) { console.log('[error add]');  }
       break;
     case 'remove':
-      remove(data.poi);
+      try {
+        remove(data.poi);
+      } catch(err) { console.log('[error remove]');  }
       break;
     case 'update':
-      update(data.poi);
+      try {
+        update(data.poi);
+      } catch(err) { console.log('[error update]');  }
       break;
   }
 }
+
+

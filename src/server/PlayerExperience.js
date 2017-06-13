@@ -20,7 +20,12 @@ class PlayerExperience extends Experience {
     this.checkin = this.require('checkin');
     this.sharedParams = this.require('shared-params');
     this.geolocation = this.require('geolocation');
-    this.salesman = this.require('salesman');
+    this.salesman = this.require('salesman', {
+      populationSize: 100,
+      generationsPerCycle: 200,
+      cycleInterval: 400,
+    });
+
     this.audioBufferManager = this.require('audio-buffer-manager');
 
     // model for loop parameters
@@ -127,41 +132,44 @@ class PlayerExperience extends Experience {
       // emit a server-side event (planet listens)
       this.messaging.emit('drop', time, client.coordinates, dropParams);
 
-      // if only 1 or 2 clients
-      if (echoPlayersIndexes.length > clientsLength - 1)
-        echoPlayersIndexes.length = clientsLength - 1;
+      // make sure there is a `currentPath`
+      if (currentPath !== null) {
+        // if only 1 or 2 clients
+        if (echoPlayersIndexes.length > clientsLength - 1)
+          echoPlayersIndexes.length = clientsLength - 1;
 
-      const playerIndex = currentPath.indexOf(client.uuid);
-      const echoPeriod = loopParams.period;
-      let echoDelay = 0;
+        const playerIndex = currentPath.indexOf(client.uuid);
+        const echoPeriod = loopParams.period;
+        let echoDelay = 0;
 
-      echoPlayersIndexes.forEach((offset) => {
-        let echoPlayerIndex = (playerIndex + offset) % clientsLength;
-        // modulo in both directions
-        if (echoPlayerIndex < 0)
-          echoPlayerIndex = clientsLength - 1;
+        echoPlayersIndexes.forEach((offset) => {
+          let echoPlayerIndex = (playerIndex + offset) % clientsLength;
+          // modulo in both directions
+          if (echoPlayerIndex < 0)
+            echoPlayerIndex = clientsLength - 1;
 
-        const echoPlayerUuid = currentPath[echoPlayerIndex];
-        const echoPlayer = uuidClientMap.get(echoPlayerUuid);
-        const echoAttenuation = Math.pow(loopParams.attenuation, 1 / 3);
-        echoDelay += echoPeriod;
-        dropParams.gain *= echoAttenuation;
+          const echoPlayerUuid = currentPath[echoPlayerIndex];
+          const echoPlayer = uuidClientMap.get(echoPlayerUuid);
+          const echoAttenuation = Math.pow(loopParams.attenuation, 1 / 3);
+          echoDelay += echoPeriod;
+          dropParams.gain *= echoAttenuation;
 
-        // player is still in the path retrieved by the salesman but is disconnected
-        if (echoPlayer) {
-          // keep track of echoPlayer index to remove all drops at this position no planets
-          dropParams.targetIndex = echoPlayer.index;
+          // player is still in the path retrieved by the salesman but is disconnected
+          if (echoPlayer) {
+            // keep track of echoPlayer index to remove all drops at this position no planets
+            dropParams.targetIndex = echoPlayer.index;
 
-          if (!echoPlayer.isBot) // don't send messages to bots
-            this.send(echoPlayer, 'echo', time + echoDelay, dropParams);
-          // emit echo maesage server-side
-          this.messaging.emit('echo', time + echoDelay, echoPlayer.coordinates, dropParams);
-          // keep track of the players that are echoing this one
-          client.activities[this.id].echoPlayers.add(echoPlayer);
-        } else {
-          client.activities[this.id].echoPlayers.delete(echoPlayer);
-        }
-      });
+            if (!echoPlayer.isBot) // don't send messages to bots
+              this.send(echoPlayer, 'echo', time + echoDelay, dropParams);
+            // emit echo maesage server-side
+            this.messaging.emit('echo', time + echoDelay, echoPlayer.coordinates, dropParams);
+            // keep track of the players that are echoing this one
+            client.activities[this.id].echoPlayers.add(echoPlayer);
+          } else {
+            client.activities[this.id].echoPlayers.delete(echoPlayer);
+          }
+        });
+      }
     }
   }
 

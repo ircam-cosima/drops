@@ -50,7 +50,8 @@ export default class PlayerExperience extends soundworks.Experience {
 
     // requires mobile device and web audio
     this.platform = this.require('platform', {
-      features: ['mobile-device', 'web-audio']
+      // features: ['mobile-device', 'web-audio']
+      features: ['web-audio']
     });
     // configure required services
     this.audioBufferManager = this.require('audio-buffer-manager', {

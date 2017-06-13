@@ -39,7 +39,7 @@ sharedParams.addEnum('autoPlay', 'auto play', ['off', 'on'], 'off');
 sharedParams.addEnum('forcePattern', 'force pattern index', ['off', 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 'off');
 sharedParams.addEnum('mutePlayers', 'mute players', ['on', 'off'], 'off');
 sharedParams.addEnum('mutePlanets', 'mute planets', ['on', 'off'], 'off');
-sharedParams.addEnum('enableBots', 'enable bots', ['on', 'off'], 'on');
+sharedParams.addEnum('enableBots', 'enable bots', ['on', 'off'], config.enableBots);
 
 sharedParams.addTrigger('clear', 'clear');
 

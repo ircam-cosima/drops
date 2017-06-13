@@ -28,7 +28,7 @@
     "soundworks": "collective-soundworks/soundworks.git#develop",
     "source-map-support": "^0.4.2",
     "topojson": "^2.2.0",
-    "webworker-threads": "^0.7.9"
+    "webworker-threads": "^0.7.11"
   },
   "devDependencies": {
     "babel-core": "^6.14.0",

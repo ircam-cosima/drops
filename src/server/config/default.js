@@ -23,7 +23,9 @@ export default {
   // application at its root URL
   defaultClient: 'player',
 
+  // app configuration
   geolocation: false,
+  enableBots: 'off',
 
   // define from where the assets (static files) should be loaded, these value
   // could also refer to a separate server for scalability reasons. This value

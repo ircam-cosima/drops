@@ -69,7 +69,8 @@ class Bot {
 
     this.triggerDropMessage(time, dropParams);
 
-    this._triggerTimeoutId = setTimeout(this._trigger, Math.random() * 10000 + 5000);
+    // trigger a drop each 10..20 sec
+    this._triggerTimeoutId = setTimeout(this._trigger, Math.random() * 1000 * 10 + 10 * 1000);
   }
 
   destroy(now = false) {
