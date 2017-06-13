@@ -41,8 +41,7 @@ class PlanetExperience extends soundworks.Experience {
     this.scheduler = this.require('sync-scheduler', { lookahead: 0.050 });
 
     this.triggerLoop = this.triggerLoop.bind(this);
-    this.triggerEcho = this.triggerEcho.bind(this);
-    this.triggerDrop = this.triggerDrop.bind(this);
+    this.renderDrop = this.renderDrop.bind(this);
     this.clear = this.clear.bind(this);
     this.clearAll = this.clearAll.bind(this);
   }
@@ -69,7 +68,7 @@ class PlanetExperience extends soundworks.Experience {
       this._initAudioOutput();
 
       // looper
-      this.looper = new Looper(this.scheduler, () => {}, this.triggerDrop);
+      this.looper = new Looper(this.scheduler, () => {}, this.renderDrop);
       this.synth = new SampleSynth(this.audioBufferManager.data.audio);
       this.synth.connect(this.getDestination());
 
@@ -82,13 +81,22 @@ class PlanetExperience extends soundworks.Experience {
       this.sharedParams.addParamListener('clear', this.clearAll);
 
       // messages from the server
-      this.receive('drop', this.triggerLoop);
-      this.receive('echo', this.triggerEcho);
-      this.receive('clear', this.clear);
+      this.receive('drop', (syncTime, coordinates, params) => {
+        params.coordinates = coordinates; // for visual rendering
+        this.triggerLoop(syncTime, params);
+      });
+      // never play sound of echos
+      this.receive('echo', (syncTime, coordinates, params) => {
+        params.coordinates = coordinates; // for visual rendering
+        params.muted = true;
+        this.triggerLoop(syncTime, params);
+      });
 
       this.receive('path', (path, coordinates) => {
         this.renderer.setSalesmanCoordinates(coordinates);
       });
+
+      this.receive('clear', this.clear);
 
       this.receive('proximity-player', (coords) => {
         this.renderer.stateMachine.trigger('goto', coords.reverse());
@@ -162,28 +170,19 @@ class PlanetExperience extends soundworks.Experience {
     $container.call(zoom);
   }
 
-  triggerLoop(syncTime, coordinates, soundParams, playSound = true) {
-    soundParams.coordinates = coordinates;
-    this.looper.createLoop(syncTime, soundParams);
-
-    if (playSound) {
-      const now = audioContext.currentTime;
-      this.synth.trigger(now, soundParams);
-    }
-
-  }
-
-  triggerEcho(syncTime, coordinates, soundParams) {
-    this.triggerLoop(syncTime, coordinates, soundParams, false);
+  triggerLoop(syncTime, params) {
+    this.looper.createLoop(syncTime, params);
   }
 
   // looper callback
-  triggerDrop(audioTime, soundParams, loopCounter) {
-    if (loopCounter === 0) {
-      this.renderer.addPing(soundParams);
+  renderDrop(audioTime, params, loopCounter) {
+    if (loopCounter === 0) { // don't render local echos
+      this.renderer.addPing(params);
 
-      const now = audioContext.currentTime;
-      this.synth.trigger(now, soundParams);
+      if (!params.muted) {
+        const now = audioContext.currentTime;
+        this.synth.trigger(now, params);
+      }
     }
   }
 

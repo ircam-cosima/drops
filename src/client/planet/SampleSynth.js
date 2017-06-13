@@ -17,8 +17,9 @@ class SampleSynth {
     const bufferInfos = this.bufferInfos;
     const { x, y, midiKey, gain } = params;
 
-    // pitch 2 octava lower
-    const detune = -1 * 3 * 12 * 100;
+    // pitch 2 or 3 octava lower
+    const octava = Math.random() < 0.5 ? -2 : -3;
+    const detune = -3 * 12 * 100;
     const attackTime = 4;
 
     // center note
