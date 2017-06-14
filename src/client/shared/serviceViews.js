@@ -751,7 +751,7 @@ const serviceViews = {
             <br />
             <br />
             <p>
-              To play with your smartphone please visit<br />
+              To play drops with your mobile device, open<br />
               <a href="https://apps.cosima.ircam.fr/drops">
                 https://apps.cosima.ircam.fr/drops
               </a>
@@ -822,8 +822,19 @@ const serviceViews = {
       this.template = `
         <% if (isCompatible === false) { %>
           <div class="section-top"></div>
-          <div class="section-center flex-center">
+          <div class="section-center align-center">
             <p><%= errorCompatibleMessage %></p>
+
+            <% if (globals.env === 'production') { %>
+            <br />
+            <br />
+            <p>
+              For a visualization of all drops on earth, open<br />
+              <a href="https://apps.cosima.ircam.fr/drops/planet">
+                https://apps.cosima.ircam.fr/drops/planet
+              </a>
+            <p>
+            <% } %>
           </div>
           <div class="section-bottom"></div>
         <% } else if (hasAuthorizations === false) { %>
@@ -851,7 +862,7 @@ const serviceViews = {
             <br />
             <br />
             <p class="tiny">
-              To see other players, please visit<br />
+              For a visualization of all drops on earth, open<br />
               <a href="https://apps.cosima.ircam.fr/drops/planet">
                 https://apps.cosima.ircam.fr/drops/planet
               </a>
