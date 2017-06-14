@@ -2,7 +2,7 @@
 var fse = require('fs-extra');
 var klaw = require('klaw');
 var path = require('path');
-var uglifyJS = require('uglify-js');
+var uglifyJS = require('uglifyjs');
 var util = require('util');
 var watch = require('watch');
 
