@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 var fse = require('fs-extra');
 var klaw = require('klaw');
-var watch = require('watch');
 var path = require('path');
 var uglifyJS = require('uglify-js');
 var util = require('util');
+var watch = require('watch');
 
 var javascripts = require('./javascripts');
 var log = require('./log');
@@ -46,13 +46,10 @@ function escapeRegExp(str) {
 }
 
 /**
- * Options for babel transpiling.
+ * Options for babel transpiling (cf .babelrc).
  */
-var babelOptions = {
-  sourceMap: 'inline',
-  presets: ['es2015'],
-  plugins: ['transform-runtime', 'transform-es2015-modules-commonjs'],
-};
+var babelrc = fse.readFileSync(path.join(cwd, '.babelrc'));
+var babelOptions = JSON.parse(babelrc);
 
 /**
  * Options for browserify.
@@ -80,6 +77,12 @@ var watchOptions = {
   ignoreNotPermitted: true,
   interval: 2,
 };
+
+// return a new instance instance because the object is modified when
+// a new monitor is created
+function getWatchOptions() {
+  return Object.assign({}, watchOptions);
+}
 
 /**
  * Path to the server index

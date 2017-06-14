@@ -2,7 +2,6 @@ import 'source-map-support/register';
 import { EventEmitter } from 'events';
 import path from 'path';
 import * as soundworks from 'soundworks/server';
-import ControllerExperience from './ControllerExperience';
 import PlanetExperience from './PlanetExperience';
 import PlayerExperience from './PlayerExperience';
 // application services
@@ -59,7 +58,7 @@ soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) =>
 
 const messaging = new EventEmitter();
 
-const controllerExperience = new ControllerExperience('controller');
+const controllerExperience = new soundworks.ControllerExperience('controller', { auth: true });
 const playerExperience = new PlayerExperience('player', messaging);
 const planetExperience = new PlanetExperience('planet', messaging);
 

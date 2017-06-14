@@ -1,12 +1,10 @@
-import * as soundworks from 'soundworks/client';
+import { client, Canvas2dRenderer } from 'soundworks/client';
 import * as d3 from 'd3';
 import * as topojson from 'topojson';
 // proxies for user input (drag and zoom)
 import DragProxy from './control-proxies/DragProxy';
 import ZoomProxy from './control-proxies/ZoomProxy';
 import StateMachine from './automations/StateMachine';
-
-const client = soundworks.client;
 
 class Planet {
   constructor(projection) {
@@ -28,7 +26,7 @@ class Planet {
   }
 }
 
-class PlanetRenderer extends soundworks.Renderer {
+class PlanetRenderer extends Canvas2dRenderer {
   constructor(ctx, topology, scaleExtent) {
     super();
 

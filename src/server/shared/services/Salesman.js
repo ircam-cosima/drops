@@ -91,6 +91,8 @@ class Salesman extends Service {
         this._worker.postMessage({ cmd: 'update', poi: poi });
       }
     });
+
+    this.ready();
   }
 
   _triggerEvolve() {

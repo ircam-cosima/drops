@@ -37,13 +37,13 @@ class PlayerExperience extends Experience {
     this.botsEnabled = null
 
     // listen to shared parameter changes
-    this.sharedParams.addParamListener('loopPeriod', (value) => this.loopParams.period = value);
-    this.sharedParams.addParamListener('loopAttenuation', (value) => this.loopParams.attenuation = value);
-    this.sharedParams.addParamListener('enableBots', (value) => this.enableBots(value));
-    this.sharedParams.addParamListener('state', (state) => {
+    this.sharedParams.addParamListener('loopPeriod', value => this.loopParams.period = value);
+    this.sharedParams.addParamListener('loopAttenuation', value => this.loopParams.attenuation = value);
+    this.sharedParams.addParamListener('enableBots', value => this.enableBots(value));
+    this.sharedParams.addParamListener('state', value => {
       const currentTime = this.metricScheduler.currentTime;
 
-      if (state === 'running')
+      if (value === 'running')
         this.metricScheduler.sync(currentTime, 0, TEMPO, TEMPO_UNIT, 'start');
       else
         this.metricScheduler.sync(currentTime, 0, 0, TEMPO_UNIT, 'stop');
@@ -51,7 +51,7 @@ class PlayerExperience extends Experience {
   }
 
   start() {
-    this.salesman.addListener('result', (path) => this.currentPath = path);
+    this.salesman.addListener('result', path => this.currentPath = path);
   }
 
   enter(client) {
@@ -99,7 +99,7 @@ class PlayerExperience extends Experience {
 
   updateBots() {
     if (this.clients.length === 0) {
-      this.bots.forEach((bot) => bots.destroy(bot));
+      this.bots.forEach(bot => bots.destroy(bot));
       this.bots.length = 0;
     } else if (this.clients.length <= 3) {
       const diffBots = 3 - (this.clients.length + this.bots.length);
@@ -181,7 +181,7 @@ class PlayerExperience extends Experience {
     const { index } = client;
     const echoPlayers = client.activities[this.id].echoPlayers;
 
-    echoPlayers.forEach((echoPlayer) => {
+    echoPlayers.forEach(echoPlayer => {
       if (!echoPlayer.isBot)
         this.send(echoPlayer, 'clear', index);
     });

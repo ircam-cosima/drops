@@ -1,4 +1,4 @@
-import { Renderer } from 'soundworks/client';
+import { Canvas2dRenderer } from 'soundworks/client';
 import { getScaler } from 'soundworks/utils/math';
 
 class Circle {
@@ -65,7 +65,7 @@ class Circle {
   }
 }
 
-class CirclesRenderer extends Renderer {
+class CirclesRenderer extends Canvas2dRenderer {
   constructor() {
     super();
 

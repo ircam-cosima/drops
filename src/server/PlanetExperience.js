@@ -17,6 +17,7 @@ class PlanetExperience extends soundworks.Experience {
   }
 
   start() {
+    console.log('planet start');
     // results from salesman service
     this.salesman.addListener('result', (path, coordinates) => {
       this.broadcast('planet', null, 'path', path, coordinates);
@@ -43,11 +44,13 @@ class PlanetExperience extends soundworks.Experience {
   }
 
   _testPlayerProximity(player) {
-    this.clients.forEach((planet) => {
-      const distance = getDistance(player.coordinates, planet.coordinates);
+    this.clients.forEach(planet => {
+      if (Array.isArray(player.coordinates)) {
+        const distance = getDistance(player.coordinates, planet.coordinates);
 
-      if (distance < 50)
-        this.send(planet, 'proximity-player', player.coordinates);
+        if (distance < 50)
+          this.send(planet, 'proximity-player', player.coordinates);
+      }
     });
   }
 }

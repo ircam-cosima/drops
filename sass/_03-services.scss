@@ -36,14 +36,6 @@
   }
 }
 
-
-.buttons {
-  .btn {
-    width: 90%;
-    margin: 5%;
-  }
-}
-
 .select {
   color: $backgroundColor;
   background-color: $foregroundColor;
@@ -112,14 +104,14 @@
     margin: 12px auto 0;
     border: solid 1px white;
     border-radius: 5px;
-    height: $loaderProgressBarHeight;
+    height: $loadingProgressBarHeight;
     overflow: hidden;
     flex-basis: 80%;
   }
 
   .progress-bar {
     background-color: white;
-    height: $loaderProgressBarHeight;
+    height: $loadingProgressBarHeight;
     width: 0; // updated from javascript
     @include transition(width 150ms);
   }
@@ -137,6 +129,21 @@
 
   h1 {
     margin: 8px 0;
+  }
+}
+
+// ------------------------------------------------------------
+// LANGUAGE
+// ------------------------------------------------------------
+
+#service-language {
+  .section-center {
+    padding: 10px;
+  }
+
+  .btn {
+    width: 100%;
+    margin-bottom: 20px;
   }
 }
 

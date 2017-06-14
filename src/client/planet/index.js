@@ -1,17 +1,22 @@
 import * as soundworks from 'soundworks/client';
 import PlanetExperience from './PlanetExperience';
-import viewTemplates from '../shared/viewTemplates';
-import viewContent from '../shared/viewContent';
+import serviceViews from '../shared/serviceViews';
 
 window.addEventListener('load', () => {
-  // configuration received from the server through the `index.html`
-  // @see {~/src/server/index.js}
-  // @see {~/html/default.ejs}
-  const config = window.soundworksConfig;
+  const config = Object.assign({ appContainer: '#container' }, window.soundworksConfig);
+  config.env = 'production';
+  console.log(config);
   soundworks.client.init(config.clientType, config);
-  soundworks.client.setViewContentDefinitions(viewContent);
-  soundworks.client.setViewTemplateDefinitions(viewTemplates);
 
-  const experience = new PlanetExperience(config.assetsDomain, config.geolocation);
+  soundworks.client.setServiceInstanciationHook((id, instance) => {
+    if (serviceViews.has(id)) {
+      if (id === 'service:audio-buffer-manager')
+        instance.view = serviceViews.get('service:audio-buffer-manager-planet', config);
+      else
+        instance.view = serviceViews.get(id, config);
+    }
+  });
+
+  const experience = new PlanetExperience(config.assetsDomain, config.geolocation, config.env);
   soundworks.client.start();
 });

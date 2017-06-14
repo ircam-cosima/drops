@@ -11,7 +11,7 @@ function dbToLin(val) {
 
 const audioContext = soundworks.audioContext;
 
-const viewTemplate = `
+const template = `
   <canvas class="background"></canvas>
   <div class="foreground">
     <div class="section-top flex-middle"></div>
@@ -21,12 +21,20 @@ const viewTemplate = `
 `;
 
 class PlanetExperience extends soundworks.Experience {
-  constructor(assetsDomain, geolocation) {
+  constructor(assetsDomain, geolocation, env) {
     super();
+
+    const features = env === 'production' ? ['full-screen'] : [];
+
+    this.platform = this.require('platform', {
+      // showDialog: false,
+      features: features,
+    });
 
     this.sharedParams = this.require('shared-params');
 
     this.audioBufferManager = this.require('audio-buffer-manager', {
+      viewPriority: 0,
       assetsDomain: assetsDomain,
       files: {
         topology: 'data/world-110m-withlakes.json',
@@ -46,20 +54,13 @@ class PlanetExperience extends soundworks.Experience {
     this.clearAll = this.clearAll.bind(this);
   }
 
-  init() {
-    this.viewTemplate = viewTemplate;
-    this.viewContent = {};
-    this.viewCtor = soundworks.CanvasView;
-    this.viewOptions = { preservePixelRatio: true };
-    this.view = this.createView();
-  }
-
   start() {
     super.start();
 
-    if (!this.hasStarted)
-      this.init();
-
+    this.view = new soundworks.CanvasView(template, {}, {}, {
+      id: 'planet-experience',
+      preservePixelRatio: true,
+    });
     this.show();
 
     // initialize view
@@ -73,11 +74,11 @@ class PlanetExperience extends soundworks.Experience {
       this.synth.connect(this.getDestination());
 
       // params
-      this.sharedParams.addParamListener('maxDrops', (value) => this.looper.setMaxLocalLoops(value));
-      this.sharedParams.addParamListener('loopPeriod', (value) => this.looper.params.period = value);
-      this.sharedParams.addParamListener('loopAttenuation', (value) => this.looper.params.attenuation = value);
-      this.sharedParams.addParamListener('minGain', (value) => this.looper.params.minGain = dbToLin(value));
-      this.sharedParams.addParamListener('mutePlanets', (value) => this.mute(value));
+      this.sharedParams.addParamListener('maxDrops', value => this.looper.setMaxLocalLoops(value));
+      this.sharedParams.addParamListener('loopPeriod', value => this.looper.params.period = value);
+      this.sharedParams.addParamListener('loopAttenuation', value => this.looper.params.attenuation = value);
+      this.sharedParams.addParamListener('minGain', value => this.looper.params.minGain = dbToLin(value));
+      this.sharedParams.addParamListener('mutePlanets', value => this.mute(value));
       this.sharedParams.addParamListener('clear', this.clearAll);
 
       // messages from the server
@@ -98,7 +99,7 @@ class PlanetExperience extends soundworks.Experience {
 
       this.receive('clear', this.clear);
 
-      this.receive('proximity-player', (coords) => {
+      this.receive('proximity-player', coords => {
         this.renderer.stateMachine.trigger('goto', coords.reverse());
       });
     }, 0);
@@ -159,11 +160,11 @@ class PlanetExperience extends soundworks.Experience {
 
     zoom.scaleTo($container, this.renderer.projection.scale());
 
-    // use zoom to maintain projection and zoom in sync as
-    // any other way to reinit the zoom with current projection values failed
+    // use zoom to maintain projection and zoom coherent as all
+    // other tries to reinit the zoom with current projection values failed
     // (aka `$container.call(zoom.transform, zoomTransformValues)`)
     for (let id in this.renderer.stateMachine.states)
-      this.renderer.stateMachine.states[id].scaleTo = (value) => zoom.scaleTo($container, value);
+      this.renderer.stateMachine.states[id].scaleTo = value => zoom.scaleTo($container, value);
 
     // apply to $container
     $container.call(drag);

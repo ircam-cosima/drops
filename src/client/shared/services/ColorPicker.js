@@ -20,8 +20,8 @@ const template = `
 `;
 
 class ColorPickerView extends SegmentedView {
-  constructor(template, content, events, options) {
-    super(template, content, events, options);
+  constructor(template, model, events, options) {
+    super(template, model, events, options);
 
     this._updatePalette = this._updatePalette.bind(this);
 
@@ -89,32 +89,22 @@ class ColorPicker extends Service {
     this._onSelectColor = this._onSelectColor.bind(this);
   }
 
-  init() {
-    this.viewTemplate = template;
-    this.viewCtor = ColorPickerView;
-    this.viewContent = {};
-    this.viewOptions = {
-      priority: 7,
+  start() {
+    super.start();
+
+    this.options.viewPriority = 7;
+
+    this.view = new ColorPickerView(template, {}, {
+      'touchstart .color': this._onSelectColor,
+      'mousedown .color': this._onSelectColor,
+    }, {
+      id: 'service-color-picker',
       ratios: {
         '.section-top': 0.12,
         '.section-center': 0.85,
         '.section-bottom': 0.03,
       },
-    };
-
-    this.viewEvents = {
-      'touchstart .color': this._onSelectColor,
-      'mousedown .color': this._onSelectColor,
-    };
-
-    this.view = this.createView();
-  }
-
-  start() {
-    super.start();
-
-    if (!this.hasStarted)
-      this.init();
+    });
 
     this.show();
   }

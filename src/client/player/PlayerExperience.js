@@ -13,7 +13,7 @@ function dbToLin(val) {
   return Math.exp(0.11512925464970229 * val); // pow(10, val / 20)
 };
 
-const viewTemplate = `
+const template = `
   <canvas class="background"></canvas>
   <div class="foreground">
     <div class="section-top flex-middle"></div>
@@ -83,29 +83,16 @@ export default class PlayerExperience extends soundworks.Experience {
     this.triggerDrop = this.triggerDrop.bind(this)
   }
 
-  init() {
-    // setup view (creator, template and content)
-    this.viewCtor = soundworks.CanvasView;
-    this.viewTemplate = viewTemplate;
-    this.viewContent = {
-      state: this.state,
-      maxDrop: 0,
-      numAvailable: 0,
-    }
-
-    this.viewOptions = { preservePixelRatio: true };
-    // create view with the creator, template and content given above
-    this.view = this.createView();
-  }
-
   start() {
     super.start();
 
-    // just init once
-    if (!this.hasStarted)
-      this.init();
+    const model = {
+      state: this.state,
+      maxDrop: 0,
+      numAvailable: 0,
+    };
 
-    // show view
+    this.view = new soundworks.CanvasView(template, model, {}, { preservePixelRatio: true });
     this.show();
 
     this._initMotion();
@@ -203,15 +190,15 @@ export default class PlayerExperience extends soundworks.Experience {
   }
 
   updateView(numLoops, numLocalLoops, maxLocalLoops) {
-    this.view.content.maxDrops = maxLocalLoops;
+    this.view.model.maxDrops = maxLocalLoops;
 
     if (this.state === 'reset') {
-      this.view.content.state = 'reset';
+      this.view.model.state = 'reset';
     } else if (this.state === 'end' && numLoops === 0) {
-      this.view.content.state = 'end';
+      this.view.model.state = 'end';
     } else {
-      this.view.content.state = this.state;
-      this.view.content.numAvailable = Math.max(0, maxLocalLoops - numLocalLoops);
+      this.view.model.state = this.state;
+      this.view.model.numAvailable = Math.max(0, maxLocalLoops - numLocalLoops);
     }
 
     this.view.render('.section-center');
@@ -225,6 +212,7 @@ export default class PlayerExperience extends soundworks.Experience {
       const dropParams = this.mapper.getDropParams(x, y, client);
 
       this.looper.createLoop(syncTime, dropParams, true);
+      console.log('send drop');
       this.send('drop', syncTime, dropParams);
     }
   }

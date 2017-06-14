@@ -12,33 +12,34 @@ var sass = require('node-sass');
  * and are not prefixed by `_`. Transpile them to the `distDirectory`
  */
 function processSass(srcDirectory, distDirectory, isAllowed, sassOptions) {
-  klaw(srcDirectory).on('data', function(item) {
-    var filename = item.path;
-    var basename = path.basename(filename);
+  klaw(srcDirectory)
+    .on('data', function(item) {
+      var filename = item.path;
+      var basename = path.basename(filename);
 
-    if (isAllowed(filename) && !/^_/.test(basename)) {
-      var relFilename = path.relative(srcDirectory, filename);
-      var outFilename = path.join(distDirectory, relFilename);
-      outFilename = outFilename.replace(/\.scss$/, '.css');
+      if (isAllowed(filename) && !/^_/.test(basename)) {
+        var relFilename = path.relative(srcDirectory, filename);
+        var outFilename = path.join(distDirectory, relFilename);
+        outFilename = outFilename.replace(/\.scss$/, '.css');
 
-      Object.assign(sassOptions, {
-        file: filename,
-        outFilename: outFilename
-      });
-
-      sass.render(sassOptions, function(err, result) {
-        if (err)
-          return log.sassError(err);
-
-        fse.outputFile(outFilename, result.css, function(err) {
-          if (err)
-            return console.error(err.message);
-
-          log.sassSuccess(outFilename);
+        Object.assign(sassOptions, {
+          file: filename,
+          outFilename: outFilename
         });
-      });
-    }
-  });
+
+        sass.render(sassOptions, function(err, result) {
+          if (err)
+            return log.sassError(err);
+
+          fse.outputFile(outFilename, result.css, function(err) {
+            if (err)
+              return console.error(err.message);
+
+            log.sassSuccess(outFilename);
+          });
+        });
+      }
+    });
 }
 
 module.exports = {
