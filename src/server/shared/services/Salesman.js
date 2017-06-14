@@ -22,8 +22,6 @@ class Salesman extends Service {
 
     this._uuidPoiMap = new Map();
     this._indexPoiMap = new Map();
-    this._pathCoordinates = [];
-    this._pathUuids = [];
     this._worker = null;
 
     this._triggerEvolve = this._triggerEvolve.bind(this);
@@ -51,15 +49,16 @@ class Salesman extends Service {
 
           const path = data.path;
           const length = path.length;
-          this._pathCoordinates.length = length;
+          const pathCoordinates = [];
+          const pathUuids = [];
 
           for (let i = 0; i < length; i++) {
             const { coordinates, uuid } = this._indexPoiMap.get(path[i]);
-            this._pathCoordinates[i] = coordinates;
-            this._pathUuids[i] = uuid;
+            pathCoordinates[i] = coordinates;
+            pathUuids[i] = uuid;
           }
 
-          this.emit('result', this._pathUuids, this._pathCoordinates);
+          this.emit('result', pathUuids, pathCoordinates);
           resultTimeoutId = setTimeout(this._triggerEvolve, cycleInterval);
 
           // sometime results are not reveived from the worker for undefined

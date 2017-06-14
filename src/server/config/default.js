@@ -25,8 +25,8 @@ export default {
 
   // app configuration
   geolocation: false,
-  enableBots: 'off',
-  gaId: 'adzdazdb',
+  enableBots: 'on',
+  gaId: '',
 
   // define from where the assets (static files) should be loaded, these value
   // could also refer to a separate server for scalability reasons. This value
