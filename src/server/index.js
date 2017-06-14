@@ -54,6 +54,7 @@ soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) =>
     defaultType: config.defaultClient,
     assetsDomain: config.assetsDomain,
     geolocation: config.geolocation,
+    gaId: config.gaId,
   };
 });
 
