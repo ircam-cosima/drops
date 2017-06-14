@@ -11,8 +11,12 @@ window.addEventListener('load', () => {
   soundworks.client.init(config.clientType, config);
 
   soundworks.client.setServiceInstanciationHook((id, instance) => {
-    if (serviceViews.has(id))
-      instance.view = serviceViews.get(id, config);
+    if (serviceViews.has(id)) {
+      if (id === 'service:platform')
+        instance.view = serviceViews.get('service:platform-player', config);
+      else
+        instance.view = serviceViews.get(id, config);
+    }
   });
 
   const experience = new PlayerExperience(config.assetsDomain, config.geolocation);

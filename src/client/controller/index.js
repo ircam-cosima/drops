@@ -20,6 +20,7 @@ window.addEventListener('load', () => {
   controller.setGuiOptions('localEchoGain', { type: 'slider', size: 'large' });
   controller.setGuiOptions('mutePlayers', { type: 'buttons' });
   controller.setGuiOptions('mutePlanets', { type: 'buttons' });
+  controller.setGuiOptions('volumePlanets', { type: 'slider', size: 'large' });
   controller.setGuiOptions('enableBots', { type: 'buttons' });
   // start client
   soundworks.client.start();

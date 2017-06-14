@@ -78,6 +78,7 @@ class PlanetExperience extends soundworks.Experience {
       this.sharedParams.addParamListener('loopPeriod', value => this.looper.params.period = value);
       this.sharedParams.addParamListener('loopAttenuation', value => this.looper.params.attenuation = value);
       this.sharedParams.addParamListener('minGain', value => this.looper.params.minGain = dbToLin(value));
+      this.sharedParams.addParamListener('volumePlanets', value => this.volume(dbToLin(value)));
       this.sharedParams.addParamListener('mutePlanets', value => this.mute(value));
       this.sharedParams.addParamListener('clear', this.clearAll);
 
@@ -106,20 +107,28 @@ class PlanetExperience extends soundworks.Experience {
   }
 
   _initAudioOutput() {
-    this.master = audioContext.createGain();
-    this.master.connect(audioContext.destination);
-    this.master.gain.value = 1;
+    this.muteGain = audioContext.createGain();
+    this.muteGain.connect(audioContext.destination);
+    this.muteGain.gain.value = 1;
+
+    this.masterGain = audioContext.createGain();
+    this.masterGain.connect(this.muteGain);
+    this.masterGain.gain.value = 1;
   }
 
   mute(value) {
     if (value === 'on')
-      this.master.gain.value = 0;
+      this.muteGain.gain.value = 0;
     else
-      this.master.gain.value = 1;
+      this.muteGain.gain.value = 1;
+  }
+
+  volume(value) {
+    this.masterGain.gain.value = value;
   }
 
   getDestination() {
-    return this.master;
+    return this.masterGain;
   }
 
   _initView() {

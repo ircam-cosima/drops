@@ -36,8 +36,9 @@ sharedParams.addNumber('localEchoGain', 'local echo gain', -80, 0, 0.1, -18);
 sharedParams.addEnum('autoPlay', 'auto play', ['off', 'on'], 'off');
 
 sharedParams.addEnum('forcePattern', 'force pattern index', ['off', 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 'off');
-sharedParams.addEnum('mutePlayers', 'mute players', ['on', 'off'], 'off');
-sharedParams.addEnum('mutePlanets', 'mute planets', ['on', 'off'], 'off');
+sharedParams.addEnum('mutePlayers', 'players - mute', ['on', 'off'], 'off');
+sharedParams.addEnum('mutePlanets', 'planets - mute', ['on', 'off'], 'off');
+sharedParams.addNumber('volumePlanets', 'planets - volume ', -80, 6, 0.1, 0);
 sharedParams.addEnum('enableBots', 'enable bots', ['on', 'off'], config.enableBots);
 
 sharedParams.addTrigger('clear', 'clear');

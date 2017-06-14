@@ -716,6 +716,205 @@ const serviceViews = {
     }
   },
 
+  'service:platform-planet': class PlatformView extends SegmentedView {
+    constructor() {
+      super();
+
+      this.template = `
+        <% if (isCompatible === false) { %>
+          <div class="section-top"></div>
+          <div class="section-center flex-center">
+            <p><%= errorCompatibleMessage %></p>
+          </div>
+          <div class="section-bottom"></div>
+        <% } else if (hasAuthorizations === false) { %>
+          <div class="section-top"></div>
+          <div class="section-center align-center">
+            <% if (globals.env === 'production') { %>
+            <p>
+              Sorry, the application relies on geolocation,<br />
+              please make sure your position can be accessed.
+            <p>
+            <% } else { %>
+              <p><%= errorHooksMessage %></p>
+            <% } %>
+          </div>
+          <div class="section-bottom"></div>
+        <% } else { %>
+          <div class="section-top flex-middle"></div>
+          <div class="section-center align-center">
+            <p class="big">
+              <b><%= globals.appName %></b> / planet
+            </p>
+
+            <% if (globals.env === 'production') { %>
+            <br />
+            <br />
+            <p>
+              To play with your smartphone please visit<br />
+              <a href="https://apps.cosima.ircam.fr/drops">
+                https://apps.cosima.ircam.fr/drops
+              </a>
+            <p>
+            <% } %>
+          </div>
+          <div class="section-bottom flex-middle">
+            <% if (checking === true) { %>
+            <p class="small soft-blink"><%= checkingMessage %></p>
+            <% } else if (hasAuthorizations === true) { %>
+            <p class="small soft-blink"><%= instructions %></p>
+            <% } %>
+          </div>
+        <% } %>
+      `;
+
+      this.model = {
+        isCompatible: null,
+        hasAuthorizations: null,
+        checking: false,
+        instructions: 'Click to join!',
+        checkingMessage: 'Please wait while checking compatiblity',
+        errorCompatibleMessage: 'Sorry,<br />Your device is not compatible with the application.',
+        errorHooksMessage: `Sorry,<br />The application didn't obtain the necessary authorizations.`,
+      };
+
+      this._touchstartCallback = noop;
+      this._mousedownCallback = noop;
+    }
+
+    onRender() {
+      super.onRender();
+
+      this.installEvents({
+        'mousedown': (e) => this._mousedownCallback(e),
+        'touchstart': (e) => this._touchstartCallback(e),
+      });
+    }
+
+    setTouchStartCallback(callback) {
+      this._touchstartCallback = callback;
+    }
+
+    setMouseDownCallback(callback) {
+      this._mousedownCallback = callback;
+    }
+
+    updateCheckingStatus(value) {
+      this.model.checking = value;
+      this.render();
+    }
+
+    updateIsCompatibleStatus(value) {
+      this.model.isCompatible = value;
+      this.render();
+    }
+
+    updateHasAuthorizationsStatus(value) {
+      this.model.hasAuthorizations = value;
+      this.render();
+    }
+  },
+
+  'service:platform-player': class PlatformView extends SegmentedView {
+    constructor() {
+      super();
+
+      this.template = `
+        <% if (isCompatible === false) { %>
+          <div class="section-top"></div>
+          <div class="section-center flex-center">
+            <p><%= errorCompatibleMessage %></p>
+          </div>
+          <div class="section-bottom"></div>
+        <% } else if (hasAuthorizations === false) { %>
+          <div class="section-top"></div>
+          <div class="section-center align-center">
+            <% if (globals.env === 'production') { %>
+            <p>
+              Sorry, the application relies on geolocation,<br />
+              please make sure your position can be accessed.
+            <p>
+            <% } else { %>
+              <p><%= errorHooksMessage %></p>
+            <% } %>
+          </div>
+          <div class="section-bottom"></div>
+        <% } else { %>
+          <div class="section-top flex-middle"></div>
+          <div class="section-center align-center">
+            <p class="big">
+              Welcome to<br />
+              <b><%= globals.appName %></b>
+            </p>
+
+            <% if (globals.env === 'production') { %>
+            <br />
+            <br />
+            <p class="tiny">
+              To see other players, please visit<br />
+              <a href="https://apps.cosima.ircam.fr/drops/planet">
+                https://apps.cosima.ircam.fr/drops/planet
+              </a>
+            <p>
+            <% } %>
+          </div>
+          <div class="section-bottom flex-middle">
+            <% if (checking === true) { %>
+            <p class="small soft-blink"><%= checkingMessage %></p>
+            <% } else if (hasAuthorizations === true) { %>
+            <p class="small soft-blink"><%= instructions %></p>
+            <% } %>
+          </div>
+        <% } %>
+      `;
+
+      this.model = {
+        isCompatible: null,
+        hasAuthorizations: null,
+        checking: false,
+        instructions: 'Touch the screen to join!',
+        checkingMessage: 'Please wait while checking compatiblity',
+        errorCompatibleMessage: 'Sorry,<br />Your device is not compatible with the application.',
+        errorHooksMessage: `Sorry,<br />The application didn't obtain the necessary authorizations.`,
+      };
+
+      this._touchstartCallback = noop;
+      this._mousedownCallback = noop;
+    }
+
+    onRender() {
+      super.onRender();
+
+      this.installEvents({
+        'mousedown': (e) => this._mousedownCallback(e),
+        'touchstart': (e) => this._touchstartCallback(e),
+      });
+    }
+
+    setTouchStartCallback(callback) {
+      this._touchstartCallback = callback;
+    }
+
+    setMouseDownCallback(callback) {
+      this._mousedownCallback = callback;
+    }
+
+    updateCheckingStatus(value) {
+      this.model.checking = value;
+      this.render();
+    }
+
+    updateIsCompatibleStatus(value) {
+      this.model.isCompatible = value;
+      this.render();
+    }
+
+    updateHasAuthorizationsStatus(value) {
+      this.model.hasAuthorizations = value;
+      this.render();
+    }
+  },
+
   // ------------------------------------------------
   // Raw-Socket
   // ------------------------------------------------

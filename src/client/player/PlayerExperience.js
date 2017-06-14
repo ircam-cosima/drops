@@ -50,8 +50,7 @@ export default class PlayerExperience extends soundworks.Experience {
 
     // requires mobile device and web audio
     this.platform = this.require('platform', {
-      // features: ['mobile-device', 'web-audio']
-      features: ['web-audio']
+      features: ['mobile-device', 'web-audio']
     });
     // configure required services
     this.audioBufferManager = this.require('audio-buffer-manager', {
@@ -212,7 +211,6 @@ export default class PlayerExperience extends soundworks.Experience {
       const dropParams = this.mapper.getDropParams(x, y, client);
 
       this.looper.createLoop(syncTime, dropParams, true);
-      console.log('send drop');
       this.send('drop', syncTime, dropParams);
     }
   }
