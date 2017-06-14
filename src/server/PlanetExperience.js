@@ -17,7 +17,6 @@ class PlanetExperience extends soundworks.Experience {
   }
 
   start() {
-    console.log('planet start');
     // results from salesman service
     this.salesman.addListener('result', (path, coordinates) => {
       this.broadcast('planet', null, 'path', path, coordinates);
