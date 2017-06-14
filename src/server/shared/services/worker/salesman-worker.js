@@ -213,6 +213,7 @@ function remove(poi) {
   const current = stack[0];
   const cache = stack[1];
 
+  // remove from paths in whole population
   for (let i = 0; i < populationSize; i++) {
     const index0 = indexOf(current[i], poiId);
     const index1 = indexOf(cache[i], poiId);
@@ -224,8 +225,6 @@ function remove(poi) {
   // decrease fitness and pathLengths size
   fitnesses.length = fitnesses.length - 1;
   pathLengths.length = pathLengths.length - 1;
-
-  // console.log('remove', Object.keys(pois).length);
 }
 
 // ------------------------------------------------------
@@ -438,25 +437,17 @@ self.onmessage = (e) => {
       initialize([], populationSize);
       break;
     case 'evolve':
-      try {
-        const best = evolve(data.generations);
-        self.postMessage({ cmd: 'result', path: best });
-      } catch(err) { console.log('[error evolve]');  }
+      const best = evolve(data.generations);
+      self.postMessage({ cmd: 'result', path: best });
       break;
     case 'add':
-      try {
-        add(data.poi);
-      } catch(err) { console.log('[error add]');  }
+      add(data.poi);
       break;
     case 'remove':
-      try {
-        remove(data.poi);
-      } catch(err) { console.log('[error remove]');  }
+      remove(data.poi);
       break;
     case 'update':
-      try {
-        update(data.poi);
-      } catch(err) { console.log('[error update]');  }
+      update(data.poi);
       break;
   }
 }

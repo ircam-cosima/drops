@@ -35,18 +35,22 @@ class Salesman extends Service {
     const file = path.join(__dirname, 'worker', 'salesman-worker.js');
     this._worker = new Worker(file);
 
-    let timeoutId = null;
+    let resultTimeoutId = null;
+    let recoverTimeoutId = null;
 
+    // sometime message is not received, then the loop stops.
+    // consider some fallback
     this._worker.onmessage = (e) => {
       const data = e.data;
       const cmd = data.cmd;
 
-      // send to the world
       switch (cmd) {
         case 'result':
+          clearTimeout(resultTimeoutId);
+          clearTimeout(recoverTimeoutId);
+
           const path = data.path;
           const length = path.length;
-          // update path coordinates
           this._pathCoordinates.length = length;
 
           for (let i = 0; i < length; i++) {
@@ -56,13 +60,18 @@ class Salesman extends Service {
           }
 
           this.emit('result', this._pathUuids, this._pathCoordinates);
-          timeoutId = setTimeout(this._triggerEvolve, cycleInterval);
+          resultTimeoutId = setTimeout(this._triggerEvolve, cycleInterval);
+
+          // sometime results are not reveived from the worker for undefined
+          // reason, we have to define a recovery system in that case
+          recoverTimeoutId = setTimeout(() => {
+            console.log('-------------------------- [recover worker]');
+            this._triggerEvolve();
+          }, cycleInterval * 5);
+
           break;
       }
     };
-
-    // catch the error inside the worker seems to fix the problem
-    // this._worker.onerror = (e) => console.log('[worker error]', e);
 
     this._worker.postMessage({
       cmd: 'initialize',
