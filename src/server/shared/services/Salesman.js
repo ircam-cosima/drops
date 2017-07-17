@@ -59,6 +59,7 @@ class Salesman extends Service {
           }
 
           this.emit('result', pathUuids, pathCoordinates);
+
           resultTimeoutId = setTimeout(this._triggerEvolve, cycleInterval);
 
           // sometime results are not reveived from the worker for undefined

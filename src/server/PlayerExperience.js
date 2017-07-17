@@ -23,7 +23,7 @@ class PlayerExperience extends Experience {
     this.salesman = this.require('salesman', {
       populationSize: 100,
       generationsPerCycle: 200,
-      cycleInterval: 400,
+      cycleInterval: 2000,
     });
 
     this.audioBufferManager = this.require('audio-buffer-manager');

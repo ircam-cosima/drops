@@ -133,7 +133,7 @@ function initialize(_pois = [], _populationSize = 100, _crossoverProbability = 0
 function evolve(nbrGenerations = 100) {
   let bestPath = [];
 
-  if (pois.size < 1)
+  if (getObjectLength(pois) < 1)
     return bestPath;
 
   for (let i = 0; i < nbrGenerations; i++) {
