@@ -1,0 +1,79 @@
+#controller {
+  #shared-params {
+    padding: 10px;
+    box-sizing: border-box;
+
+    h1 {
+      margin: 8px 0;
+    }
+  }
+
+  #log {
+    margin: 10px;
+    padding: 8px;
+    height: 400px;
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: #202020;
+    border-radius: 2px;
+
+    .error {
+      font-size: 10px;
+    }
+  }
+}
+
+
+#player {
+
+}
+
+.align-center {
+  text-align: center;
+}
+
+.tiny {
+  font-size: 0.8rem;
+}
+
+a {
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+}
+
+#planet-experience {
+  background-color: #000000;
+}
+
+#service-color-picker {
+  .color-wrapper {
+    display: flex;
+    display: -webkit-flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .color, .color-change {
+    flex-basis: auto;
+    border-radius: 50%;
+    border: 2px solid #000000;
+    box-sizing: border-box;
+  }
+
+  .color-change {
+    background: url(../images/reload-icon.png) 50% 50% no-repeat;
+    background-size: contain;
+    opacity: 0.9;
+
+    // &.active, &:focue {
+    //   // background-color: yellow;
+    //   -webkit-animation: spin 0.4s linear;
+    //   -moz-animation: spin 0.4s linear;
+    //   animation: spin 0.4s linear;
+    // }
+  }
+
+  // @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+  // @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+}

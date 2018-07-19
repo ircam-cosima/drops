@@ -1,0 +1,80 @@
+#!/usr/bin/env node
+const babel = require('babel-core');
+const browserify = require('browserify');
+const browserifyInc = require('browserify-incremental')
+const fse = require('fs-extra');
+const uglify = require('uglify-js');
+
+// transpile `src` into `dist`
+module.exports.transpile = (src, dist, babelOptions) => {
+  return new Promise((resolve, reject) => {
+    babel.transformFile(src.abs, babelOptions, (err, result) => {
+      if (err)
+        return reject(err);
+
+      fse.outputFile(dist.abs, result.code, err => {
+        if (err)
+          reject(err);
+        else
+          resolve([src, dist]);
+      });
+    });
+  });
+};
+
+const bundlers = new Map();
+/**
+ * Transform a given file to it's browserified version, client only.
+ */
+module.exports.bundle = (src, dist, browserifyOptions) => {
+  let bundler = null;
+
+  if (bundlers.has(src.abs)) {
+    bundler = bundlers.get(src.abs);
+  } else {
+    const options = Object.assign({}, browserifyInc.args, browserifyOptions);
+    bundler = browserify(src.abs, options);
+    browserifyInc(bundler, { cacheFile: './bin/.browserify-cache.json' });
+
+    bundlers.set(src.abs, bundler);
+  }
+
+  return new Promise((resolve, reject) => {
+    fse.ensureFileSync(dist.abs); // ensure file exists
+
+    const writeStream = fse.createWriteStream(dist.abs);
+
+    bundler
+      .bundle()
+      .on('error', err => {
+        return reject(err);
+      })
+      .on('end', () => { /*do nothing*/ })
+      .pipe(writeStream);
+
+    writeStream.on('finish', () => resolve([src, dist]));
+  });
+};
+
+/**
+ * Uglify `scr` into `dist`.
+ * @fixme
+ */
+module.exports.minify = (src, dist) => {
+  return new Promise((resolve, reject) => {
+    fse.readFile(src.abs, (err, buf) => {
+      if (err)
+        return reject(err);
+
+      const result = uglify.minify(buf.toString());
+
+      fse.outputFile(dist.abs, result.code, (err) => {
+        if (err)
+          reject(err);
+
+        resolve([src, dist])
+      });
+    });
+  });
+};
+

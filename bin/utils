@@ -1,0 +1,27 @@
+#!/usr/bin/env node
+const path = require('path');
+const sep = path.sep;
+
+ // http://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex
+const escapeRegExp = module.exports.escapeRegExp = function(str) {
+  return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+}
+
+module.exports.isJS = function(file) {
+  return path.extname(file.abs) === '.js';
+}
+
+module.exports.isServerFile = function(file) {
+  const regExp = escapeRegExp(`src${sep}server${sep}`);
+  return new RegExp('^' + regExp).test(file.rel);
+}
+
+module.exports.isClientFile = function(file) {
+  const regExp = escapeRegExp(`src${sep}client${sep}`);
+  return new RegExp('^' + regExp).test(file.rel);
+}
+
+module.exports.isSharedFile = function(file) {
+  const regExp = escapeRegExp(`${sep}shared${sep}`);
+  return new RegExp(regExp).test(file.rel);
+}
