@@ -51,6 +51,9 @@ p {
 // LAYOUT HELPERS
 // -----------------------------------------------------------------
 
+.loading {
+  background: url(../images/loader.gif) 50% 50% no-repeat;
+}
 // default container of the application
 #container {
   position: relative;

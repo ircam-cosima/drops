@@ -7,6 +7,8 @@ import Salesman from '../shared/services/Salesman';
 import ColorPicker from '../shared/services/ColorPicker';
 
 window.addEventListener('load', () => {
+  document.body.classList.remove('loading');
+
   const config = Object.assign({ appContainer: '#container' }, window.soundworksConfig);
   soundworks.client.init(config.clientType, config);
 

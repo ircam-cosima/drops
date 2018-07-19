@@ -129,6 +129,11 @@ class PlayerExperience extends Experience {
       const loopParams = this.loopParams;
       const echoPlayersIndexes = [-1, 1];
 
+      // as bots emit drops in settimeouts, they sometime are no longer present
+      // when the message is emitted.
+      if (clientsLength === 0)
+        return;
+
       // emit a server-side event for the planet
       this.messaging.emit('drop', time, client.coordinates, dropParams);
 

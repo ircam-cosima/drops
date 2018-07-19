@@ -110,6 +110,8 @@ class ColorPicker extends Service {
   }
 
   stop() {
+    super.stop();
+
     this.hide();
   }
 

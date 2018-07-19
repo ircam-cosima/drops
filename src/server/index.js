@@ -4,6 +4,7 @@ import path from 'path';
 import * as soundworks from 'soundworks/server';
 import PlanetExperience from './PlanetExperience';
 import PlayerExperience from './PlayerExperience';
+import ControllerExperience from './ControllerExperience';
 // application services
 import Salesman from './shared/services/Salesman';
 
@@ -60,7 +61,7 @@ soundworks.server.setClientConfigDefinition((clientType, config, httpRequest) =>
 
 const messaging = new EventEmitter();
 
-const controllerExperience = new soundworks.ControllerExperience('controller', { auth: true });
+const controllerExperience = new ControllerExperience('controller', { auth: true });
 const playerExperience = new PlayerExperience('player', messaging);
 const planetExperience = new PlanetExperience('planet', messaging);
 

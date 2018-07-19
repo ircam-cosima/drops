@@ -44,7 +44,7 @@ const template = `
 
 const METRIC_PATTERN_UPDATE_PERIOD = 1; // every 1 minute
 
-export default class PlayerExperience extends soundworks.Experience {
+class PlayerExperience extends soundworks.Experience {
   constructor(assetsDomain, geolocation) {
     super();
 
@@ -92,46 +92,47 @@ export default class PlayerExperience extends soundworks.Experience {
     };
 
     this.view = new soundworks.CanvasView(template, model, {}, { preservePixelRatio: true });
-    this.show();
+    this.show().then(() => {
 
-    this._initMotion();
-    this._initSurface();
-    this._initAudioOutput();
+      this._initMotion();
+      this._initSurface();
+      this._initAudioOutput();
 
-    this.looper = new Looper(this.scheduler, this.updateView, this.triggerDrop);
-    this.mapper = new Mapper(this.metricScheduler);
+      this.looper = new Looper(this.scheduler, this.updateView, this.triggerDrop);
+      this.mapper = new Mapper(this.metricScheduler);
 
-    // audio rendering
-    this.synth = new SampleSynth(this.audioBufferManager.data);
-    this.synth.connect(this.getDestination());
+      // audio rendering
+      this.synth = new SampleSynth(this.audioBufferManager.data);
+      this.synth.connect(this.getDestination());
 
-    // visual rendering
-    this.renderer = new CirclesRenderer();
+      // visual rendering
+      this.renderer = new CirclesRenderer();
 
-    this.view.setPreRender((ctx, dt, width, height) => {
-      ctx.fillStyle = '#000000';
-      ctx.fillRect(0, 0, width, height);
+      this.view.setPreRender((ctx, dt, width, height) => {
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, width, height);
+      });
+
+      this.view.addRenderer(this.renderer);
+
+      // experience related parameters
+      const sharedParams = this.sharedParams;
+      sharedParams.addParamListener('state', (state) => this.setState(state));
+      sharedParams.addParamListener('maxDrops', (value) => this.looper.setMaxLocalLoops(value));
+      sharedParams.addParamListener('loopPeriod', (value) => this.looper.params.period = value);
+      sharedParams.addParamListener('loopAttenuation', (value) => this.looper.params.attenuation = value);
+      sharedParams.addParamListener('minGain', (value) => this.looper.params.minGain = dbToLin(value));
+      sharedParams.addParamListener('localEchoGain', (value) => this.synth.localEchoGain = dbToLin(value));
+      sharedParams.addParamListener('forcePattern', (value) => this.mapper.forcePattern = value);
+      sharedParams.addParamListener('clear', () => this.clear());
+      sharedParams.addParamListener('mutePlayers', (value) => this.mute(value));
+      // must be initialized after all loops params
+      sharedParams.addParamListener('autoPlay', (value) => this.setAutoPlay(value));
+
+      // setup listeners for messages from server
+      this.receive('echo', (time, dropParams) => this.looper.createLoop(time, dropParams));
+      this.receive('clear', (index) => this.looper.removeLoopByIndex(index));
     });
-
-    this.view.addRenderer(this.renderer);
-
-    // experience related parameters
-    const sharedParams = this.sharedParams;
-    sharedParams.addParamListener('state', (state) => this.setState(state));
-    sharedParams.addParamListener('maxDrops', (value) => this.looper.setMaxLocalLoops(value));
-    sharedParams.addParamListener('loopPeriod', (value) => this.looper.params.period = value);
-    sharedParams.addParamListener('loopAttenuation', (value) => this.looper.params.attenuation = value);
-    sharedParams.addParamListener('minGain', (value) => this.looper.params.minGain = dbToLin(value));
-    sharedParams.addParamListener('localEchoGain', (value) => this.synth.localEchoGain = dbToLin(value));
-    sharedParams.addParamListener('forcePattern', (value) => this.mapper.forcePattern = value);
-    sharedParams.addParamListener('clear', () => this.clear());
-    sharedParams.addParamListener('mutePlayers', (value) => this.mute(value));
-    // must be initialized after all loops params
-    sharedParams.addParamListener('autoPlay', (value) => this.setAutoPlay(value));
-
-    // setup listeners for messages from server
-    this.receive('echo', (time, dropParams) => this.looper.createLoop(time, dropParams));
-    this.receive('clear', (index) => this.looper.removeLoopByIndex(index));
   }
 
   _initMotion() {
@@ -262,3 +263,5 @@ export default class PlayerExperience extends soundworks.Experience {
   }
 
 }
+
+export default PlayerExperience;

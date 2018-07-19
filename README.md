@@ -18,3 +18,17 @@ npm run start
 ```
 
 You can refer to the [*Soundworks Template*](https://github.com/collective-soundworks/soundworks-template/) repository to learn more about the structure of this project.
+
+
+RangeError: Invalid array length
+    at Bot.triggerDropMessage (/var/www/node/drops/dist/server/PlayerExperience.js:139:11)
+    at Bot._trigger (/var/www/node/drops/dist/server/bots.js:68:10)
+    at ontimeout (timers.js:380:14)
+    at tryOnTimeout (timers.js:244:5)
+    at Timer.listOnTimeout (timers.js:214:5)
+RangeError: Invalid array length
+    at Bot.triggerDropMessage (/var/www/node/drops/dist/server/PlayerExperience.js:139:11)
+    at Bot._trigger (/var/www/node/drops/dist/server/bots.js:68:10)
+    at ontimeout (timers.js:380:14)
+    at tryOnTimeout (timers.js:244:5)
+    at Timer.listOnTimeout (timers.js:214:5)

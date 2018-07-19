@@ -3,6 +3,8 @@ import PlanetExperience from './PlanetExperience';
 import serviceViews from '../shared/serviceViews';
 
 window.addEventListener('load', () => {
+  document.body.classList.remove('loading');
+
   const config = Object.assign({ appContainer: '#container' }, window.soundworksConfig);
   soundworks.client.init(config.clientType, config);
 

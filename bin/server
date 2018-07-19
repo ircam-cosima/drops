@@ -1,70 +1,45 @@
 #!/usr/bin/env node
-var colors = require('colors');
-var fse = require('fs-extra');
-var log = require('./log');
-var path = require('path');
-var childProcess = require('child_process');
+const fse = require('fs-extra');
+const childProcess = require('child_process');
 
-'use strict';
+// Process hosting the server
+let server = null;
 
-var cwd = process.cwd();
+// run the `serverIndex` in a forked process
+const start = module.exports.start = function(src) {
+  return new Promise((resolve, reject) => {
+    fse.stat(src.abs, (err, stats) => {
+      if (err)
+        reject();
 
-/**
- * Process hosting the server
- */
-var server = null;
-
-/**
- * Run the `serverIndex` in a forked process
- */
-function start(serverIndex) {
-  try {
-    if (fse.statSync(serverIndex).isFile()) {
-      if (server)
-        stop();
-
-      log.serverStart();
-      server = childProcess.fork(serverIndex);
-    }
-  } catch(err) {
-    log.serverError(serverIndex);
-  }
+      if (server) {
+        stop().then(() => {
+          server = childProcess.fork(src.abs);
+          resolve();
+        });
+      } else {
+        server = childProcess.fork(src.abs);
+        resolve();
+      }
+    });
+  });
 }
 
-/**
- * Kill the forked process hosting the server
- */
-function stop() {
-  if (server) {
-    log.serverStop();
-    server.kill();
+// kill the forked process hosting the server
+const stop = module.exports.stop = function() {
+  return new Promise((resolve, reject) => {
+    if (server)
+      server.kill();
+
     server = null;
-  }
+    resolve();
+  });
 }
 
-/**
- *
- */
-function restart() {
-  stop();
-  start();
-}
-
-/**
- * Kill server on uncaughtException
- */
+// Kill server on uncaughtException
 process.on('uncaughtException', function (err) {
   console.log('Uncaught Exception: '.red);
   console.error(err.stack);
 
-  stop();
-  process.exit();
+  stop().then(() => process.exit());
 });
-
-module.exports = {
-  start: start,
-  stop: stop,
-  restart: restart,
-};
-
-

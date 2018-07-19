@@ -1,97 +1,103 @@
 #!/usr/bin/env node
-var pkg = require('../package.json');
-var colors = require('colors');
-var path = require('path');
+const pkg = require('../package.json');
+const chalk = require('chalk');
+const path = require('path');
 
-'use strict';
+const prefix = '[' + pkg.name + ']\t';
+const getDeltaTime = time => new Date().getTime() - time;
 
-var prefix = '[' + pkg.name + ']\t';
-var cwd = process.cwd();
 
-function toRel(target) {
-  return path.relative(cwd, target);
+module.exports.transpileSuccess = (src, dist, dt) => {
+  const msg = prefix + chalk.green('%s: successfully transpiled to "%s" (%sms)');
+  console.log(msg, src.rel, dist.rel, dt);
+  return Promise.resolve([src, dist]);
 }
 
-function getDeltaTime(time) {
-  return new Date().getTime() - time;
+module.exports.transpileError = (src, err) => {
+  const msg = prefix + chalk.red('%s');
+  const content = err.message.replace(src.abs, src.rel);
+  console.log(msg, content);
+  console.log(err.codeFrame);
+  return Promise.reject(src);
 }
 
-var log = {
-  transpileSuccess: function(src, dest, startTime) {
-    var time = getDeltaTime(startTime);
-    var msg = prefix + '%s: successfully transpiled to "%s" (%sms)'.green;
-    console.log(msg, toRel(src), toRel(dest), time);
-  },
+module.exports.copyFileSuccess = (file, dist, dt) => {
+  const msg = prefix + chalk.green('%s: successfully copied to "%s" (%sms)');
+  console.log(msg, file.rel, dist.rel, dt);
+  return Promise.resolve([file, dist]);
+}
 
-  transpileError: function(err) {
-    var parts = err.message.split(':');
-    var msg = prefix + '%s'.red;
+module.exports.copyFileError = (file, err) => {
+  const msg = prefix + chalk.red('error copying %s');
+  console.log(msg, file.rel);
+  console.error(err.stack);
+  return Promise.reject(file);
+}
 
-    console.log(msg, toRel(err.message));
-    console.log(err.codeFrame);
-  },
+module.exports.deleteFileSuccess = (file) => {
+  const msg = prefix + chalk.yellow('%s: successfully deleted');
+  console.log(msg, file.rel);
+  return Promise.resolve(file);
+}
 
-  bundleStart: function(dest) {
-    var msg = prefix + '%s: bundle start'.yellow;
-    console.log(msg, toRel(dest));
-  },
+module.exports.deleteFileError = (file, err) => {
+  const msg = prefix + chalk.red('error deleting %s');
+  console.log(msg, file.rel);
+  console.error(err.stack);
+  return Promise.resolve(file);
+}
 
-  bundleSuccess: function(dest, startTime) {
-    var time = getDeltaTime(startTime);
-    var msg = prefix + '%s: successfully bundled (%sms)'.green;
-    console.log(msg, toRel(dest), time);
-  },
+module.exports.bundleSuccess = (src, dist, dt) => {
+  const msg = prefix + chalk.green('%s: successfully created (%sms)');
+  console.log(msg, dist.rel, dt);
+  return Promise.resolve([src, dist]);
+}
 
-  bundleError: function(dest, err) {
-    var msg = prefix + '%s: bundle error'.red;
-    console.log(msg, toRel(dest));
-    console.log('> ' + err.message);
-  },
+module.exports.bundleError = (src, err) => {
+  const msg = prefix + chalk.red(`${err.message}`);
+  console.log(msg);
+  console.error(err.stack);
+  return Promise.reject(src);
+}
 
-  deleteFile: function(filename) {
-    var msg = prefix + '%s: successfully removed'.yellow;
-    console.log(msg, toRel(filename));
-  },
+module.exports.sassSuccess = (src, dist, dt) => {
+  const msg = prefix + chalk.green('%s: successfully created (%sms)');
+  console.log(msg, dist.rel, dt);
+  return Promise.resolve([src, dist]);
+}
 
-  minifyStart: function(filename) {
-    var msg = prefix + '%s: minify start'.yellow;
-    console.log(msg, toRel(filename));
-  },
+module.exports.sassError = (src, err) => {
+  const msg = prefix + chalk.red(`error processing sass file: "${src.rel}"`);
+  console.log(msg);
+  console.error(err.formatted);
+  return Promise.reject(src);
+}
 
-  minifySuccess: function(filename, outFilename, startTime) {
-    var msg = prefix + '%s: successfully minified (%sms)'.green;
-    var time = getDeltaTime(startTime);
-    console.log(msg, toRel(outFilename), time);
-  },
+module.exports.serverStart = function() {
+  console.log(prefix + chalk.cyan('server start'));
+  return Promise.resolve();
+}
 
-  sassSuccess: function(dest) {
-    var msg = prefix + '%s: successfully written'.green
-    console.log(msg, toRel(dest));
-  },
+module.exports.serverStop = function() {
+  console.log(prefix + chalk.cyan('server stop'));
+  return Promise.resolve();
+}
 
-  sassError: function(err) {
-    var msg = prefix + ('%s (%s:%s): sass error').red;
-    console.log(msg, toRel(err.file), err.line, err.column);
-    console.log('> ' + err.message);
-  },
+module.exports.serverError = function() {
+  console.log(prefix + chalk.red('unable to start server, run `npm run transpile`'));
+  return Promise.resolve();
+}
 
-  serverStart: function() {
-    console.log(prefix + 'server start'.cyan);
-  },
+// @note - fixme
+module.exports.minifySuccess = (src, dist, dt) => {
+  const msg = prefix + chalk.green('%s: successfully minified to "%s" (%sms)');
+  console.log(msg, src.rel, dist.rel, dt);
+  return Promise.resolve();
+}
 
-  serverStop: function() {
-    console.log(prefix + 'server stop'.cyan);
-  },
-
-  serverError: function(serverIndex) {
-    var msg = prefix + '%s: not found, run `npm run transpile`'.red;
-    console.log(msg, toRel(serverIndex));
-  },
-
-  watchWarning: function(directory) {
-    var msg = prefix + '%s: is not a directory, restart the script to watch it'.yellow;
-    console.log(msg, toRel(directory));
-  }
-};
-
-module.exports = log;
+module.exports.minifyError = (src, err) => {
+  const msg = prefix + chalk.red(`${err.message}`);
+  console.log(msg);
+  console.error(err.stack);
+  return Promise.reject(src);
+}
