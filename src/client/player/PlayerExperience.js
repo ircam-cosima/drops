@@ -58,9 +58,9 @@ class PlayerExperience extends soundworks.Experience {
       assetsDomain: assetsDomain
     });
 
-    this.motionInput = this.require('motion-input', {
-      descriptors: ['accelerationIncludingGravity']
-    });
+    // this.motionInput = this.require('motion-input', {
+    //   descriptors: ['accelerationIncludingGravity']
+    // });
 
     this.geolocation = this.require('geolocation', {
       bypass: !geolocation,
@@ -94,7 +94,7 @@ class PlayerExperience extends soundworks.Experience {
     this.view = new soundworks.CanvasView(template, model, {}, { preservePixelRatio: true });
     this.show().then(() => {
 
-      this._initMotion();
+      // this._initMotion();
       this._initSurface();
       this._initAudioOutput();
 
@@ -135,22 +135,22 @@ class PlayerExperience extends soundworks.Experience {
     });
   }
 
-  _initMotion() {
-    if (this.motionInput.isAvailable('accelerationIncludingGravity')) {
-      this.motionInput.addListener('accelerationIncludingGravity', (data) => {
-        const accX = data[0];
-        const accY = data[1];
-        const accZ = data[2];
-        const mag = Math.sqrt(accX * accX + accY * accY + accZ * accZ);
+  // _initMotion() {
+  //   if (this.motionInput.isAvailable('accelerationIncludingGravity')) {
+  //     this.motionInput.addListener('accelerationIncludingGravity', (data) => {
+  //       const accX = data[0];
+  //       const accY = data[1];
+  //       const accZ = data[2];
+  //       const mag = Math.sqrt(accX * accX + accY * accY + accZ * accZ);
 
-        // clear screen on shaking
-        if (mag > 20) {
-          this.clear();
-          this.autoPlay = 'disable'; // disable auto play on shake
-        }
-      });
-    }
-  }
+  //       // clear screen on shaking
+  //       if (mag > 20) {
+  //         this.clear();
+  //         this.autoPlay = 'disable'; // disable auto play on shake
+  //       }
+  //     });
+  //   }
+  // }
 
   _initSurface() {
     const surface = new soundworks.TouchSurface(this.view.$el);
