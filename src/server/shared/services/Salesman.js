@@ -1,5 +1,5 @@
 import { Service, serviceManager } from 'soundworks/server';
-import { Worker } from 'webworker-threads';
+import Worker from 'web-worker';
 import path from 'path';
 
 const SERVICE_ID = 'service:salesman';
